@@ -1,0 +1,18 @@
+% Paired Wilcoxon Signed-Rank Test & Cohen's d
+\begin{table}[t]
+\centering
+\caption{Paired Wilcoxon Signed-Rank Tests and Effect Sizes comparing Physics-Constrained Agent to Baselines ($N=1,000$).}
+\label{tab:wilcoxon_tests}
+\begin{tabular}{llcccc}
+\hline
+Comparison & Metric & Ours (Mean) & Base (Mean) & $p$-value & Cohen's $d$ \\
+\hline
+Physics-Constrained vs QBugLM & pass_at_1 & 0.775 & 0.381 & $< 10^{-15}$ & 0.799 \\
+Physics-Constrained vs QBugLM & pass_at_3 & 0.991 & 0.381 & $< 10^{-15}$ & 1.250 \\
+Physics-Constrained vs QBugLM & physics_validity & 0.992 & 0.696 & $< 10^{-15}$ & 0.639 \\
+Physics-Constrained vs PyZX & pass_at_1 & 0.775 & 0.050 & $< 10^{-15}$ & 1.623 \\
+Physics-Constrained vs PyZX & pass_at_3 & 0.991 & 0.050 & $< 10^{-15}$ & 3.992 \\
+Physics-Constrained vs PyZX & physics_validity & 0.992 & 0.155 & $< 10^{-15}$ & 2.265 \\
+\hline
+\end{tabular}
+\end{table}

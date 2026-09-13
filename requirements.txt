@@ -1,0 +1,14 @@
+qiskit
+qiskit-aer
+qiskit-ibm-runtime
+pennylane
+pyzx
+pandas
+scipy
+matplotlib
+openai
+langchain
+python-dotenv
+pytest
+tqdm
+seaborn

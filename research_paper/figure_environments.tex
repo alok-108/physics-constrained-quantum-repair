@@ -1,0 +1,34 @@
+% Add this helper after loading graphicx:
+% \usepackage{graphicx}
+\newcommand{\maybefig}[2]{%
+  \IfFileExists{paper/figures/#1}{%
+    \includegraphics[width=\columnwidth]{paper/figures/#1}%
+  }{%
+    \IfFileExists{figures/#1}{%
+      \includegraphics[width=\columnwidth]{figures/#1}%
+    }{%
+      \fbox{\parbox{0.95\columnwidth}{\centering Missing figure: #2}}%
+    }%
+  }%
+}
+
+\begin{figure}[t]
+  \centering
+  \maybefig{pass_at_k_comparison.pdf}{Pass@1 and Pass@3 comparison}
+  \caption{Pass@1 and Pass@3 repair success. The proposed physics-constrained agent outperforms both baselines.}
+  \label{fig:pass}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \maybefig{heatmap_bugtype_vs_system.pdf}{Bug type versus system heatmap}
+  \caption{Repair performance across bug categories and systems.}
+  \label{fig:heat}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \maybefig{iterations_used_comparison.pdf}{Iterations used comparison}
+  \caption{Number of repair iterations used by each system.}
+  \label{fig:iter}
+\end{figure}
