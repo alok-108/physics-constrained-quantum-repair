@@ -156,3 +156,36 @@ def backward_states(ops: Sequence[Op], target: np.ndarray, n: int) -> List[np.nd
 def mean_overlap(a: np.ndarray, b: np.ndarray, n: int) -> float:
     m = a.shape[-1]
     return float(overlaps(a.reshape(2 ** n, m), b.reshape(2 ** n, m)).mean())
+
+
+# --------------------------------------------------------------------------- #
+# Scalable semantic check (no dense unitary): sampled average fidelity
+# --------------------------------------------------------------------------- #
+def sampled_process_fidelity(a: QuantumCircuit, b: QuantumCircuit, n_states: int = 24,
+                             seed: int = 0, batch: int = 4):
+    """Estimate the process fidelity of two circuits without building 2^n x 2^n matrices.
+
+    For Haar-random input states psi the mean of |<psi| U_a^dag U_b |psi>|^2 equals the
+    average gate fidelity F_avg, and F_pro = ((d + 1) F_avg - 1) / d. Returns
+    ``(F_pro_estimate, worst_state_overlap, standard_error)``.
+
+    One-sided evidence: a state with low overlap *proves* the circuits differ;
+    passing only supports equivalence statistically (it can miss faults that act
+    non-trivially on a vanishing fraction of states). Cost is O(n_states * 2^n * gates).
+    """
+    if a.num_qubits != b.num_qubits:
+        return 0.0, 0.0, 0.0
+    n = a.num_qubits
+    d = 2 ** n
+    rng = np.random.default_rng(seed)
+    ops_a, ops_b = ops_from_circuit(a), ops_from_circuit(b)
+    vals = []
+    for start in range(0, n_states, batch):
+        m = min(batch, n_states - start)
+        init = random_states(n, m, rng)
+        vals.extend(overlaps(evolve(ops_a, init, n), evolve(ops_b, init, n)).tolist())
+    arr = np.asarray(vals)
+    f_avg = float(arr.mean())
+    se = float(arr.std(ddof=1) / np.sqrt(len(arr))) if len(arr) > 1 else 0.0
+    f_pro = ((d + 1) * f_avg - 1.0) / d
+    return float(f_pro), float(arr.min()), (d + 1) / d * se

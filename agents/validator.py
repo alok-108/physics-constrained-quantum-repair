@@ -43,7 +43,7 @@ from qiskit_aer.noise import NoiseModel, depolarizing_error
 
 from src.physics_model import get_default_physics_model
 from src.routing import is_irreducible
-from src.sim import process_fidelity
+from src.sim import process_fidelity, sampled_process_fidelity
 
 MAX_DEPTH = 250
 FIDELITY_THRESHOLD = 0.99
@@ -68,12 +68,21 @@ class ValidatorAgent:
     """Semantic, physical and noise acceptance oracle shared by all systems."""
 
     def __init__(self, alpha: float = 0.01, null_resamples: int = 400,
-                 shots: int = 4096, fidelity_threshold: float = FIDELITY_THRESHOLD):
+                 shots: int = 4096, fidelity_threshold: float = FIDELITY_THRESHOLD,
+                 semantic_mode: str = "auto", dense_limit: int = 10, noise_limit: int = 10,
+                 sample_states: int = 24):
         self.physics = get_default_physics_model()
         self.alpha = alpha
         self.null_resamples = null_resamples
         self.shots = shots
         self.fidelity_threshold = fidelity_threshold
+        # semantic_mode: "exact" (dense unitary), "sampled" (Haar-state estimate, scales past
+        # ~12 qubits, one-sided evidence) or "auto" (exact up to dense_limit qubits, else sampled).
+        # The noise stage needs a density matrix (4^n memory) and is skipped above noise_limit.
+        self.semantic_mode = semantic_mode
+        self.dense_limit = dense_limit
+        self.noise_limit = noise_limit
+        self.sample_states = sample_states
         self.noise_model = build_noise_model()
         self.noisy_sim = AerSimulator(noise_model=self.noise_model, method="density_matrix",
                                       max_parallel_threads=1)
@@ -136,8 +145,17 @@ class ValidatorAgent:
         metrics["reducible"] = False
 
         # V_sem
+        sampled = self.semantic_mode == "sampled" or (
+            self.semantic_mode == "auto" and cand.num_qubits > self.dense_limit)
         try:
-            f = process_fidelity(cand, ref)
+            if sampled:
+                f, worst, se = sampled_process_fidelity(cand, ref, self.sample_states,
+                                                        seed=_stable_seed(gt_key or "sem"))
+                metrics.update({"semantic_check": "sampled", "worst_state_overlap": round(worst, 6),
+                                "fidelity_stderr": round(se, 6)})
+            else:
+                f = process_fidelity(cand, ref)
+                metrics["semantic_check"] = "exact"
         except Exception as e:
             metrics["fidelity_error"] = str(e)
             f = 0.0
@@ -148,6 +166,11 @@ class ValidatorAgent:
                         "the candidate does not implement the specified computation.")
 
         # V_noise
+        if cand.num_qubits > self.noise_limit:
+            metrics["noise_check"] = "skipped (density matrix infeasible)"
+            return {"status": "PASS", "failed_stage": None,
+                    "reason": "Structural, physical and semantic criteria satisfied; noise stage skipped",
+                    "feedback": "Candidate accepted (noise stage skipped).", "metrics": metrics}
         try:
             key = gt_key or hashlib.sha256(qiskit.qasm3.dumps(ref).encode()).hexdigest()[:16]
             p_ref = self._ref_probs(ref, key)

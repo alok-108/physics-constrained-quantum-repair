@@ -119,7 +119,23 @@ checked under the identity layout, and no language model was run.
 ChatGPT to repair quantum programs. QBugLM~\cite{pham2026qbuglm} provides an
 agentic benchmarking framework and reports that iterative feedback matters. Any
 comparison with such a system must match retry budgets and run the authors'
-release; we therefore report no arm named after an external system.
+release; we therefore report no arm named after an external system. Published
+quantum repair methods with their own protocols include HornBro~\cite{tan2025hornbro}
+and the unitary-operation approach of Li \emph{et al.}~\cite{li2024unitar}; they
+differ from ours in task, language and oracle, so we do not claim a head-to-head
+comparison with them.
+
+\textbf{Benchmarks.} Bugs4Q~\cite{zhao2023bugs4q} remains the main collection of
+real, executable quantum bugs with reproducing tests, but it is small and tied to
+Qiskit, and its entries are sensitive to SDK versions; reproducibility drops
+without version pinning~\cite{ohto2026reproducibility}. Our benchmark is
+synthetic and therefore complementary: it trades realism for control over
+admissibility and observability, and it makes no claim about real-fault
+prevalence. Surveys of quantum testing identify the oracle problem as central
+and stress methodological standards~\cite{ramalho2024roadmap}; measurement-based
+oracles that use only computational-basis outputs can miss phase
+faults~\cite{oldfield2024projective}, which is the failure we found in the
+single-input check.
 
 \textbf{Transformation baselines.} ZX-calculus simplification~\cite{duncan2020zx}
 rewrites a circuit while preserving the computation it denotes, which makes PyZX
@@ -590,7 +606,16 @@ the budget and suite size are experimental variables, not hidden constants.
 \textbf{Physical model.} Connectivity is checked on virtual indices under the
 identity layout; the noise model is depolarising with analytic readout error;
 FakeSherbrooke is a model, not a live device with calibration drift. A
-routing-aware or transpiled evaluation would be strictly more demanding.
+routing-aware or transpiled evaluation would be strictly more demanding; initial
+placement, routing and calibration-aware mapping change success rates
+substantially on superconducting hardware~\cite{murali2019noise,nation2025benchmark},
+so identity-layout validity is a necessary rather than sufficient condition.
+Exact unitary comparison does not scale: the validator therefore also offers a
+sampled average-fidelity check (and skips the density-matrix noise stage) above
+ten qubits, which gives one-sided statistical evidence only, and
+structure-aware verification such as automata-based~\cite{chen2023automata} or
+ZX-based~\cite{peham2022zx} equivalence checking would be the principled
+replacement. All reported results use the exact check ($\le 8$ qubits).
 
 \textbf{Missing baselines.} No language model was executed, because no API key
 was configured; the repository contains the language-model path but every
