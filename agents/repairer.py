@@ -52,7 +52,7 @@ import qiskit
 import qiskit.qasm3
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import (
-    CPhaseGate, CXGate, HGate, PhaseGate, RXGate, RYGate, RZGate, SdgGate, SGate,
+    CPhaseGate, CXGate, CYGate, CZGate, HGate, PhaseGate, RXGate, RYGate, RZGate, SdgGate, SGate,
     SwapGate, TdgGate, TGate, XGate, YGate, ZGate,
 )
 
@@ -68,6 +68,7 @@ SINGLE_GATES = {"h": HGate, "x": XGate, "y": YGate, "z": ZGate,
 AXIS_EXCHANGE = {"rx": ("ry", "rz"), "ry": ("rx", "rz"), "rz": ("rx", "ry")}
 PROBE_ANGLES = (0.0, 2.0 * math.pi / 3.0, 4.0 * math.pi / 3.0)
 COHERENCE_DELAY_US = 150.0
+TWO_QUBIT_SUBS = {"cx": (CZGate, CYGate), "cz": (CXGate,), "cy": (CXGate,)}
 
 
 class RepairerAgent:
@@ -90,13 +91,14 @@ class RepairerAgent:
     def __init__(self, model_name: str = "gpt-4o", temperature: float = 0.0,
                  use_physics_context: bool = True, accept_at: float = 0.999,
                  max_steps: int = 4, build_per_step: int = 4,
-                 router: str = "swapback"):
+                 router: str = "swapback", extended_edits: bool = False):
         self.model_name = model_name
         self.temperature = temperature
         self.use_physics_context = use_physics_context
         self.accept_at = accept_at
         self.max_steps = max_steps
         self.build_per_step = build_per_step
+        self.extended_edits = extended_edits   # + 2-qubit substitution and analytic rotation insertion
         self.router = router            # "swapback" (own construction) or "qiskit" (SABRE + layout undo)
         self.physics = get_default_physics_model()
         self.api_key = os.getenv("OPENAI_API_KEY")
@@ -224,6 +226,10 @@ class RepairerAgent:
             if oracle.exhausted():
                 break
             cands = self._neighbourhood(cur, oracle)
+            if (self.extended_edits and not oracle.exhausted()
+                    and (not cands or cands[0][0] < self.accept_at)):
+                # no single edit completes the repair: let angle-solved rotation insertions compete
+                cands = sorted(cands + self._rotation_insertions(cur, oracle), key=lambda r: -r[0])
             nxt: Optional[Tuple[float, QuantumCircuit]] = None
             built = 0
             for score, edit in cands[:24]:
@@ -247,7 +253,8 @@ class RepairerAgent:
                 break
         return best[2] if best is not None else cur
 
-    def _neighbourhood(self, qc: QuantumCircuit, oracle: BehaviouralOracle) -> List[Tuple[float, Edit]]:
+    def _neighbourhood(self, qc: QuantumCircuit, oracle: BehaviouralOracle,
+                       rotations: bool = False) -> List[Tuple[float, Edit]]:
         """All single-instruction edits, scored by the oracle, best first."""
         n = qc.num_qubits
         results: List[Tuple[float, int, Edit]] = []
@@ -296,6 +303,9 @@ class RepairerAgent:
                         batch.append((3, Edit("replace", i, gate, (q2,), "retarget")))
             if name == "cx":
                 batch.append((3, Edit("replace", i, CXGate(), (qs[1], qs[0]), "reverse")))
+            if self.extended_edits and name in TWO_QUBIT_SUBS and len(qs) == 2:
+                for alt in TWO_QUBIT_SUBS[name]:
+                    batch.append((2, Edit("replace", i, alt(), qs, "substitute_2q")))
         for i, ins in enumerate(qc.data):
             if ins.operation.name not in ("delay", "barrier", "measure"):
                 batch.append((4, Edit("delete", i, None, (), "delete")))
@@ -313,8 +323,38 @@ class RepairerAgent:
             if not np.isnan(s):
                 results.append((float(s), prio, e))
 
+        if rotations and self.extended_edits:
+            results += [(sc_, 6, e_) for sc_, e_ in self._rotation_insertions(qc, oracle)]
         results.sort(key=lambda r: (-r[0], r[1]))
         return [(s, e) for s, _, e in results]
+
+    def _rotation_insertions(self, qc: QuantumCircuit, oracle: BehaviouralOracle) -> List[Tuple[float, Edit]]:
+        """Insert a rotation (or controlled phase on adjacent qubits) anywhere, with its angle solved
+        analytically from three probe queries; costs 3 queries per (position, gate, qubits)."""
+        n, L = qc.num_qubits, len(qc.data)
+        slots = [(name, (q,)) for q in range(n) for name in ("rx", "ry", "rz")]
+        slots += [("cp", (q, q + 1)) for q in range(n - 1)]
+        need = 3 * len(slots) * (L + 1)
+        if oracle.remaining() < need:
+            return []
+        probes, meta = [], []
+        for pos in range(L + 1):
+            for name, qs in slots:
+                cls = ANGLE_GATES[name]
+                probes += [Edit("insert", pos, cls(t), qs, "angle_probe") for t in PROBE_ANGLES]
+                meta.append((pos, name, qs))
+        sc = oracle.evaluate_edits(qc, probes)
+        design = np.array([[1.0, math.cos(t), math.sin(t)] for t in PROBE_ANGLES])
+        out: List[Tuple[float, Edit]] = []
+        for g, (pos, name, qs) in enumerate(meta):
+            f = sc[3 * g:3 * g + 3]
+            if np.isnan(f).any():
+                continue
+            c0, c1, s1 = np.linalg.solve(design, f)
+            theta = round(math.atan2(s1, c1), 4)
+            out.append((min(1.0, float(c0 + math.hypot(c1, s1))),
+                        Edit("insert", pos, ANGLE_GATES[name](theta), qs, "insert_rotation")))
+        return out
 
     # ------------------------------------------------------------------ #
     def _key_of(self, qasm: str) -> Optional[Tuple]:

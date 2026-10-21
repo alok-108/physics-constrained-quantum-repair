@@ -69,6 +69,32 @@ class BehaviouralOracle:
         self.queries_used = 0
         self.counterexamples_used = 0
 
+    @classmethod
+    def from_tests(cls, inputs: np.ndarray, expected: np.ndarray, query_budget: int = 2000,
+                   seed_key: str = "tests") -> "BehaviouralOracle":
+        """Oracle backed by user-supplied (input state, expected output state) pairs.
+
+        ``inputs`` and ``expected`` have shape (2**n, m). There is no reference circuit, so
+        there is no counterexample pool, no held-out set and no exact process fidelity.
+        """
+        inputs = np.asarray(inputs, dtype=complex)
+        expected = np.asarray(expected, dtype=complex)
+        if inputs.shape != expected.shape or inputs.ndim != 2:
+            raise ValueError("inputs and expected must both have shape (2**n, m)")
+        n = int(round(np.log2(inputs.shape[0])))
+        if 2 ** n != inputs.shape[0]:
+            raise ValueError("state length must be a power of two")
+        self = cls.__new__(cls)
+        self._ref = None
+        self._n = n
+        self._suite_in, self._suite_ref = inputs, expected
+        empty = np.zeros((2 ** n, 0), dtype=complex)
+        self._pool_in = self._pool_ref = self._hold_in = self._hold_ref = empty
+        self.query_budget = query_budget
+        self.queries_used = 0
+        self.counterexamples_used = 0
+        return self
+
     # ------------------------------------------------------------------ #
     @property
     def num_qubits(self) -> int:
@@ -113,7 +139,7 @@ class BehaviouralOracle:
         Returns the candidate's agreement on that state, or ``None`` when the
         budget is spent or the candidate cannot be evaluated.
         """
-        if self.exhausted() or candidate.num_qubits != self._n:
+        if self.exhausted() or candidate.num_qubits != self._n or self._pool_in.shape[1] == 0:
             return None
         self.queries_used += 1
         try:
@@ -183,11 +209,17 @@ class BehaviouralOracle:
     # ------------------------------------------------------------------ #
     # Evaluation instruments: not an agent affordance, not charged to budget.
     # ------------------------------------------------------------------ #
+    def suite_agreements(self, candidate: QuantumCircuit) -> np.ndarray:
+        """Per-test agreement of a candidate on the current suite (not charged to the budget)."""
+        return self._agreement(ops_from_circuit(candidate), self._suite_in, self._suite_ref)
+
     def holdout_gap(self, candidate: QuantumCircuit) -> Dict[str, float]:
         """Suite agreement vs. held-out agreement vs. exact process fidelity."""
         try:
             ops = ops_from_circuit(candidate)
             suite = float(self._agreement(ops, self._suite_in, self._suite_ref).mean())
+            if self._ref is None:                      # test-suite oracle: nothing held out
+                return {"suite": suite, "holdout": None, "process": None, "gap": None}
             hold = float(self._agreement(ops, self._hold_in, self._hold_ref).mean())
             proc = process_fidelity(candidate, self._ref)
         except Exception:

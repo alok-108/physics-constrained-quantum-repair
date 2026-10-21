@@ -10,6 +10,34 @@ constraints (IBM FakeSherbrooke model).
 > [docs/BENCHMARK_V2.md](docs/BENCHMARK_V2.md)). They are kept under
 > [`legacy_v1/`](legacy_v1/) for audit only. Everything below is v2.
 
+## Use it: `qrepair`
+
+```bash
+python -m src.cli lint      examples/needs_lint.qasm
+python -m src.cli verify    examples/ghz3_buggy.qasm --tests examples/ghz3_tests.json
+python -m src.cli localize  examples/ghz3_buggy.qasm --tests examples/ghz3_tests.json
+python -m src.cli repair    examples/ghz3_buggy.qasm --tests examples/ghz3_tests.json --out fixed.qasm
+python -m src.cli repair    examples/ghz3_buggy.qasm --reference examples/ghz3_reference.qasm --json
+```
+
+| Command | What it does | Needs |
+|---|---|---|
+| `lint` | parse errors with a probable line, non-adjacent two-qubit gates, coherence budget, cancellable pairs, no-op rotations, idle qubits | nothing |
+| `localize` | ranks instructions by the agreement gain of the best single edit there | reference circuit or test file |
+| `verify` | runs the acceptance predicate and names the failing stage | reference circuit or test file |
+| `repair` | minimal repair, unified diff, JSON report, device-aware routing and delay trimming | reference circuit or test file |
+
+A specification is a reference circuit (exact unitary equivalence plus the noise criterion)
+or a JSON file of `(input, expected output)` amplitude pairs. Test-file acceptance is
+weaker and the report says so: passing the tests is not an equivalence certificate, so use
+tests that include phase-sensitive inputs. Exit status: 0 success, 1 findings or failure,
+2 input error. How this relates to MQT Debugger, Proq, HornBro, UnitAR and others, and
+what is *not* claimed: [docs/COMPARISON.md](docs/COMPARISON.md).
+
+Measured on the benchmark: the extended repair mode (used by the CLI) reaches 98.8 % Pass@3
+against 97.0 % for the base agent, and the localiser ranks the faulty instruction first in
+86.2 % of 400 structural/semantic faults (random ranking: 7.7 %).
+
 ## Results (v2, 1000 circuits, attempt budget K = 3, deterministic agent)
 
 | System | Pass@3 (95 % CI) | Physically valid | Mean oracle queries |
@@ -21,6 +49,7 @@ constraints (IBM FakeSherbrooke model).
 | Static repair (no oracle) | 60.0 % [56.9, 63.0] | 100 % | 0 |
 | PyZX (ZX-calculus simplification) | 5.0 % [3.8, 6.5] | 15.1 % | 0 |
 | Qiskit transpiler only (SABRE + exact layout undo) | 29.7 % [26.9, 32.6] | 69.7 % | 0 |
+| P+D with extended edit neighbourhood (two-qubit substitution, rotation insertion; added after E1) | 98.8 % [97.9, 99.3] | 100 % | 547 |
 | Qiskit transpiler O0 / O2 / O3 | 9.7 % / 29.7 % / 29.7 % | 69.7 % | 0 |
 | P+D with Qiskit's router instead of the agent's own | 97.0 % [95.7, 97.9] | 100 % | 553 |
 
@@ -62,7 +91,9 @@ src/
   physics_model.py     FakeSherbrooke connectivity, coherence, depth
   routing.py           swap-in/swap-back routing, inverse cancellation
   sim.py, edits.py     batched simulator, single-instruction edits
-  run_experiments.py   parallel, resumable benchmark runner (11 arms: 2x2 factorial, no-oracle, PyZX, Qiskit levels 0-3, Qiskit-router)
+  run_experiments.py   parallel, resumable benchmark runner (12 arms: 2x2 factorial, no-oracle, PyZX, Qiskit levels 0-3, Qiskit-router, extended edits)
+  product.py, cli.py   the qrepair tool: lint, localize, verify, repair
+  eval_localization.py fault-localisation accuracy on the benchmark
   analyze_results.py   exact McNemar, Newcombe intervals, Holm; tables and figures
 data/                 1000 circuits: buggy/, ground_truth/, metadata.csv
 experiments/          results_main.csv, results_weak_oracle.csv, results_budget_*.csv

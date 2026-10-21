@@ -61,12 +61,15 @@ ARM_CONFIG: Dict[str, Dict[str, Any]] = {
     "unconstrained_reject_only": dict(use_physics_context=False, verbose_feedback=False, use_oracle=True),
     "static_no_oracle":          dict(use_physics_context=True,  verbose_feedback=True,  use_oracle=False),
     # robustness check: same agent, but physical faults are routed by Qiskit's SABRE router
+    # extended edit neighbourhood: 2-qubit substitution and analytic rotation insertion
+    "ours_full_ext":             dict(use_physics_context=True,  verbose_feedback=True,  use_oracle=True,
+                                      extended_edits=True),
     "ours_full_qiskit_router":   dict(use_physics_context=True,  verbose_feedback=True,  use_oracle=True,
                                       router="qiskit"),
 }
 CORE_SYSTEMS = ["ours_full", "ours_reject_only", "unconstrained_diag", "unconstrained_reject_only",
                 "static_no_oracle", "pyzx_zx_calculus"]
-EXTRA_SYSTEMS = ["ours_full_qiskit_router", "qiskit_transpile", "qiskit_transpile_l0",
+EXTRA_SYSTEMS = ["ours_full_ext", "ours_full_qiskit_router", "qiskit_transpile", "qiskit_transpile_l0",
                  "qiskit_transpile_l2", "qiskit_transpile_l3"]
 SYSTEMS = CORE_SYSTEMS + EXTRA_SYSTEMS
 

@@ -190,6 +190,45 @@ class ValidatorAgent:
                 "reason": "All structural, physical, semantic and noise criteria satisfied",
                 "feedback": "Candidate accepted.", "metrics": metrics}
 
+    def validate_tests(self, repaired_qasm: str, oracle, threshold: float = 0.999) -> Dict[str, Any]:
+        """Acceptance when only a test suite (no reference circuit) is available.
+
+        Stages: syntax, register width, device admissibility, minimality, and agreement of
+        the candidate with every test. This is weaker than ``validate``: passing the tests is
+        *not* a certificate of unitary equivalence, and the noise stage needs a reference.
+        """
+        metrics: Dict[str, Any] = {}
+
+        def fail(stage, reason, feedback):
+            return {"status": "FAIL", "failed_stage": stage, "reason": reason,
+                    "feedback": feedback, "metrics": metrics}
+
+        try:
+            cand = qiskit.qasm3.loads(repaired_qasm)
+        except Exception as e:
+            return fail("syntax", "QASM parsing failure", f"Candidate is not valid OpenQASM 3.0: {e}")
+        if cand.num_qubits != oracle.num_qubits:
+            return fail("structural", "Register width mismatch",
+                        f"Candidate declares {cand.num_qubits} qubits; tests use {oracle.num_qubits}.")
+        conn, violations = self.physics.validate_circuit_connectivity(cand)
+        if not conn:
+            return fail("connectivity", "Hardware connectivity violation", violations[0])
+        if not self.physics.is_coherence_valid(cand):
+            return fail("coherence", "Coherence limit exceeded", "Execution duration exceeds the T2 budget.")
+        if not self.physics.is_depth_valid(cand, max_depth=MAX_DEPTH):
+            return fail("depth", "Circuit depth exceeded", f"Depth {cand.depth()} exceeds {MAX_DEPTH}.")
+        if not is_irreducible(cand):
+            return fail("minimality", "Reducible inverse pair remains", "Adjacent self-inverse gates cancel.")
+        ag = oracle.suite_agreements(cand)
+        metrics.update({"tests": int(len(ag)), "min_test_agreement": round(float(ag.min()), 6),
+                        "mean_test_agreement": round(float(ag.mean()), 6)})
+        if ag.min() < threshold:
+            return fail("tests", "Test failure", f"{int((ag < threshold).sum())} of {len(ag)} tests fail "
+                        f"(worst agreement {ag.min():.4f}).")
+        return {"status": "PASS", "failed_stage": None, "reason": "All tests and physical checks satisfied",
+                "feedback": "Candidate accepted (test suite only; not an equivalence certificate).",
+                "metrics": metrics}
+
     # ------------------------------------------------------------------ #
     def _noisy_probs(self, qc: QuantumCircuit) -> np.ndarray:
         """Exact output distribution under the gate-noise model plus readout error."""

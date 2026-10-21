@@ -137,6 +137,15 @@ oracles that use only computational-basis outputs can miss phase
 faults~\cite{oldfield2024projective}, which is the failure we found in the
 single-input check.
 
+\textbf{Debugging tools.} MQT Debugger~\cite{rovara2025debugging} evaluates
+user-placed assertions by classical simulation and, after a failure, narrows the
+cause by cone-of-influence analysis; Proq~\cite{li2020proq} checks
+projection-based assertions with few measurements, including on hardware. Both
+detect and locate faults but need hand-written assertions and leave the repair
+to the user. The tool released with this paper (\texttt{qrepair}) takes a
+reference circuit or amplitude tests instead, localises by scoring edits, and
+proposes a minimal diff; we make no head-to-head claim (\texttt{docs/COMPARISON.md}).
+
 \textbf{Transformation baselines.} ZX-calculus simplification~\cite{duncan2020zx}
 rewrites a circuit while preserving the computation it denotes, which makes PyZX
 a meaningful transformation baseline but not a repair baseline: it cannot restore
@@ -531,6 +540,30 @@ at level 0 (routing only: the 97 unmapped circuits), $29.7\%$ at level 1 and
 likewise at levels 2 and 3, which add inverse cancellation; higher optimisation
 does not erase the benchmark's faults, because none except redundancy can be
 removed by compilation.
+
+\subsection{Extended edit neighbourhood and localisation}
+
+The per-mode table shows two gaps in the base neighbourhood. We therefore added,
+after E1, two operators behind a flag: substitution of a two-qubit gate (CX$\leftrightarrow$CZ,
+CX$\to$CY) and insertion of a rotation or adjacent controlled phase with its angle
+solved from three probe queries, tried only when no single edit completes the
+repair. The extended agent (P+D/E) reaches $98.8\%$ Pass@3 ($[97.9,99.3]$): $20$
+circuits are repaired that P+D misses and $2$ are lost, a paired difference of
+$+0.018$ ($[0.009,0.029]$; Holm $p<10^{-3}$; this contrast was added after the
+first results). CX$\to$CZ replacement rises from $63\%$ to $100\%$ and removal of
+an instruction from $82\%$ to $96\%$. Both lost circuits are compound QFT faults
+whose search exhausted the 8000-query budget (the base agent used 6817 and 1522
+queries on them), so the extension costs budget on the hardest cases; mean
+queries are $546.5$ against $552.9$.
+
+The same scoring gives instruction-level fault localisation: rank each instruction
+by the largest agreement gain of any single edit there. On the 400 structural
+and semantic faults, with the faulty position taken from the difference to the
+reference, the faulty instruction is ranked first in $86.5\%$ of cases with the
+base neighbourhood and $86.2\%$ with the extended one, within the top three in
+$91.0\%$ and $93.8\%$, and within the top five in $92.8\%$ and $95.2\%$, against
+$7.7\%$, $22.9\%$ and $36.3\%$ for a random ranking. Removed instructions are the
+weakest case ($66.2\%$ top-1, extended).
 
 \subsection{E2: weak oracle}
 

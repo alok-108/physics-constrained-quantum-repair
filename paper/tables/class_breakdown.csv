@@ -1,6 +1,6 @@
-bug_type,Physics + diagnostic feedback,"Physics, bare rejection","No physics, diagnostic feedback","No physics, bare rejection",Static repair (no oracle),PyZX,"Physics + diagnostic, Qiskit router",Qiskit transpiler only,Qiskit transpiler O0,Qiskit transpiler O2,Qiskit transpiler O3
-gate_redundancy,100.0,100.0,100.0,100.0,100.0,25.0,100.0,100.0,0.0,100.0,100.0
-physics_violation,100.0,100.0,0.0,0.0,100.0,0.0,100.0,48.5,48.5,48.5,48.5
-semantic_deviation,100.0,100.0,100.0,100.0,0.0,0.0,100.0,0.0,0.0,0.0,0.0
-structural,85.0,85.0,85.0,85.0,0.0,0.0,85.0,0.0,0.0,0.0,0.0
-syntax,100.0,100.0,100.0,100.0,100.0,0.0,100.0,0.0,0.0,0.0,0.0
+bug_type,Physics + diagnostic feedback,"Physics, bare rejection","No physics, diagnostic feedback","No physics, bare rejection",Static repair (no oracle),PyZX,"Physics + diagnostic, extended edits","Physics + diagnostic, Qiskit router",Qiskit transpiler only,Qiskit transpiler O0,Qiskit transpiler O2,Qiskit transpiler O3
+gate_redundancy,100.0,100.0,100.0,100.0,100.0,25.0,100.0,100.0,100.0,0.0,100.0,100.0
+physics_violation,100.0,100.0,0.0,0.0,100.0,0.0,100.0,100.0,48.5,48.5,48.5,48.5
+semantic_deviation,100.0,100.0,100.0,100.0,0.0,0.0,99.0,100.0,0.0,0.0,0.0,0.0
+structural,85.0,85.0,85.0,85.0,0.0,0.0,95.0,85.0,0.0,0.0,0.0,0.0
+syntax,100.0,100.0,100.0,100.0,100.0,0.0,100.0,100.0,0.0,0.0,0.0,0.0

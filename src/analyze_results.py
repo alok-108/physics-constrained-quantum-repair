@@ -41,6 +41,7 @@ LABELS = {
     "unconstrained_reject_only": "No physics, bare rejection",
     "static_no_oracle": "Static repair (no oracle)",
     "pyzx_zx_calculus": "PyZX",
+    "ours_full_ext": "Physics + diagnostic, extended edits",
     "ours_full_qiskit_router": "Physics + diagnostic, Qiskit router",
     "qiskit_transpile": "Qiskit transpiler only",
     "qiskit_transpile_l0": "Qiskit transpiler O0",
@@ -58,6 +59,7 @@ CONTRASTS = [
     ("ours_full", "static_no_oracle", "behavioural oracle"),
     ("ours_full", "pyzx_zx_calculus", "transformation baseline"),
     ("ours_full", "qiskit_transpile", "compiler baseline"),
+    ("ours_full_ext", "ours_full", "extended edit neighbourhood (added after E1)"),
     ("ours_full", "ours_full_qiskit_router", "router choice (own vs Qiskit)"),
 ]
 
@@ -158,7 +160,7 @@ def class_table(df: pd.DataFrame, budget: int = 3) -> pd.DataFrame:
 
 
 def mode_table(df: pd.DataFrame, budget: int = 3) -> pd.DataFrame:
-    sub = df[df.system_name.isin(["ours_full", "unconstrained_reject_only", "static_no_oracle"])]
+    sub = df[df.system_name.isin(["ours_full", "ours_full_ext", "unconstrained_reject_only", "static_no_oracle"])]
     p = sub.pivot_table(index=["bug_type", "fault_mode", "mode_family"], columns="system_name",
                         values=f"pass_at_{budget}", aggfunc="mean") * 100
     n = sub[sub.system_name == "ours_full"].groupby(["bug_type", "fault_mode", "mode_family"]).size().rename("n")
@@ -250,7 +252,7 @@ def save(fig, name: str) -> None:
     plt.close(fig)
 
 
-PALETTE = ["#2a6f97", "#61a5c2", "#c97b2a", "#e5b982", "#7a7a7a", "#b5b5b5", "#3b8b5a", "#8f5aa6", "#b07a9c", "#6c9e4f", "#d1a33f"]
+PALETTE = ["#2a6f97", "#61a5c2", "#c97b2a", "#e5b982", "#7a7a7a", "#b5b5b5", "#3b8b5a", "#8f5aa6", "#b07a9c", "#6c9e4f", "#d1a33f", "#4c78a8"]
 
 
 def fig_passk(df: pd.DataFrame, budget: int = 3) -> None:
@@ -340,11 +342,11 @@ def load_sweep(pattern: str) -> pd.DataFrame:
 SHORT = {
     "ours_full": "P+D", "ours_reject_only": "P+R", "unconstrained_diag": "U+D",
     "unconstrained_reject_only": "U+R", "static_no_oracle": "Static", "pyzx_zx_calculus": "PyZX",
-    "ours_full_qiskit_router": "P+D/Q", "qiskit_transpile": "Qiskit O1",
+    "ours_full_ext": "P+D/E", "ours_full_qiskit_router": "P+D/Q", "qiskit_transpile": "Qiskit O1",
     "qiskit_transpile_l0": "Qiskit O0", "qiskit_transpile_l2": "Qiskit O2", "qiskit_transpile_l3": "Qiskit O3",
 }
 SHORT_LEGEND = ("P/U = physics context on/off; D/R = diagnostic feedback / bare rejection; "
-                "Static = no oracle; P+D/Q = P+D with Qiskit routing; Qiskit On = transpiler only at optimisation level n")
+                "Static = no oracle; P+D/E = P+D with the extended edit neighbourhood; P+D/Q = P+D with Qiskit routing; Qiskit On = transpiler only at optimisation level n")
 
 
 def shorten(df: pd.DataFrame) -> pd.DataFrame:
