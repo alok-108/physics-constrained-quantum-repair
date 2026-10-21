@@ -3,5 +3,4 @@ include "stdgates.inc";
 qubit[3] q;
 h q[0];
 cx q[0], q[1];
-cx q[1], q[2];
-delay[1200us] q[0];
+cx q[0], q[2];

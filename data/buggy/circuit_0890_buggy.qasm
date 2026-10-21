@@ -25,4 +25,3 @@ h q[5];
 swap q[0], q[5];
 swap q[1], q[4];
 swap q[2], q[3];
-cx q[0], q[2];

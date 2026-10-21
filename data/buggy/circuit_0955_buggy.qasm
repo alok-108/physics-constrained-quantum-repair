@@ -18,4 +18,3 @@ cp(pi/2) q[4], q[3];
 h q[4];
 swap q[0], q[4];
 swap q[1], q[3];
-delay[1200us] q[0];
