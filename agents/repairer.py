@@ -60,7 +60,7 @@ from agents.diagnostician import LEAKY_KEYS
 from agents.oracle import BehaviouralOracle
 from src.edits import Edit, apply_edit
 from src.physics_model import get_default_physics_model
-from src.routing import cancel_inverses, circuit_key, route_and_cancel
+from src.routing import cancel_inverses, circuit_key, compile_with_qiskit, route_and_cancel
 
 ANGLE_GATES = {"rx": RXGate, "ry": RYGate, "rz": RZGate, "p": PhaseGate, "cp": CPhaseGate}
 SINGLE_GATES = {"h": HGate, "x": XGate, "y": YGate, "z": ZGate,
@@ -89,13 +89,15 @@ class RepairerAgent:
 
     def __init__(self, model_name: str = "gpt-4o", temperature: float = 0.0,
                  use_physics_context: bool = True, accept_at: float = 0.999,
-                 max_steps: int = 4, build_per_step: int = 4):
+                 max_steps: int = 4, build_per_step: int = 4,
+                 router: str = "swapback"):
         self.model_name = model_name
         self.temperature = temperature
         self.use_physics_context = use_physics_context
         self.accept_at = accept_at
         self.max_steps = max_steps
         self.build_per_step = build_per_step
+        self.router = router            # "swapback" (own construction) or "qiskit" (SABRE + layout undo)
         self.physics = get_default_physics_model()
         self.api_key = os.getenv("OPENAI_API_KEY")
         self.llm = None
@@ -199,6 +201,8 @@ class RepairerAgent:
                 if dur * to_us > COHERENCE_DELAY_US:
                     continue
             kept._append(ins)
+        if self.router == "qiskit":
+            return cancel_inverses(compile_with_qiskit(kept))
         return route_and_cancel(kept, self.physics)
 
     # ------------------------------------------------------------------ #

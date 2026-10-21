@@ -5,6 +5,8 @@ K and the same information boundary. No outcome is hard-coded.
 
 Arms
 ----
+ours_full_qiskit_router    ours_full, but routing is done by Qiskit (SABRE + final-layout undo)
+qiskit_transpile           Qiskit transpiler only (routing + O1 cancellation), no repair logic
 ours_full                  physics context ON,  diagnostic feedback ON
 ours_reject_only           physics context ON,  feedback = bare rejection
 unconstrained_diag         physics context OFF, diagnostic feedback ON
@@ -56,8 +58,14 @@ ARM_CONFIG: Dict[str, Dict[str, Any]] = {
     "unconstrained_diag":        dict(use_physics_context=False, verbose_feedback=True,  use_oracle=True),
     "unconstrained_reject_only": dict(use_physics_context=False, verbose_feedback=False, use_oracle=True),
     "static_no_oracle":          dict(use_physics_context=True,  verbose_feedback=True,  use_oracle=False),
+    # robustness check: same agent, but physical faults are routed by Qiskit's SABRE router
+    "ours_full_qiskit_router":   dict(use_physics_context=True,  verbose_feedback=True,  use_oracle=True,
+                                      router="qiskit"),
 }
-SYSTEMS = list(ARM_CONFIG) + ["pyzx_zx_calculus"]
+CORE_SYSTEMS = ["ours_full", "ours_reject_only", "unconstrained_diag", "unconstrained_reject_only",
+                "static_no_oracle", "pyzx_zx_calculus"]
+EXTRA_SYSTEMS = ["ours_full_qiskit_router", "qiskit_transpile"]
+SYSTEMS = CORE_SYSTEMS + EXTRA_SYSTEMS
 
 
 # --------------------------------------------------------------------------- #
@@ -129,6 +137,34 @@ def run_pyzx(circuit_id: str, buggy: str, gt: str, validator, budget: int) -> Di
             "final_candidate_qasm": final, "history": history}
 
 
+def run_qiskit_transpile(circuit_id: str, buggy: str, gt: str, validator, budget: int) -> Dict[str, Any]:
+    """Compiler-only baseline: Qiskit routing with exact layout bookkeeping, no repair logic."""
+    from src.routing import compile_with_qiskit
+    try:
+        cand = qiskit.qasm3.dumps(compile_with_qiskit(qiskit.qasm3.loads(buggy)))
+    except Exception:
+        cand = None
+    history, seen, success = [], set(), False
+    for it in range(1, budget + 1):
+        if cand is None:
+            history.append({"iteration": it, "status": "FAIL", "failed_stage": "generation",
+                            "candidate_digest": None, "candidate_repeated": False, "strategy": "qiskit"})
+            continue
+        dig = hashlib.sha256(cand.encode()).hexdigest()[:12]
+        repeated = dig in seen
+        seen.add(dig)
+        v = validator.validate(repaired_qasm=cand, ground_truth=gt, gt_key=circuit_id)
+        history.append({"iteration": it, "status": v["status"], "failed_stage": v.get("failed_stage"),
+                        "candidate_digest": dig, "candidate_repeated": repeated, "strategy": "qiskit",
+                        "metrics": v.get("metrics", {})})
+        if v["status"] == "PASS":
+            success = True
+            break
+    return {"success": success, "iterations": len(history), "distinct_candidates": len(seen),
+            "oracle_queries": 0, "counterexamples": 0, "holdout": None,
+            "final_candidate_qasm": cand, "history": history}
+
+
 # --------------------------------------------------------------------------- #
 def row_from_run(meta: Dict[str, Any], system: str, res: Dict[str, Any], buggy: str,
                  physics, budget: int, duration: float) -> Dict[str, Any]:
@@ -198,6 +234,8 @@ def _run_circuit(meta: Dict[str, Any], root: str) -> List[Dict[str, Any]]:
         t0 = time.time()
         if system == "pyzx_zx_calculus":
             res = run_pyzx(meta["circuit_id"], buggy, gt, _STATE["validator"], _STATE["budget"])
+        elif system == "qiskit_transpile":
+            res = run_qiskit_transpile(meta["circuit_id"], buggy, gt, _STATE["validator"], _STATE["budget"])
         else:
             res = _STATE["orch"][system].run(circuit_id=meta["circuit_id"], buggy_qasm=buggy,
                                              ground_truth_qasm=gt, circuit_spec=spec)
@@ -286,7 +324,7 @@ if __name__ == "__main__":
     ap.add_argument("--out", default=os.path.join(PROJECT_ROOT, "experiments", "results.csv"))
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--budget", type=int, default=BUDGET_K)
-    ap.add_argument("--systems", nargs="+", default=SYSTEMS, choices=SYSTEMS)
+    ap.add_argument("--systems", nargs="+", default=CORE_SYSTEMS, choices=SYSTEMS)
     ap.add_argument("--workers", type=int, default=1)
     ap.add_argument("--resume", action="store_true")
     ap.add_argument("--seed", type=int, default=20260915)

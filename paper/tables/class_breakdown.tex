@@ -1,18 +1,18 @@
-\begin{table}[t]
+\begin{table*}[t]
 \centering
-\caption{Pass@3 (\%) by injected fault class (200 circuits per class). P/U = physics context on/off; D/R = diagnostic feedback / bare rejection; Static = no oracle.}
+\caption{Pass@3 (\%) by injected fault class (200 circuits per class). P/U = physics context on/off; D/R = diagnostic feedback / bare rejection; Static = no oracle; P+D/Q = P+D with Qiskit routing; Qiskit = transpiler only.}
 \label{tab:class}
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{lrrrrrr}
+\begin{tabular}{lrrrrrrrr}
 \toprule
-bug\_type & P+D & P+R & U+D & U+R & Static & PyZX \\
+bug\_type & P+D & P+R & U+D & U+R & Static & PyZX & P+D/Q & Qiskit \\
 \midrule
-gate\_redundancy & 100.0 & 100.0 & 100.0 & 100.0 & 100.0 & 25.0 \\
-physics\_violation & 100.0 & 100.0 & 0.0 & 0.0 & 100.0 & 0.0 \\
-semantic\_deviation & 100.0 & 100.0 & 100.0 & 100.0 & 0.0 & 0.0 \\
-structural & 85.0 & 85.0 & 85.0 & 85.0 & 0.0 & 0.0 \\
-syntax & 100.0 & 100.0 & 100.0 & 100.0 & 100.0 & 0.0 \\
+gate\_redundancy & 100.0 & 100.0 & 100.0 & 100.0 & 100.0 & 25.0 & 100.0 & 100.0 \\
+physics\_violation & 100.0 & 100.0 & 0.0 & 0.0 & 100.0 & 0.0 & 100.0 & 48.5 \\
+semantic\_deviation & 100.0 & 100.0 & 100.0 & 100.0 & 0.0 & 0.0 & 100.0 & 0.0 \\
+structural & 85.0 & 85.0 & 85.0 & 85.0 & 0.0 & 0.0 & 85.0 & 0.0 \\
+syntax & 100.0 & 100.0 & 100.0 & 100.0 & 100.0 & 0.0 & 100.0 & 0.0 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}

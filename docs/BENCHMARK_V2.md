@@ -63,14 +63,16 @@ Measured on the v1 data with the validator's own checks:
   is expected and is **not** evidence of general repair ability. The informative
   cells are the extended modes, compound faults, and the weak-oracle and
   low-budget regimes.
-* `RepairerAgent`'s router is the same swap-in/swap-back construction used to
-  build physics-fault references. Routing agreement is therefore partly by
-  construction; the acceptance predicate only requires unitary equality,
-  admissibility and a noise-floor-level TVD.
+* `RepairerAgent`'s default router is the swap-in/swap-back construction used to
+  build physics-fault references. This was tested: replacing it by Qiskit's
+  SABRE router with exact final-layout undo (`ours_full_qiskit_router`) leaves
+  acceptance unchanged (97.0 %, zero discordant circuits), so agreement is not
+  an artefact of a shared router. The physics-context contrast is still a
+  capability contrast.
 * Connectivity is checked under the identity layout; no live-device or
   calibration-drift evidence.
 * No LLM configuration has been executed (no API key was available); the
   repository contains the LLM path but every reported number is from the
   deterministic path.
-* A compiler baseline (e.g. Qiskit's transpiler with final-layout bookkeeping)
-  and an externally executed QBugLM run are still missing.
+* An externally executed QBugLM run is still missing. (A compiler-only baseline,
+  `qiskit_transpile`, is included: 29.7 % Pass@3.)

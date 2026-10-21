@@ -43,7 +43,8 @@ oracle-guided edit search, counterexample-guided feedback) in a $2\times2$
 design that separates physical knowledge from feedback. At a matched attempt
 budget of three, the full agent is accepted on $97.0\%$ of circuits (95\% CI
 $[95.7,97.9]$) against $77.0\%$ without physical knowledge, $60.0\%$ for static
-repair without an oracle, and $5.0\%$ for ZX-calculus simplification. The
+repair without an oracle, $29.7\%$ for the Qiskit transpiler alone and $5.0\%$ for
+ZX-calculus simplification. The
 physical-knowledge effect ($+20.0$ points, 200 discordant circuits, none
 reversed) is confined to the physical fault class, where an arm without routing
 cannot succeed; on logical faults the arms are indistinguishable. Diagnostic
@@ -391,7 +392,7 @@ feedback now changes what the generator can know.
 \section{Experimental Design}
 \label{sec:design}
 
-\textbf{Arms.} Table~\ref{tab:arms} lists the six systems. All run through the
+\textbf{Arms.} Table~\ref{tab:arms} lists the eight systems. All run through the
 same loop with the same $K=3$ and the same acceptance predicate. No system is
 given the reference or the fault label.
 
@@ -408,15 +409,18 @@ Code & Description & Phys. & Feedback & Oracle \\
 P+D & full agent & on & diag. & yes \\
 P+R & bare rejection & on & bare & yes \\
 U+D & no physical context & off & diag. & yes \\
-U+R & no phys., bare rejection & off & bare & yes \\
+U+R & no phys., bare rej. & off & bare & yes \\
 Static & static repairs only & on & -- & no \\
 PyZX & ZX simplification & -- & -- & no \\
+P+D/Q & P+D, Qiskit router & on & diag. & yes \\
+Qiskit & transpiler only & -- & -- & no \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Experiments.} E1 (main): suite of 4 states, budget 8000 queries, all six
-arms, all 1000 circuits. E2 (weak oracle): suite of 1 state ($\lvert 0\ldots0
+\textbf{Experiments.} E1 (main): suite of 4 states, budget 8000 queries, the six
+core arms plus the compiler and router arms (run afterwards on the same
+circuits), all 1000 circuits. E2 (weak oracle): suite of 1 state ($\lvert 0\ldots0
 \rangle$), same budget, the four factorial arms. E3 (budget sweep): suite of 4,
 budgets $50,\dots,3200$, arms P+D and U+R.
 
@@ -425,8 +429,9 @@ from the attempt trace. Rates carry Wilson 95\% intervals. Outcomes are paired
 binary variables, so contrasts use McNemar's exact test~\cite{mcnemar1947} on
 discordant pairs with the paired risk difference and a Newcombe method-10
 interval~\cite{newcombe1998paired}; Holm correction~\cite{holm1979} is applied
-over the rows of each contrast table. The six contrasts were fixed before
-running. Resource overhead is gate count relative to the reference over accepted
+over the rows of each contrast table. Six contrasts were fixed before
+running; the compiler and router contrasts were added after the first results
+and are labelled as such here. Resource overhead is gate count relative to the reference over accepted
 repairs only. All runs are deterministic.
 
 \section{Results}
@@ -491,6 +496,22 @@ path. These cells, not the aggregate, indicate what the agent cannot do.
 
 \input{../paper/tables/mode_breakdown.tex}
 
+\subsection{Compiler baseline and router robustness}
+
+A standard compiler is the natural baseline for the physical class. The
+\emph{Qiskit} arm runs the transpiler (trivial layout, SABRE routing onto the
+device line, level-1 optimisation) and appends an exact permutation that undoes
+the final layout, so its output implements the same unitary as its input and is
+scored by the same predicate; it contains no repair logic. It is accepted on
+$29.7\%$ of circuits ($[26.9,32.6]$): $100\%$ of redundancy faults (level-1
+cancellation), $48.5\%$ of physical faults (all 97 unmapped circuits, none of the
+103 over-long delays, which the transpiler leaves in place), and none of the
+syntax, structural or semantic faults. P+D exceeds it by $+0.673$
+($[0.643,0.701]$; 673 discordant circuits, none reversed), so compilation alone
+covers less than a third of the benchmark even in its home class. Replacing the
+agent's router by Qiskit's (P+D/Q) leaves acceptance unchanged (zero discordant
+circuits).
+
 \subsection{E2: weak oracle}
 
 With a suite of one state the first-attempt rate falls from $97.0\%$ to $86.9\%$
@@ -552,11 +573,13 @@ characterises the agent on this fault distribution and says little about
 unrestricted faults. The informative evidence is the per-mode table, the
 weak-oracle regime and the budget sweep.
 
-\textbf{Routing by construction.} The agent's router equals the construction used
-to build physical-fault references. The predicate only requires unitary equality,
-admissibility and a TVD below the noise floor, so other correct routings are
-accepted, but we did not test alternative routers. The physical-knowledge
-contrast is a capability contrast (Section~\ref{sec:results}).
+\textbf{Routing by construction.} The agent's default router equals the
+construction used to build physical-fault references. We tested this directly by
+swapping in Qiskit's SABRE router with an exact final-layout undo: acceptance is
+unchanged ($97.0\%$, zero discordant circuits), and the routed circuits are
+$1.1\%$ smaller than the reference on average, so agreement is not an artefact
+of sharing a router. The physical-knowledge contrast remains a capability
+contrast (Section~\ref{sec:results}).
 
 \textbf{Oracle strength.} Agreement on a handful of input states is a weaker
 specification than a full test suite, and the oracle returns scores of many
@@ -572,8 +595,7 @@ routing-aware or transpiled evaluation would be strictly more demanding.
 \textbf{Missing baselines.} No language model was executed, because no API key
 was configured; the repository contains the language-model path but every
 reported number is from the deterministic path, so nothing here is evidence
-about language-model repair. We report no externally executed QBugLM run and no
-compiler baseline with final-layout bookkeeping.
+about language-model repair. We report no externally executed QBugLM run.
 
 \textbf{Statistics.} The 1000 circuits are not independent draws of real
 faults; they are a generated population, so intervals describe sampling over

@@ -1,6 +1,6 @@
-bug_type,Physics + diagnostic feedback,"Physics, bare rejection","No physics, diagnostic feedback","No physics, bare rejection",Static repair (no oracle),PyZX
-gate_redundancy,100.0,100.0,100.0,100.0,100.0,25.0
-physics_violation,100.0,100.0,0.0,0.0,100.0,0.0
-semantic_deviation,100.0,100.0,100.0,100.0,0.0,0.0
-structural,85.0,85.0,85.0,85.0,0.0,0.0
-syntax,100.0,100.0,100.0,100.0,100.0,0.0
+bug_type,Physics + diagnostic feedback,"Physics, bare rejection","No physics, diagnostic feedback","No physics, bare rejection",Static repair (no oracle),PyZX,"Physics + diagnostic, Qiskit router",Qiskit transpiler only
+gate_redundancy,100.0,100.0,100.0,100.0,100.0,25.0,100.0,100.0
+physics_violation,100.0,100.0,0.0,0.0,100.0,0.0,100.0,48.5
+semantic_deviation,100.0,100.0,100.0,100.0,0.0,0.0,100.0,0.0
+structural,85.0,85.0,85.0,85.0,0.0,0.0,85.0,0.0
+syntax,100.0,100.0,100.0,100.0,100.0,0.0,100.0,0.0

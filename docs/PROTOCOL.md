@@ -78,6 +78,8 @@ the identity layout.
 | `unconstrained_reject_only` | off | bare rejection | yes |
 | `static_no_oracle` | on | – | no (syntax, cancellation, routing only) |
 | `pyzx_zx_calculus` | – | – | no (equivalence-preserving transformation baseline) |
+| `qiskit_transpile` | – | – | no (Qiskit routing + O1 cancellation, exact final-layout undo; compiler baseline) |
+| `ours_full_qiskit_router` | on | diagnostic | yes (as `ours_full`, but physical faults routed by Qiskit SABRE) |
 
 "Physics context" gates (i) device checks in diagnosis and (ii) delay trimming
 plus swap routing in generation. It does not change what is required for
@@ -110,6 +112,7 @@ for Q in 50 100 200 400 800 1600 3200; do
   python src/run_experiments.py --workers 8 --oracle-budget $Q --out experiments/results_budget_$Q.csv \
          --systems ours_full unconstrained_reject_only
 done
+python src/run_experiments.py --workers 8 --out experiments/results_extra.csv        --systems ours_full_qiskit_router qiskit_transpile      # compiler baseline, router robustness
 python src/analyze_results.py                  # tables -> paper/tables, figures -> paper/figures
 pytest -q
 ```

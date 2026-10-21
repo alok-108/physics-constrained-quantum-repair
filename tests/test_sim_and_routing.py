@@ -97,3 +97,15 @@ def test_budget_is_enforced_and_unevaluated_edits_are_nan():
     scores = oracle.evaluate_edits(ref, edits)
     assert np.isfinite(scores[:3]).all() and np.isnan(scores[3:]).all()
     assert oracle.exhausted() and oracle.score(ref) == 0.0
+
+
+def test_qiskit_compile_is_unitary_equal_and_admissible():
+    """compile_with_qiskit must undo the final layout exactly (used by the compiler baseline)."""
+    from src.routing import compile_with_qiskit
+    physics = get_default_physics_model()
+    rng = np.random.default_rng(7)
+    for n in (4, 5, 6):
+        qc = random_circuit(n, 30, rng)
+        out = compile_with_qiskit(qc)
+        assert physics.validate_circuit_connectivity(out)[0]
+        assert process_fidelity(out, qc) == pytest.approx(1.0, abs=1e-9)

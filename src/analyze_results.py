@@ -42,6 +42,8 @@ LABELS = {
     "unconstrained_reject_only": "No physics, bare rejection",
     "static_no_oracle": "Static repair (no oracle)",
     "pyzx_zx_calculus": "PyZX",
+    "ours_full_qiskit_router": "Physics + diagnostic, Qiskit router",
+    "qiskit_transpile": "Qiskit transpiler only",
 }
 ORDER = list(LABELS)
 
@@ -53,6 +55,8 @@ CONTRASTS = [
     ("unconstrained_diag", "unconstrained_reject_only", "diagnostic feedback (physics off)"),
     ("ours_full", "static_no_oracle", "behavioural oracle"),
     ("ours_full", "pyzx_zx_calculus", "transformation baseline"),
+    ("ours_full", "qiskit_transpile", "compiler baseline"),
+    ("ours_full", "ours_full_qiskit_router", "router choice (own vs Qiskit)"),
 ]
 
 
@@ -244,7 +248,7 @@ def save(fig, name: str) -> None:
     plt.close(fig)
 
 
-PALETTE = ["#2a6f97", "#61a5c2", "#c97b2a", "#e5b982", "#7a7a7a", "#b5b5b5"]
+PALETTE = ["#2a6f97", "#61a5c2", "#c97b2a", "#e5b982", "#7a7a7a", "#b5b5b5", "#3b8b5a", "#8f5aa6"]
 
 
 def fig_passk(df: pd.DataFrame, budget: int = 3) -> None:
@@ -334,9 +338,10 @@ def load_sweep(pattern: str) -> pd.DataFrame:
 SHORT = {
     "ours_full": "P+D", "ours_reject_only": "P+R", "unconstrained_diag": "U+D",
     "unconstrained_reject_only": "U+R", "static_no_oracle": "Static", "pyzx_zx_calculus": "PyZX",
+    "ours_full_qiskit_router": "P+D/Q", "qiskit_transpile": "Qiskit",
 }
 SHORT_LEGEND = ("P/U = physics context on/off; D/R = diagnostic feedback / bare rejection; "
-                "Static = no oracle")
+                "Static = no oracle; P+D/Q = P+D with Qiskit routing; Qiskit = transpiler only")
 
 
 def shorten(df: pd.DataFrame) -> pd.DataFrame:
@@ -381,6 +386,9 @@ def contrast_view(ct: pd.DataFrame) -> pd.DataFrame:
 
 def main(results: str, weak: str, sweep_glob: str, budget: int = 3) -> None:
     df = pd.read_csv(results)
+    extra = os.path.join(os.path.dirname(results), "results_extra.csv")
+    if os.path.exists(extra):                      # compiler baseline and router-robustness arm
+        df = pd.concat([df, pd.read_csv(extra)], ignore_index=True)
     pd.set_option("display.width", 250); pd.set_option("display.max_columns", 30)
 
     rt = rate_table(df, budget)
@@ -403,12 +411,12 @@ def main(results: str, weak: str, sweep_glob: str, budget: int = 3) -> None:
           "on the paired risk difference; Holm correction over the "
           f"{ct.attrs['family_size']} rows shown).", "tab:contrasts", star=True)
     write(cl, "class_breakdown", f"Pass@{budget} (\\%) by injected fault class (200 circuits per class). "
-          + SHORT_LEGEND + ".", "tab:class", fmt="%.1f", index=True, tex_df=shorten(cl))
+          + SHORT_LEGEND + ".", "tab:class", fmt="%.1f", index=True, tex_df=shorten(cl), star=True)
     write(mo, "mode_breakdown", f"Pass@{budget} (\\%) by fault mode. ``legacy'' modes come from the v1 injector; "
           "``extended'' modes were added in v2. " + SHORT_LEGEND + ".", "tab:mode", fmt="%.1f",
           tex_df=shorten(mo.drop(columns=[c for c in mo.columns if c == LABELS['static_no_oracle']])), star=True)
     write(st, "rejection_stages", "Rejecting stage of the final attempt among unresolved circuits. "
-          + SHORT_LEGEND + ".", "tab:stages", fmt="%d", index=True, tex_df=shorten(st))
+          + SHORT_LEGEND + ".", "tab:stages", fmt="%d", index=True, tex_df=shorten(st), star=True)
     write(co, "oracle_cost", "Oracle cost and overfitting of the search signal (searches that used the "
           "oracle). Gap = suite agreement minus exact process fidelity of the final candidate.", "tab:cost",
           tex_df=compact_cost(co), star=True)

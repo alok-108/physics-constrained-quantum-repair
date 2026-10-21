@@ -21,7 +21,9 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import (
     CXGate, CYGate, CZGate, HGate, SwapGate, XGate, YGate, ZGate,
 )
-from qiskit.transpiler import PassManager
+from qiskit import transpile
+from qiskit.synthesis import synth_permutation_depth_lnn_kms
+from qiskit.transpiler import CouplingMap, PassManager
 from qiskit.transpiler.passes import InverseCancellation
 
 from src.physics_model import PhysicsModel, get_default_physics_model
@@ -89,3 +91,24 @@ def circuit_key(qc: QuantumCircuit) -> Tuple:
                if isinstance(p, (int, float))))
         for ins in qc.data
     )
+
+
+def compile_with_qiskit(qc: QuantumCircuit, optimization_level: int = 1, seed: int = 0) -> QuantumCircuit:
+    """Standard-compiler routing with exact final-layout bookkeeping.
+
+    Qiskit's transpiler (trivial layout, SABRE routing) onto the line formed by
+    the circuit's own device qubits, followed by an LNN permutation that undoes
+    the final layout, so the result implements the *same* unitary as ``qc`` and
+    can be compared by unitary equivalence like every other candidate.
+    """
+    n = qc.num_qubits
+    if n < 2:
+        return qc.copy()
+    tc = transpile(qc, coupling_map=CouplingMap.from_line(n), layout_method="trivial",
+                   routing_method="sabre", optimization_level=optimization_level,
+                   seed_transpiler=seed)
+    final = tc.layout.final_index_layout() if tc.layout is not None else list(range(n))
+    out = QuantumCircuit(n)
+    out.compose(tc, inplace=True)
+    out.compose(synth_permutation_depth_lnn_kms(final), inplace=True)
+    return out
