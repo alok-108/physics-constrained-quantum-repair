@@ -1,0 +1,12 @@
+REVISION CHECKLIST
+
+1. Replace the old references.bib with corrected_references.bib.
+2. Remove every \cite{fu2025quantum}; replace it with \cite{quarl2024}.
+3. If the manuscript uses \cite{chen2024quantum}, change it to \cite{dwivedi2024quantum}.
+4. If the manuscript uses \cite{zhang2025qrep}, change it to \cite{qrep2026}.
+5. Add figure_environments.tex content to the manuscript after \usepackage{graphicx}.
+6. Replace all question marks in the ablation table with actual measured results. Do not invent values.
+7. State the actual LLM configuration only if it was used and recorded. Do not claim GPT-4o, temperature, or token limits without experimental logs.
+8. Use a real author email only if it is the author's verified address. Do not use an invented institutional email.
+9. Explain negative gate/depth reduction values: repairs can add gates or depth because of routing, decomposition, or constraint satisfaction.
+10. Run: pdflatex manuscript.tex; bibtex manuscript; pdflatex manuscript.tex; pdflatex manuscript.tex

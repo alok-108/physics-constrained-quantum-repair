@@ -1,0 +1,19 @@
+% Bug Type Breakdown Table
+\begin{table*}[t]
+\centering
+\caption{Repair Success (Pass@3 \%) and Hardware Physics Validity (\%) Broken Down by Defect Category ($N=200$ per bug type).}
+\label{tab:bug_breakdown}
+\begin{tabular}{lcccccc}
+\hline
+ & \multicolumn{3}{c}{\textbf{Pass@3 (\%)}} & \multicolumn{3}{c}{\textbf{Hardware Physics Validity (\%)}}\\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+Bug Type & PyZX & QBugLM & Ours & PyZX & QBugLM & Ours \\
+\hline
+Gate Redundancy & 25.0 & 100.0 & \textbf{100.0} & 25.0 & 100.0 & \textbf{100.0} \\
+Physics Violation & 0.0 & 0.0 & \textbf{100.0} & 0.0 & 0.0 & \textbf{100.0} \\
+Semantic Deviation & 0.0 & 27.0 & \textbf{100.0} & 25.5 & 100.0 & \textbf{100.0} \\
+Structural & 0.0 & 15.5 & \textbf{98.0} & 27.0 & 100.0 & \textbf{98.5} \\
+Syntax & 0.0 & 48.0 & \textbf{97.5} & 0.0 & 48.0 & \textbf{97.5} \\
+\hline
+\end{tabular}
+\end{table*}
