@@ -1,110 +1,157 @@
-"""Tests for multi-agent system (tests/test_agents.py).
+"""Information boundary and behaviour of the repair agents."""
 
-Verifies feedback loop, Diagnostician, Repairer, Validator, and Orchestrator
-across 5 representative sample circuits representing each bug class.
-"""
-
-from __future__ import annotations
-
+import inspect
+import math
 import os
-import sys
-import json
+
+import numpy as np
 import pytest
-import pandas as pd
+import qiskit.qasm3
+from qiskit import QuantumCircuit
 
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-SRC_DIR = os.path.join(PROJECT_ROOT, "src")
-AGENTS_DIR = os.path.join(PROJECT_ROOT, "agents")
-for p in [SRC_DIR, AGENTS_DIR, PROJECT_ROOT]:
-    if p not in sys.path:
-        sys.path.insert(0, p)
-
-from agents.orchestrator import Orchestrator
+from agents import repairer as repairer_module
 from agents.diagnostician import DiagnosticianAgent
+from agents.oracle import BehaviouralOracle
+from agents.orchestrator import Orchestrator
 from agents.repairer import RepairerAgent
-from agents.validator import ValidatorAgent
+from src.routing import circuit_key
+
+from conftest import read_pair
 
 
-@pytest.fixture(scope="session")
-def metadata():
-    csv_path = os.path.join(PROJECT_ROOT, "data", "metadata.csv")
-    assert os.path.exists(csv_path), "metadata.csv required for test_agents"
-    return pd.read_csv(csv_path)
+# ---------------------------------------------------------------- boundary
+def test_repair_interface_has_no_reference_or_label_channel():
+    params = set(inspect.signature(RepairerAgent.repair).parameters)
+    assert not params & {"ground_truth", "ground_truth_hint", "reference", "bug_type"}
+    assert "ground_truth" not in inspect.signature(DiagnosticianAgent.diagnose).parameters
 
 
-def test_individual_agents():
-    """Unit test individual agent interfaces."""
-    diag = DiagnosticianAgent()
-    repair = RepairerAgent()
-    val = ValidatorAgent()
-
-    # Syntax test
-    broken_qasm = 'OPENQASM 3.0;\ninclude "stdgates.inc";\nqubit[2] q;\ncx q[0], q[1]\n'  # missing semicolon
-    gt_qasm = 'OPENQASM 3.0;\ninclude "stdgates.inc";\nqubit[2] q;\ncx q[0], q[1];\n'
-
-    report = diag.diagnose(broken_qasm)
-    assert report["bug_type"] == "syntax"
-    assert "suggested_fix" in report
-
-    repaired = repair.repair(broken_qasm, report)
-    assert repaired.strip().endswith(";")
-
-    res = val.validate(repaired, gt_qasm)
-    assert res["status"] == "PASS"
-    assert res["metrics"]["parsable"] is True
+def test_repairer_never_touches_private_oracle_state():
+    src = inspect.getsource(repairer_module)
+    for forbidden in ("._ref", "_suite_ref", "_pool_ref", "_hold_ref", "ground_truth"):
+        assert forbidden not in src.replace("ground-truth", ""), forbidden
 
 
-def test_orchestrator_feedback_loop_on_5_samples(metadata):
-    """Run Orchestrator feedback loop on 5 sample circuits spanning all 5 bug types."""
-    bug_types = ["syntax", "structural", "gate_redundancy", "semantic_deviation", "physics_violation"]
-    orchestrator = Orchestrator(max_iterations=3)
+def test_fault_labels_are_stripped_from_the_specification():
+    from agents.diagnostician import LEAKY_KEYS
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.cx(0, 1)
+    spec = {"circuit_type": "ghz", "num_qubits": 2, "bug_type": "syntax", "fault_mode": "x"}
+    report = DiagnosticianAgent().diagnose(qiskit.qasm3.dumps(qc), spec)
+    assert report["bug_type"] != "syntax"           # label was not used
+    assert {"bug_type", "fault_mode"} <= set(LEAKY_KEYS)
 
-    sampled_circuits = []
-    for b_type in bug_types:
-        row = metadata[metadata["bug_type"] == b_type].iloc[0]
-        sampled_circuits.append(row)
 
-    assert len(sampled_circuits) == 5
+# ---------------------------------------------------------------- oracle
+def test_counterexample_extends_suite_and_consumes_budget():
+    ref = QuantumCircuit(3)
+    ref.h(0)
+    ref.cx(0, 1)
+    ref.rz(0.4, 2)
+    oracle = BehaviouralOracle(ref, query_budget=50, suite_size=1, seed_key="cx")
+    wrong = QuantumCircuit(3)
+    wrong.h(0)
+    wrong.cx(0, 1)
+    before = oracle.score(wrong)
+    agreement = oracle.counterexample(wrong)
+    after = oracle.score(wrong)
+    assert oracle.counterexamples_used == 1 and oracle.queries_used == 3
+    assert agreement is not None and agreement < 1.0
+    assert after < before                           # the new test exposes the missing rz
 
-    for row in sampled_circuits:
-        c_id = row["circuit_id"]
-        bug_type = row["bug_type"]
 
-        buggy_path = os.path.join(PROJECT_ROOT, row["buggy_file"])
-        gt_path = os.path.join(PROJECT_ROOT, row["ground_truth_file"])
+def test_holdout_gap_reports_overfitting_of_weak_suite():
+    ref = QuantumCircuit(3)
+    ref.h(0)
+    ref.cx(0, 1)
+    ref.rz(2.0, 2)
+    oracle = BehaviouralOracle(ref, suite_size=1, seed_key="gap")
+    candidate = QuantumCircuit(3)
+    candidate.h(0)
+    candidate.cx(0, 1)                              # rz missing: invisible on |000>
+    gap = oracle.holdout_gap(candidate)
+    assert gap["suite"] == pytest.approx(1.0) and gap["process"] < 0.5 and gap["gap"] > 0.4
 
-        with open(buggy_path, "r", encoding="utf-8") as f:
-            buggy_qasm = f.read()
-        with open(gt_path, "r", encoding="utf-8") as f:
-            gt_qasm = f.read()
 
-        spec = {
-            "circuit_type": row["circuit_type"],
-            "num_qubits": int(row["num_qubits"]),
-            "bug_type": bug_type
-        }
+# ---------------------------------------------------------------- search
+def test_angle_solver_recovers_a_perturbed_rotation_in_few_queries():
+    ref = QuantumCircuit(3)
+    ref.h(0)
+    ref.cx(0, 1)
+    ref.rx(0.83, 2)
+    ref.cp(1.1, 1, 2)
+    bad = QuantumCircuit(3)
+    bad.h(0)
+    bad.cx(0, 1)
+    bad.rx(0.83 + math.pi / 3, 2)
+    bad.cp(1.1, 1, 2)
+    oracle = BehaviouralOracle(ref, query_budget=500, seed_key="ang")
+    agent = RepairerAgent()
+    fixed = agent._search(bad, oracle, set())
+    ang = [i.operation.params[0] for i in fixed.data if i.operation.name == "rx"][0]
+    assert abs(ang - 0.83) < 1e-3
+    assert oracle.queries_used < 150
 
-        result = orchestrator.run(
-            circuit_id=c_id,
-            buggy_qasm=buggy_qasm,
-            ground_truth_qasm=gt_qasm,
-            circuit_spec=spec
-        )
 
-        assert result["circuit_id"] == c_id
-        assert result["status"] == "PASS", f"Failed repair for {c_id} ({bug_type})"
-        assert 1 <= result["iterations"] <= 3
+def test_tabu_forces_a_different_candidate_on_retry():
+    ref = QuantumCircuit(3)
+    ref.h(0)
+    ref.cx(0, 1)
+    ref.cx(1, 2)
+    bad = QuantumCircuit(3)
+    bad.h(0)
+    bad.cx(1, 0)
+    bad.cx(1, 2)
+    agent = RepairerAgent()
+    oracle = BehaviouralOracle(ref, query_budget=5000, seed_key="tabu")
+    first = agent._search(bad, oracle, set())
+    second = agent._search(first, oracle, {circuit_key(first)})
+    assert circuit_key(first) != circuit_key(second)
 
-        # Verify log file
-        log_file = result["log_file"]
-        assert os.path.isfile(log_file), f"Log file missing: {log_file}"
 
-        with open(log_file, "r", encoding="utf-8") as f:
-            logged_data = json.load(f)
+def test_physics_awareness_gates_the_routing_path():
+    qc = QuantumCircuit(4)
+    qc.h(0)
+    qc.cx(0, 3)                                     # non-adjacent on the device
+    text = qiskit.qasm3.dumps(qc)
+    report = {"bug_type": "physics_violation"}
+    with_physics = RepairerAgent(use_physics_context=True).repair(text, report, {}, oracle=None)
+    without = RepairerAgent(use_physics_context=False).repair(text, report, {}, oracle=None)
+    from src.physics_model import get_default_physics_model
+    phys = get_default_physics_model()
+    assert phys.validate_circuit_connectivity(qiskit.qasm3.loads(with_physics))[0]
+    assert not phys.validate_circuit_connectivity(qiskit.qasm3.loads(without))[0]
 
-        assert logged_data["circuit_id"] == c_id
-        assert len(logged_data["history"]) == result["iterations"]
-        for step in logged_data["history"]:
-            assert "diagnosis" in step
-            assert "repaired_qasm" in step
-            assert "validation" in step
+
+# ---------------------------------------------------------------- end to end
+def test_orchestrator_repairs_one_circuit_per_fault_class(metadata, root, validator):
+    orch = Orchestrator(max_iterations=3, validator=validator)
+    for bug in ["syntax", "structural", "gate_redundancy", "semantic_deviation", "physics_violation"]:
+        row = metadata[(metadata.bug_type == bug) & (metadata.circuit_type == "vqe_h2")].iloc[0]
+        buggy, gt = read_pair(root, row)
+        res = orch.run(row["circuit_id"], buggy, gt, {"circuit_type": row["circuit_type"],
+                                                      "num_qubits": int(row["num_qubits"])})
+        assert res["status"] == "PASS", (bug, [h["failed_stage"] for h in res["history"]])
+        assert 1 <= res["iterations"] <= 3
+
+
+def test_unconstrained_arm_cannot_repair_a_physics_fault(metadata, root, validator):
+    row = metadata[(metadata.bug_type == "physics_violation") & (metadata.fault_mode == "unmapped")].iloc[0]
+    buggy, gt = read_pair(root, row)
+    orch = Orchestrator(max_iterations=2, validator=validator, use_physics_context=False,
+                        verbose_feedback=False)
+    res = orch.run(row["circuit_id"], buggy, gt, {"circuit_type": row["circuit_type"],
+                                                  "num_qubits": int(row["num_qubits"])})
+    assert res["status"] == "UNRESOLVED"
+    assert res["history"][-1]["failed_stage"] == "connectivity"
+
+
+def test_run_is_deterministic(metadata, root, validator):
+    row = metadata[(metadata.bug_type == "semantic_deviation") & (metadata.circuit_type == "qaoa_maxcut")].iloc[0]
+    buggy, gt = read_pair(root, row)
+    spec = {"circuit_type": row["circuit_type"], "num_qubits": int(row["num_qubits"])}
+    a = Orchestrator(validator=validator).run(row["circuit_id"], buggy, gt, spec)
+    b = Orchestrator(validator=validator).run(row["circuit_id"], buggy, gt, spec)
+    assert a["final_candidate_qasm"] == b["final_candidate_qasm"]
+    assert a["oracle_queries"] == b["oracle_queries"]

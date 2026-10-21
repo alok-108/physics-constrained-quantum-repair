@@ -1,137 +1,118 @@
 # Physics-Constrained Quantum Circuit Repair
 
-A benchmark and multi-agent framework for joint fault localization, repair generation, and hardware-grounded validation of OpenQASM circuits under realistic superconducting quantum processor constraints.
+A leakage-free evaluation protocol, a corrected 1000-circuit benchmark, and a
+repair agent for faulty OpenQASM 3 circuits under superconducting-device
+constraints (IBM FakeSherbrooke model).
 
----
+> **Status.** The first release of this repository reported 77.5 % Pass@1 and
+> 99.1 % Pass@3. Those numbers are **not valid** (reference leakage, hard-coded
+> baseline outcomes, an inadmissible benchmark; see
+> [docs/BENCHMARK_V2.md](docs/BENCHMARK_V2.md)). They are kept under
+> [`legacy_v1/`](legacy_v1/) for audit only. Everything below is v2.
 
-## Research Context
+## Results (v2, 1000 circuits, attempt budget K = 3, deterministic agent)
 
-- **Gap**: Current quantum program repair techniques either evaluate correctness only via ideal statevector simulation (e.g., QBugLM), consider purely logical equivalences (e.g., HornBro), are restricted to small scales (e.g., QRep's 13-qubit limit), or focus on ZX-calculus diagram optimization rather than semantic and physical repair (e.g., PyZX). No end-to-end multi-agent system exists that simultaneously performs fault localization, repair synthesis, and physical constraint verification.
-- **Research Question**: *Can a multi-agent system localize and repair faulty OpenQASM circuits using hardware-level physical constraints and live calibration/noise feedback?*
-- **Baselines to Beat**:
-  - **QBugLM**: Simulation-only LLM repair lacking physical layout and coherence grounding.
-  - **HornBro**: Logical equivalence repair omitting hardware noise and native gate sets.
-  - **QRep**: Scalability limited to $\le 13$ qubits.
-  - **PyZX**: ZX-calculus circuit simplification without defect-targeted bug repair.
+| System | Pass@3 (95 % CI) | Physically valid | Mean oracle queries |
+|---|---|---|---|
+| P+D: physics context, diagnostic feedback | **97.0 %** [95.7, 97.9] | 100 % | 553 |
+| P+R: physics context, bare rejection | 97.0 % [95.7, 97.9] | 100 % | 555 |
+| U+D: no physics context, diagnostic feedback | 77.0 % [74.3, 79.5] | 80.1 % | 963 |
+| U+R: no physics context, bare rejection | 77.0 % [74.3, 79.5] | 80.1 % | 965 |
+| Static repair (no oracle) | 60.0 % [56.9, 63.0] | 100 % | 0 |
+| PyZX (ZX-calculus simplification) | 5.0 % [3.8, 6.5] | 15.1 % | 0 |
 
----
+What the numbers do and do not say:
 
-## Directory Structure
+* **Physics context** adds +20.0 points (200 discordant circuits, none reversed).
+  It is confined to the 200 physical-fault circuits, where an arm without delay
+  trimming and routing cannot succeed; on logical faults the arms are identical.
+  This is a *capability* effect, not evidence that physical knowledge improves
+  semantic repair.
+* **The behavioural oracle** is what separates semantic repair from static
+  repair (+37.0 points).
+* **Diagnostic feedback** (counterexample-guided) has no effect with a strong
+  oracle (suite of 4 states) but raises Pass@3 from 88.1 % to 97.0 %
+  (+8.9 points, Holm p ≈ 3e-25) when the initial suite is one state.
+* The benchmark consists of small edits whose inverse lies inside the agent's
+  edit neighbourhood, so ~97 % is **not** evidence of general repair ability.
+  Per-fault-mode results (e.g. 63 % on CX→CZ replacement, 0 % when a rotation
+  was removed) show where it fails; see `paper/tables/mode_breakdown.csv`.
+* **No language model was executed.** The LLM path exists but needs an API key;
+  every number comes from the deterministic path.
 
-```text
-physics-constrained-quantum-repair/
-├── .env.example                # Environment variable template (OPENAI_API_KEY)
-├── requirements.txt            # Python dependencies
-├── README.md                   # Project documentation
-├── data/
-│   ├── valid/                  # 1,000 ground-truth valid OpenQASM 3.0 circuits
-│   ├── buggy/                  # 1,000 buggy OpenQASM 3.0 circuits (1 bug injected per circuit)
-│   ├── ground_truth/           # 1,000 paired ground-truth repaired circuits
-│   └── metadata.csv            # Manifest with circuit metadata and bug classifications
-├── src/
-│   ├── __init__.py
-│   ├── physics_model.py        # IBM FakeSherbrooke (127-qubit) physical constraints model
-│   └── generate_dataset.py     # 1,000 circuit generation and bug injection engine
-├── agents/                     # Multi-agent repair framework (localization, repair, validation)
-├── experiments/
-│   ├── logs/                   # Execution logs
-│   └── results/                # Quantitative benchmark evaluation results
-├── research_paper/             # Publication artifacts (manuscript, Word doc, PDF)
-│   ├── research_paper.pdf      # Complete publication-ready PDF paper
-│   ├── research_paper.docx     # Formatted IEEE-style Word manuscript
-│   ├── manuscript.tex          # LaTeX source manuscript
-│   ├── references.bib          # BibTeX bibliography
-│   └── build_paper.py          # Document build automation
-├── paper/
-│   ├── figures/                # Publication plots and circuit diagrams
-│   └── tables/                 # LaTeX benchmark tables
-└── tests/
-    ├── test_dataset.py         # Pytest dataset verification suite
-    └── test_agents.py          # Pytest multi-agent verification suite
+Full tables: `paper/tables/`. Figures: `paper/figures/`. Paper source:
+`research_paper/manuscript.tex`.
+
+## What is in here
+
+```
+agents/
+  diagnostician.py   fault localisation (parser, device checks, cancellation); labels stripped
+  repairer.py        syntax / cancel / route, and oracle-guided edit search
+                     (analytic angle solving, edit neighbourhood, tabu)
+  oracle.py          query-counted behavioural oracle: suite, counterexample pool, held-out states
+  validator.py       acceptance predicate (the only reader of the reference source)
+  orchestrator.py    bounded loop, counterexample-guided feedback, tabu bookkeeping
+src/
+  generate_dataset.py  benchmark v2 generator (admissible references, observable faults)
+  audit.py             admissibility / observability audit for any dataset
+  physics_model.py     FakeSherbrooke connectivity, coherence, depth
+  routing.py           swap-in/swap-back routing, inverse cancellation
+  sim.py, edits.py     batched simulator, single-instruction edits
+  run_experiments.py   parallel, resumable benchmark runner (6 arms)
+  analyze_results.py   exact McNemar, Newcombe intervals, Holm; tables and figures
+data/                 1000 circuits: buggy/, ground_truth/, metadata.csv
+experiments/          results_main.csv, results_weak_oracle.csv, results_budget_*.csv
+paper/                generated tables and figures
+research_paper/       manuscript.tex, references.bib
+docs/                 PROTOCOL.md, BENCHMARK_V2.md
+legacy_v1/            the invalid first release (data, results, paper), for audit
+tests/                pytest suite (information boundary, validator stages, search, statistics)
 ```
 
----
+## Quick start
 
-## Hardware Physics Model (`src/physics_model.py`)
-
-Grounds circuit repair against IBM's 127-qubit **FakeSherbrooke** Eagle-generation superconducting processor:
-- **Coupling Graph**: Verifies whether two-qubit operations respect physical connectivity without routing overhead.
-- **Calibrated Gate Error Rates**: Queries device infidelities for single-qubit ($X, \sqrt{X}, R_z$) and entangling ($CX, ECR$) gates.
-- **Gate Durations**: Evaluates duration in nanoseconds for pulse scheduling.
-- **Coherence Verification**: Asserts that cumulative operational and idle time on any qubit does not exceed physical $T_1$ and $T_2$ coherence limits ($T_1 \sim 250\,\mu\text{s}$, $T_2 \sim 150\,\mu\text{s}$).
-
----
-
-## Dataset Overview
-
-The dataset contains **1,000 circuits** evenly split across 4 algorithmic families:
-1. **GHZ State Preparation** (3–7 qubits)
-2. **QAOA MaxCut Ansatz** (4–8 qubits)
-3. **VQE Molecular Hydrogen ($H_2$) Ansatz** (4 qubits)
-4. **Quantum Fourier Transform (QFT)** (4–6 qubits)
-
-Each circuit is serialized in **OpenQASM 3.0** with exactly one injected bug from 5 taxonomy classes (200 circuits each):
-1. **Syntax Error**: Malformed QASM syntax, omitted semicolons, corrupt keywords, unclosed brackets.
-2. **Structural Error**: Missing entangling/superposition gates, inverted control/target qubits.
-3. **Gate Redundancy**: Self-canceling duplicate gates ($X \cdot X$, $H \cdot H$, identical $CX \cdot CX$).
-4. **Semantic Deviation**: Inverted rotation angles ($-\theta$), shifted phase angles, basis changes ($R_x \leftrightarrow R_z$).
-5. **Physics Violation**: Non-nearest-neighbor coupling violations on FakeSherbrooke, or delays exceeding $T_2$ coherence.
-
-### `data/metadata.csv` Schema
-| Column | Type | Description |
-|---|---|---|
-| `circuit_id` | str | Unique circuit identifier (e.g. `circuit_0001`) |
-| `circuit_type` | str | Algorithm class (`ghz`, `qaoa_maxcut`, `vqe_h2`, `qft`) |
-| `num_qubits` | int | Number of active qubits in circuit |
-| `bug_type` | str | Bug class (`syntax`, `structural`, `gate_redundancy`, `semantic_deviation`, `physics_violation`) |
-| `valid_file` | str | Path to original valid OpenQASM 3.0 file |
-| `buggy_file` | str | Path to buggy OpenQASM 3.0 file |
-| `ground_truth_file` | str | Path to ground-truth repaired OpenQASM 3.0 file |
-| `bug_description` | str | Detailed explanation of the injected defect |
-
----
-
-## Installation & Setup
-
-1. **Clone/Navigate to project root**:
-   ```bash
-   cd /path/to/physics-constrained-quantum-repair
-   ```
-
-2. **Create and activate virtual environment**:
-   ```bash
-   python -m venv .venv
-   # Windows:
-   .venv\Scripts\activate
-   # Linux/macOS:
-   source .venv/bin/activate
-   ```
-
-3. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Configure environment**:
-   ```bash
-   cp .env.example .env
-   # Edit .env and enter your OPENAI_API_KEY
-   ```
-
----
-
-## Dataset Generation
-
-To generate or rebuild the 1,000 circuits and manifest:
 ```bash
-python src/generate_dataset.py
+python -m venv .venv && source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+
+pytest -q                                                # a few minutes
+python src/audit.py                                      # 0 violations expected on data/
+python src/audit.py --root legacy_v1                     # shows the v1 defects (367 inadmissible references)
+
+python src/run_experiments.py --workers 8 --out experiments/results_main.csv
+python src/analyze_results.py
 ```
 
----
+All experiments are deterministic; the exact commands for E1 (main), E2 (weak
+oracle) and E3 (budget sweep) are in [docs/PROTOCOL.md](docs/PROTOCOL.md).
+Regenerating the dataset (`python src/generate_dataset.py`, ~1 min) reproduces
+`data/` byte for byte.
 
-## Running Tests
+To compile the paper: `cd research_paper && pdflatex manuscript && bibtex manuscript && pdflatex manuscript && pdflatex manuscript`
+(tables and figures are read from `../paper/`).
 
-Run the complete automated test suite verifying dataset integrity, execution, bug triggering, and physical models:
-```bash
-pytest -v tests/test_dataset.py
-```
+## Protocol in one paragraph
+
+The repair side never sees the reference circuit or the injected fault label. It
+queries a behavioural oracle (a few input states with known outputs) that
+returns scalar agreement scores; every scored edit costs one query. Acceptance is
+a deterministic conjunction of syntax, register width, device admissibility,
+irreducibility, exact unitary agreement (process fidelity ≥ 0.99) and an exact
+noisy-TVD criterion below the 4096-shot sampling floor. Search signal and
+acceptance signal differ, so overfitting is measured (held-out states, exact
+process fidelity). Details: [docs/PROTOCOL.md](docs/PROTOCOL.md).
+
+## Limitations
+
+Small edits of short circuits; connectivity under the identity layout; device
+model rather than live hardware; the agent's router is the construction used to
+build physical-fault references; no externally executed QBugLM run, no compiler
+baseline with layout bookkeeping, no language-model results. See
+[docs/BENCHMARK_V2.md](docs/BENCHMARK_V2.md#d-what-v2-does-not-fix) and the
+paper's threats-to-validity section.
+
+## Configuration
+
+`.env.example` documents the optional `OPENAI_API_KEY` for the LLM repair path.
+No reported result uses it.
