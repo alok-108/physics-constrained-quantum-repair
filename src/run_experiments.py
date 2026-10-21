@@ -5,8 +5,6 @@ K and the same information boundary. No outcome is hard-coded.
 
 Arms
 ----
-ours_full_qiskit_router    ours_full, but routing is done by Qiskit (SABRE + final-layout undo)
-qiskit_transpile           Qiskit transpiler only (routing + O1 cancellation), no repair logic
 ours_full                  physics context ON,  diagnostic feedback ON
 ours_reject_only           physics context ON,  feedback = bare rejection
 unconstrained_diag         physics context OFF, diagnostic feedback ON
@@ -14,7 +12,12 @@ unconstrained_reject_only  physics context OFF, feedback = bare rejection
 static_no_oracle           physics context ON,  no behavioural oracle (static repairs only)
 pyzx_zx_calculus           ZX-calculus simplification (transformation baseline)
 
-The first four form a 2x2 factorial design (physics x feedback).
+The first four form a 2x2 factorial design (physics x feedback). Extra arms (run
+separately, see docs/PROTOCOL.md):
+
+ours_full_qiskit_router    ours_full, but routing is done by Qiskit (SABRE + final-layout undo)
+qiskit_transpile           Qiskit transpiler only (routing + O1 cancellation), no repair logic
+qiskit_transpile_l0/l2/l3  the same compiler baseline at optimisation levels 0, 2 and 3
 
 Usage
 -----
@@ -39,7 +42,6 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-import numpy as np
 import pandas as pd
 import qiskit
 import qiskit.qasm2

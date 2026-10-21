@@ -68,7 +68,7 @@ the identity layout.
 
 ## 4. Systems
 
-2 × 2 factorial design plus two reference points:
+2 × 2 factorial design plus reference points (no-oracle, PyZX, Qiskit compiler baselines, router-robustness arm):
 
 | Arm | Physics context | Feedback | Oracle |
 |-----|:---:|:---:|:---:|

@@ -80,7 +80,7 @@ re-derived, except where marked **checked here**.
 **Checked here.** The McNemar power approximation (z = 0.05 sqrt(n) / sqrt(0.20) = 3.54 at
 n = 1000, power ~0.94; n ~ 628 for 80 % power), the Hoeffding shot count
 (n >= ln(2/delta) / (2 eps^2) = 6623 at eps = 0.02, delta = 0.01) and the Holm thresholds
-(0.05/16 ... 0.05) are arithmetically correct. The OpenQASM 3 paper (Cross et al., ACM TQC 2021) exists and
+(0.05/16 ... 0.05) are arithmetically correct. The OpenQASM 3 paper (Cross et al., ACM TQC vol. 3) exists and
 the formal specification lives in a GitHub-backed document. Items the report itself marks "no source found" (provider quotas
 and prices, venue page limits and acceptance rates, 2026 model prices) are left open.
 

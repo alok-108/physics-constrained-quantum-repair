@@ -62,7 +62,7 @@ src/
   physics_model.py     FakeSherbrooke connectivity, coherence, depth
   routing.py           swap-in/swap-back routing, inverse cancellation
   sim.py, edits.py     batched simulator, single-instruction edits
-  run_experiments.py   parallel, resumable benchmark runner (6 arms)
+  run_experiments.py   parallel, resumable benchmark runner (11 arms: 2x2 factorial, no-oracle, PyZX, Qiskit levels 0-3, Qiskit-router)
   analyze_results.py   exact McNemar, Newcombe intervals, Holm; tables and figures
 data/                 1000 circuits: buggy/, ground_truth/, metadata.csv
 experiments/          results_main.csv, results_weak_oracle.csv, results_budget_*.csv

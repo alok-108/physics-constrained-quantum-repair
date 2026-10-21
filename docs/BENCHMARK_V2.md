@@ -54,7 +54,7 @@ Measured on the v1 data with the validator's own checks:
 | Search signal ≠ acceptance signal | Oracle suite of 1–4 states; acceptance on the full unitary; held-out states; reported overfitting gap. |
 | Feedback is testable without an LLM | Counterexample-guided repair: a semantic rejection adds the worst-case pool state to the suite (diagnostic arms only). |
 | Results can be reported per fault mode | `fault_mode`, `mode_family` columns (`legacy` = v1 injector modes, `extended` = added in v2: scale, shift π/3, compound faults, CX→CZ). |
-| Effects are separable | 2 × 2 factorial design (physics × feedback) plus a no-oracle lower bound and PyZX. |
+| Effects are separable | 2 × 2 factorial design (physics × feedback) plus a no-oracle lower bound, PyZX, Qiskit compiler baselines (O0-O3) and a router-robustness arm. |
 
 ## D. What v2 does not fix
 

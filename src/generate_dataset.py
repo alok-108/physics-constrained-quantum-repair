@@ -29,9 +29,8 @@ import math
 import os
 import random
 import sys
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable, Dict, List
 
-import numpy as np
 import pandas as pd
 import qiskit.qasm3
 from qiskit import QuantumCircuit

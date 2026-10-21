@@ -408,7 +408,7 @@ feedback now changes what the generator can know.
 \section{Experimental Design}
 \label{sec:design}
 
-\textbf{Arms.} Table~\ref{tab:arms} lists the eight systems. All run through the
+\textbf{Arms.} Table~\ref{tab:arms} lists the systems (Qiskit is also run at levels 0, 2 and 3). All run through the
 same loop with the same $K=3$ and the same acceptance predicate. No system is
 given the reference or the fault label.
 
@@ -429,7 +429,7 @@ U+R & no phys., bare rej. & off & bare & yes \\
 Static & static repairs only & on & -- & no \\
 PyZX & ZX simplification & -- & -- & no \\
 P+D/Q & P+D, Qiskit router & on & diag. & yes \\
-Qiskit & transpiler only & -- & -- & no \\
+Qiskit & compiler only, O0--O3 & -- & -- & no \\
 \bottomrule
 \end{tabular}
 \end{table}

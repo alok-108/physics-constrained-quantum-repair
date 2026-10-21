@@ -2,7 +2,6 @@
 
 import math
 
-import numpy as np
 import pytest
 import qiskit.qasm3
 from qiskit import QuantumCircuit

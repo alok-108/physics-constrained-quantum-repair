@@ -36,7 +36,7 @@ from __future__ import annotations
 import math
 import os
 import re
-from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 from dotenv import load_dotenv
@@ -197,7 +197,8 @@ class RepairerAgent:
             if ins.operation.name == "delay":
                 dur = getattr(ins.operation, "duration", 0) or 0
                 unit = getattr(ins.operation, "unit", "s")
-                to_us = {"us": 1.0, "s": 1e6, "ms": 1e3, "ns": 1e-3}.get(unit, 0.0)
+                dt_s = getattr(self.physics.target, "dt", None) or 2.222e-10
+                to_us = {"us": 1.0, "s": 1e6, "ms": 1e3, "ns": 1e-3, "dt": dt_s * 1e6}.get(unit, 0.0)
                 if dur * to_us > COHERENCE_DELAY_US:
                     continue
             kept._append(ins)

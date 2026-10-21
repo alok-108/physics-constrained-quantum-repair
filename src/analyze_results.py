@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import argparse
 import glob
-import itertools
 import os
 import re
 from typing import Dict, List, Tuple
@@ -277,7 +276,7 @@ def fig_passk(df: pd.DataFrame, budget: int = 3) -> None:
 def fig_class_heatmap(df: pd.DataFrame, budget: int = 3) -> None:
     t = class_table(df, budget)
     fig, ax = plt.subplots(figsize=(7.2, 3.0))
-    im = ax.imshow(t.values, cmap="Blues", vmin=0, vmax=100, aspect="auto")
+    ax.imshow(t.values, cmap="Blues", vmin=0, vmax=100, aspect="auto")
     ax.set_xticks(range(t.shape[1])); ax.set_xticklabels(t.columns, rotation=25, ha="right", fontsize=7)
     ax.set_yticks(range(t.shape[0])); ax.set_yticklabels(t.index, fontsize=8)
     for i in range(t.shape[0]):

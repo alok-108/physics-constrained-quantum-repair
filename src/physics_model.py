@@ -7,7 +7,7 @@ and validates quantum circuits against physical hardware constraints.
 from __future__ import annotations
 
 import os
-from typing import Dict, List, Optional, Set, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 import networkx as nx
 from qiskit import QuantumCircuit
 import qiskit.qasm3
