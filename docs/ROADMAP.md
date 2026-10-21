@@ -69,3 +69,43 @@ statement below as "reported by the literature search, not re-derived".
 
 * If harder fault modes (item 1) bring the agent to the level of the static baseline, the contribution is the protocol and benchmark only; reframe the paper accordingly.
 * If sampled and exact checks disagree on more than a few percent of small-angle faults (item 2), do not use sampled acceptance for any reported number.
+
+---
+
+# Second literature pass (gap tables, search date 2026-10-21)
+
+Same caveat as above: figures below are as reported by the Consensus search, not
+re-derived, except where marked **checked here**.
+
+**Checked here.** The McNemar power approximation (z = 0.05 sqrt(n) / sqrt(0.20) = 3.54 at
+n = 1000, power ~0.94; n ~ 628 for 80 % power), the Hoeffding shot count
+(n >= ln(2/delta) / (2 eps^2) = 6623 at eps = 0.02, delta = 0.01) and the Holm thresholds
+(0.05/16 ... 0.05) are arithmetically correct. The OpenQASM 3 paper (Cross et al., ACM TQC 2021) exists and
+the formal specification lives in a GitHub-backed document. Items the report itself marks "no source found" (provider quotas
+and prices, venue page limits and acceptance rates, 2026 model prices) are left open.
+
+## Decisions
+
+| Topic | Decision | Basis |
+|---|---|---|
+| Fault mix for a v3 benchmark | >= 40 % non-single-gate faults and >= 30 % not unitary-observable (measurement wiring, qubit order, API/IR, control flow). The report's 25/20/20/20/15 split is a *defensible choice*, not field prevalence. | Real-bug studies (Luo 2022, Paltenghi 2021) show API/platform/cross-layer faults dominate; fault-prevalence percentages quoted by the report were not re-checked |
+| Language coverage | State plainly that the predicate covers the purely unitary subset of OpenQASM 3; add a structural check and a path-bounded trace oracle for control flow, measure and reset | Cross et al. 2021; done in the paper's limitations |
+| Pass@k and budgets | Report external repair attempts K, internal search edits and oracle queries separately; never compare a bare Pass@3 | Already reported per arm |
+| Baselines | Published quantum repair numbers (UnitAR, HornBro, ChatGPT/Bugs4Q) are not comparable to this benchmark; only a matched re-run counts | Tiny or different tasks and oracles |
+| Oracle protocol | Two tiers: repair-time adaptive counterexamples; publication-time held-out states with X/Z/mixed-basis checks and Holm correction. Current implementation: Haar states only | Report's oracle table; mixed-basis checks are not implemented yet |
+| Equivalence at 12-30 qubits | QCEC first, shallow-circuit methods (PBEC) where applicable, restricted-witness search for non-equivalence, bounded statistical check last | Peham 2022, Chen 2023, Yu 2025; not implemented beyond the sampled check |
+| Compiler baselines | Qiskit O0-O3 done (9.7 / 29.7 / 29.7 / 29.7 %); tket and PyZX+routing still to add; publish seed, layout, routing, basis and whether final layout is undone | Done for Qiskit; the report's claim about Benchpress using level 2 is unverified |
+| Physical validity | Two layers: hard (native gates, directed coupling, width, layout bookkeeping) and soft (duration / T1,T2, edge and readout quality, calibration age) | Report's rubric; thresholds are defensible choices |
+| Duration threshold | The report suggests duration <= 0.2 min(T1,T2). **Checked here:** that would reject 4.1 % of this benchmark's own references (median ratio 0.033, p95 0.175, max 0.428), so adopting it requires regenerating the benchmark. Current rule is 0.5. | Own audit |
+| Hardware study | 60 circuits x 3 devices x 2 calibration snapshots x 4096 shots (737,280 shots), readout mitigation only; 120 circuits if a 15-point paired effect must be detected at 80 % power | Report's design; needs an IBM Quantum account; costs and quotas not established |
+| LLM study | Four arms: generation only, + oracle, + oracle + <= 2 retries, held-out score; one local open model first (CPU feasible per the cited llama.cpp study); no paid API until the non-LLM baseline is frozen | Contamination and retry confounds |
+| Statistics | Exact McNemar primary; stratified-by-family McNemar or mixed-effects logistic regression as sensitivity; power n >= ~650 for a 5-point effect at ~20 % discordance | Fay and Lumbard 2020, Wu 2018 |
+| Venues | TOSEM for protocol + benchmark; ASE/ISSTA for oracle or evaluation methodology; QCE/QSW/Q-SE for an early artifact. Fit scores are the report's judgement; check each CFP | No supplied source for 2026 CFPs |
+
+## What changes in the work plan
+
+1. v3 benchmark with non-single-gate and non-unitary faults (extends item 1 above).
+2. Mixed-basis oracle tier and a held-out split reported with Holm correction.
+3. tket and PyZX+routing baselines; structural/trace checks for control flow.
+4. Stratified-by-family sensitivity analysis and a pre-registered primary test.
+5. Local-LLM four-arm ablation, then the 60-circuit, 3-device hardware study.

@@ -44,6 +44,9 @@ LABELS = {
     "pyzx_zx_calculus": "PyZX",
     "ours_full_qiskit_router": "Physics + diagnostic, Qiskit router",
     "qiskit_transpile": "Qiskit transpiler only",
+    "qiskit_transpile_l0": "Qiskit transpiler O0",
+    "qiskit_transpile_l2": "Qiskit transpiler O2",
+    "qiskit_transpile_l3": "Qiskit transpiler O3",
 }
 ORDER = list(LABELS)
 
@@ -248,7 +251,7 @@ def save(fig, name: str) -> None:
     plt.close(fig)
 
 
-PALETTE = ["#2a6f97", "#61a5c2", "#c97b2a", "#e5b982", "#7a7a7a", "#b5b5b5", "#3b8b5a", "#8f5aa6"]
+PALETTE = ["#2a6f97", "#61a5c2", "#c97b2a", "#e5b982", "#7a7a7a", "#b5b5b5", "#3b8b5a", "#8f5aa6", "#b07a9c", "#6c9e4f", "#d1a33f"]
 
 
 def fig_passk(df: pd.DataFrame, budget: int = 3) -> None:
@@ -338,10 +341,11 @@ def load_sweep(pattern: str) -> pd.DataFrame:
 SHORT = {
     "ours_full": "P+D", "ours_reject_only": "P+R", "unconstrained_diag": "U+D",
     "unconstrained_reject_only": "U+R", "static_no_oracle": "Static", "pyzx_zx_calculus": "PyZX",
-    "ours_full_qiskit_router": "P+D/Q", "qiskit_transpile": "Qiskit",
+    "ours_full_qiskit_router": "P+D/Q", "qiskit_transpile": "Qiskit O1",
+    "qiskit_transpile_l0": "Qiskit O0", "qiskit_transpile_l2": "Qiskit O2", "qiskit_transpile_l3": "Qiskit O3",
 }
 SHORT_LEGEND = ("P/U = physics context on/off; D/R = diagnostic feedback / bare rejection; "
-                "Static = no oracle; P+D/Q = P+D with Qiskit routing; Qiskit = transpiler only")
+                "Static = no oracle; P+D/Q = P+D with Qiskit routing; Qiskit On = transpiler only at optimisation level n")
 
 
 def shorten(df: pd.DataFrame) -> pd.DataFrame:
@@ -386,9 +390,8 @@ def contrast_view(ct: pd.DataFrame) -> pd.DataFrame:
 
 def main(results: str, weak: str, sweep_glob: str, budget: int = 3) -> None:
     df = pd.read_csv(results)
-    extra = os.path.join(os.path.dirname(results), "results_extra.csv")
-    if os.path.exists(extra):                      # compiler baseline and router-robustness arm
-        df = pd.concat([df, pd.read_csv(extra)], ignore_index=True)
+    for extra in sorted(glob.glob(os.path.join(os.path.dirname(results), "results_extra*.csv"))):
+        df = pd.concat([df, pd.read_csv(extra)], ignore_index=True)   # compiler / router arms
     pd.set_option("display.width", 250); pd.set_option("display.max_columns", 30)
 
     rt = rate_table(df, budget)

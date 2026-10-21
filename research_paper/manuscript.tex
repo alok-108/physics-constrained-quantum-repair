@@ -526,7 +526,11 @@ syntax, structural or semantic faults. P+D exceeds it by $+0.673$
 ($[0.643,0.701]$; 673 discordant circuits, none reversed), so compilation alone
 covers less than a third of the benchmark even in its home class. Replacing the
 agent's router by Qiskit's (P+D/Q) leaves acceptance unchanged (zero discordant
-circuits).
+circuits). Across Qiskit optimisation levels the compiler-only rate is $9.7\%$
+at level 0 (routing only: the 97 unmapped circuits), $29.7\%$ at level 1 and
+likewise at levels 2 and 3, which add inverse cancellation; higher optimisation
+does not erase the benchmark's faults, because none except redundancy can be
+removed by compilation.
 
 \subsection{E2: weak oracle}
 
@@ -588,6 +592,18 @@ edits and the neighbourhood contains their inverses. The $97\%$ rate therefore
 characterises the agent on this fault distribution and says little about
 unrestricted faults. The informative evidence is the per-mode table, the
 weak-oracle regime and the budget sweep.
+
+\textbf{Language and fault coverage.} The acceptance predicate compares unitaries,
+device admissibility and noisy output distributions, so it covers the purely
+unitary subset of OpenQASM~3~\cite{cross2022openqasm3}. Control flow, timing,
+\texttt{measure}, \texttt{reset} and declared inputs and outputs need structural
+or path-level oracles that we do not implement. Empirical studies of real
+quantum bugs report that a large share concern API usage, platform and
+cross-layer behaviour rather than gate-level edits~\cite{luo2022bugfixes,
+paltenghi2021bugs}, and some of these (measurement wiring, output format,
+declaration errors) are not observable in the unitary at all. Our five classes
+therefore do not represent field prevalence; a v3 benchmark should include
+non-single-gate and non-unitary-observable faults (\texttt{docs/ROADMAP.md}).
 
 \textbf{Routing by construction.} The agent's default router equals the
 construction used to build physical-fault references. We tested this directly by

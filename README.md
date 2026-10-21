@@ -21,6 +21,7 @@ constraints (IBM FakeSherbrooke model).
 | Static repair (no oracle) | 60.0 % [56.9, 63.0] | 100 % | 0 |
 | PyZX (ZX-calculus simplification) | 5.0 % [3.8, 6.5] | 15.1 % | 0 |
 | Qiskit transpiler only (SABRE + exact layout undo) | 29.7 % [26.9, 32.6] | 69.7 % | 0 |
+| Qiskit transpiler O0 / O2 / O3 | 9.7 % / 29.7 % / 29.7 % | 69.7 % | 0 |
 | P+D with Qiskit's router instead of the agent's own | 97.0 % [95.7, 97.9] | 100 % | 553 |
 
 What the numbers do and do not say:
@@ -109,7 +110,8 @@ process fidelity). Details: [docs/PROTOCOL.md](docs/PROTOCOL.md).
 
 Small edits of short circuits; connectivity under the identity layout; device
 model rather than live hardware; no externally executed QBugLM run, no
-language-model results. See
+language-model results; the acceptance predicate covers only the purely unitary subset of
+OpenQASM 3 and the benchmark does not represent real-fault prevalence (see `docs/ROADMAP.md`). See
 [docs/BENCHMARK_V2.md](docs/BENCHMARK_V2.md#d-what-v2-does-not-fix) and the
 paper's threats-to-validity section.
 

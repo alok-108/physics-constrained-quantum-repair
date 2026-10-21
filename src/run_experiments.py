@@ -64,7 +64,8 @@ ARM_CONFIG: Dict[str, Dict[str, Any]] = {
 }
 CORE_SYSTEMS = ["ours_full", "ours_reject_only", "unconstrained_diag", "unconstrained_reject_only",
                 "static_no_oracle", "pyzx_zx_calculus"]
-EXTRA_SYSTEMS = ["ours_full_qiskit_router", "qiskit_transpile"]
+EXTRA_SYSTEMS = ["ours_full_qiskit_router", "qiskit_transpile", "qiskit_transpile_l0",
+                 "qiskit_transpile_l2", "qiskit_transpile_l3"]
 SYSTEMS = CORE_SYSTEMS + EXTRA_SYSTEMS
 
 
@@ -137,11 +138,12 @@ def run_pyzx(circuit_id: str, buggy: str, gt: str, validator, budget: int) -> Di
             "final_candidate_qasm": final, "history": history}
 
 
-def run_qiskit_transpile(circuit_id: str, buggy: str, gt: str, validator, budget: int) -> Dict[str, Any]:
+def run_qiskit_transpile(circuit_id: str, buggy: str, gt: str, validator, budget: int,
+                         level: int = 1) -> Dict[str, Any]:
     """Compiler-only baseline: Qiskit routing with exact layout bookkeeping, no repair logic."""
     from src.routing import compile_with_qiskit
     try:
-        cand = qiskit.qasm3.dumps(compile_with_qiskit(qiskit.qasm3.loads(buggy)))
+        cand = qiskit.qasm3.dumps(compile_with_qiskit(qiskit.qasm3.loads(buggy), optimization_level=level))
     except Exception:
         cand = None
     history, seen, success = [], set(), False
@@ -234,8 +236,10 @@ def _run_circuit(meta: Dict[str, Any], root: str) -> List[Dict[str, Any]]:
         t0 = time.time()
         if system == "pyzx_zx_calculus":
             res = run_pyzx(meta["circuit_id"], buggy, gt, _STATE["validator"], _STATE["budget"])
-        elif system == "qiskit_transpile":
-            res = run_qiskit_transpile(meta["circuit_id"], buggy, gt, _STATE["validator"], _STATE["budget"])
+        elif system.startswith("qiskit_transpile"):
+            level = 1 if system == "qiskit_transpile" else int(system[-1])      # ..._l0 / _l2 / _l3
+            res = run_qiskit_transpile(meta["circuit_id"], buggy, gt, _STATE["validator"],
+                                       _STATE["budget"], level)
         else:
             res = _STATE["orch"][system].run(circuit_id=meta["circuit_id"], buggy_qasm=buggy,
                                              ground_truth_qasm=gt, circuit_spec=spec)

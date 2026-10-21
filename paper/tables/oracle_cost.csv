@@ -5,3 +5,6 @@ Physics + diagnostic feedback,552.9,508.0,2346.8499999999885,0.066,0.003,2.3,0.0
 "No physics, bare rejection",965.1,1005.5,4601.0,0.0,0.0068,5.0,0.0,0.57
 "Physics + diagnostic, Qiskit router",552.9,508.0,2346.8499999999885,0.066,0.003,2.3,0.0,0.66
 Qiskit transpiler only,0.0,,0.0,0.0,,,,0.28
+Qiskit transpiler O0,0.0,,0.0,0.0,,,,0.34
+Qiskit transpiler O2,0.0,,0.0,0.0,,,,0.35
+Qiskit transpiler O3,0.0,,0.0,0.0,,,,0.34
