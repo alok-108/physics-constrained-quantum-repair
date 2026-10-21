@@ -1,14 +1,17 @@
-qiskit
-qiskit-aer
-qiskit-ibm-runtime
-pennylane
-pyzx
-pandas
-scipy
-matplotlib
-openai
-langchain
-python-dotenv
-pytest
-tqdm
-seaborn
+# Tested with Python 3.13, qiskit 2.5, qiskit-aer 0.17
+qiskit>=2.0
+qiskit-aer>=0.15
+qiskit-ibm-runtime>=0.30      # FakeSherbrooke backend model
+qiskit-qasm3-import>=0.5      # qiskit.qasm3.loads
+networkx>=3.0
+numpy>=1.26
+scipy>=1.11
+pandas>=2.0
+matplotlib>=3.8
+pyzx>=0.8                     # transformation baseline
+python-dotenv>=1.0
+pytest>=8.0
+
+# Optional: LLM repair path (only used when OPENAI_API_KEY is set; not used for any reported number)
+# langchain-openai>=0.1
+# langchain-core>=0.2

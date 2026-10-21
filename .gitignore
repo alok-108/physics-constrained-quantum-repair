@@ -30,3 +30,9 @@ Thumbs.db
 # Large temporary logs
 *.log
 experiments/logs/
+
+# Experiment intermediates
+experiments/*.partial.jsonl
+experiments/_*.csv
+paper/build/
+.pytest_cache/
