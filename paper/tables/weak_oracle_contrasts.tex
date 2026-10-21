@@ -1,0 +1,21 @@
+\begin{table*}[t]
+\centering
+\caption{Paired contrasts in the weak-oracle regime (Holm over the 8 rows shown).}
+\label{tab:weakc}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrrr}
+\toprule
+contrast & metric & b10 & b01 & RD [95\% CI] & p\_holm \\
+\midrule
+physics context (feedback on) & Pass@1 & 200 & 0 & +0.200 [+0.175, +0.225] & $1.0\times 10^{-59}$ \\
+physics context (feedback on) & Pass@3 & 200 & 0 & +0.200 [+0.176, +0.226] & $1.0\times 10^{-59}$ \\
+physics context (feedback off) & Pass@1 & 200 & 0 & +0.200 [+0.175, +0.225] & $1.0\times 10^{-59}$ \\
+physics context (feedback off) & Pass@3 & 200 & 0 & +0.200 [+0.175, +0.225] & $1.0\times 10^{-59}$ \\
+diagnostic feedback (physics on) & Pass@1 & 0 & 0 & +0.000 [-0.003, +0.003] & 1 \\
+diagnostic feedback (physics on) & Pass@3 & 90 & 1 & +0.089 [+0.072, +0.108] & $3.0\times 10^{-25}$ \\
+diagnostic feedback (physics off) & Pass@1 & 0 & 0 & +0.000 [-0.001, +0.001] & 1 \\
+diagnostic feedback (physics off) & Pass@3 & 90 & 1 & +0.089 [+0.071, +0.107] & $3.0\times 10^{-25}$ \\
+\bottomrule
+\end{tabular}
+\end{table*}

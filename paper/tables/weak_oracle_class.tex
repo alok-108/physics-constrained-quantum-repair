@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\caption{Weak-oracle Pass@3 (\%) by fault class. P/U = physics context on/off; D/R = diagnostic feedback / bare rejection; Static = no oracle.}
+\label{tab:weakclass}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrr}
+\toprule
+bug\_type & P+D & P+R & U+D & U+R \\
+\midrule
+gate\_redundancy & 100.0 & 100.0 & 100.0 & 100.0 \\
+physics\_violation & 100.0 & 100.0 & 0.0 & 0.0 \\
+semantic\_deviation & 98.5 & 70.5 & 98.5 & 70.5 \\
+structural & 86.5 & 70.0 & 86.5 & 70.0 \\
+syntax & 100.0 & 100.0 & 100.0 & 100.0 \\
+\bottomrule
+\end{tabular}
+\end{table}

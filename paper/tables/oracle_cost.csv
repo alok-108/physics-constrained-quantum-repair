@@ -1,0 +1,5 @@
+System,Mean queries (all),Median queries (searches),p95 queries,Counterexamples used,Mean suite-minus-process gap,Gap > 0.01 (%),Accepted with gap > 0.01 (%),Mean wall time (s)
+Physics + diagnostic feedback,552.9,508.0,2346.8499999999885,0.066,0.003,2.3,0.0,0.5
+"Physics, bare rejection",555.0,508.0,2613.749999999979,0.0,0.0048,2.8,0.0,0.45
+"No physics, diagnostic feedback",963.1,1005.5,4601.0,0.067,0.005,4.5,0.0,0.57
+"No physics, bare rejection",965.1,1005.5,4601.0,0.0,0.0068,5.0,0.0,0.57

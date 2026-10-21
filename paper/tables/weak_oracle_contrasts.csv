@@ -1,0 +1,9 @@
+contrast,metric,b10,b01,RD [95\% CI],p_holm
+physics context (feedback on),Pass@1,200,0,"+0.200 [+0.175, +0.225]",9.956824444577827e-60
+physics context (feedback on),Pass@3,200,0,"+0.200 [+0.176, +0.226]",9.956824444577827e-60
+physics context (feedback off),Pass@1,200,0,"+0.200 [+0.175, +0.225]",9.956824444577827e-60
+physics context (feedback off),Pass@3,200,0,"+0.200 [+0.175, +0.225]",9.956824444577827e-60
+diagnostic feedback (physics on),Pass@1,0,0,"+0.000 [-0.003, +0.003]",1.0
+diagnostic feedback (physics on),Pass@3,90,1,"+0.089 [+0.072, +0.108]",2.972680326362443e-25
+diagnostic feedback (physics off),Pass@1,0,0,"+0.000 [-0.001, +0.001]",1.0
+diagnostic feedback (physics off),Pass@3,90,1,"+0.089 [+0.071, +0.107]",2.972680326362443e-25

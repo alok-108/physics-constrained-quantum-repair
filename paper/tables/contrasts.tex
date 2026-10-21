@@ -1,0 +1,25 @@
+\begin{table*}[t]
+\centering
+\caption{Pre-specified paired contrasts (exact McNemar; Newcombe interval on the paired risk difference; Holm correction over the 12 rows shown).}
+\label{tab:contrasts}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrrr}
+\toprule
+contrast & metric & b10 & b01 & RD [95\% CI] & p\_holm \\
+\midrule
+physics context (feedback on) & Pass@1 & 200 & 0 & +0.200 [+0.176, +0.226] & $1.0\times 10^{-59}$ \\
+physics context (feedback on) & Pass@3 & 200 & 0 & +0.200 [+0.176, +0.226] & $1.0\times 10^{-59}$ \\
+physics context (feedback off) & Pass@1 & 200 & 0 & +0.200 [+0.176, +0.226] & $1.0\times 10^{-59}$ \\
+physics context (feedback off) & Pass@3 & 200 & 0 & +0.200 [+0.176, +0.226] & $1.0\times 10^{-59}$ \\
+diagnostic feedback (physics on) & Pass@1 & 0 & 0 & +0.000 [-0.004, +0.004] & 1 \\
+diagnostic feedback (physics on) & Pass@3 & 0 & 0 & +0.000 [-0.004, +0.004] & 1 \\
+diagnostic feedback (physics off) & Pass@1 & 0 & 0 & +0.000 [-0.002, +0.002] & 1 \\
+diagnostic feedback (physics off) & Pass@3 & 0 & 0 & +0.000 [-0.002, +0.002] & 1 \\
+behavioural oracle & Pass@1 & 370 & 0 & +0.370 [+0.340, +0.400] & $8.3\times 10^{-111}$ \\
+behavioural oracle & Pass@3 & 370 & 0 & +0.370 [+0.340, +0.400] & $8.3\times 10^{-111}$ \\
+transformation baseline & Pass@1 & 920 & 0 & +0.920 [+0.901, +0.935] & $2.7\times 10^{-276}$ \\
+transformation baseline & Pass@3 & 920 & 0 & +0.920 [+0.901, +0.935] & $2.7\times 10^{-276}$ \\
+\bottomrule
+\end{tabular}
+\end{table*}

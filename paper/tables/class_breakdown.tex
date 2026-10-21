@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\caption{Pass@3 (\%) by injected fault class (200 circuits per class). P/U = physics context on/off; D/R = diagnostic feedback / bare rejection; Static = no oracle.}
+\label{tab:class}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrrrr}
+\toprule
+bug\_type & P+D & P+R & U+D & U+R & Static & PyZX \\
+\midrule
+gate\_redundancy & 100.0 & 100.0 & 100.0 & 100.0 & 100.0 & 25.0 \\
+physics\_violation & 100.0 & 100.0 & 0.0 & 0.0 & 100.0 & 0.0 \\
+semantic\_deviation & 100.0 & 100.0 & 100.0 & 100.0 & 0.0 & 0.0 \\
+structural & 85.0 & 85.0 & 85.0 & 85.0 & 0.0 & 0.0 \\
+syntax & 100.0 & 100.0 & 100.0 & 100.0 & 100.0 & 0.0 \\
+\bottomrule
+\end{tabular}
+\end{table}

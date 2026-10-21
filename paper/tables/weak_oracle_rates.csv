@@ -1,0 +1,5 @@
+System,n,Pass@1 (%),Pass@1 95% CI,Pass@2 (%),Pass@3 (%),Pass@3 95% CI,Physically valid (%),Mean attempts,Mean oracle queries,"Gate overhead vs ref (%), accepted"
+Physics + diagnostic feedback,1000,86.9,"[84.7, 88.9]",96.8,97.0,"[95.7, 97.9]",100.0,1.16,584.1,0.2
+"Physics, bare rejection",1000,86.9,"[84.7, 88.9]",88.0,88.1,"[85.9, 90.0]",100.0,1.25,540.2,0.0
+"No physics, diagnostic feedback",1000,66.9,"[63.9, 69.7]",76.8,77.0,"[74.3, 79.5]",80.0,1.56,910.4,0.3
+"No physics, bare rejection",1000,66.9,"[63.9, 69.7]",68.0,68.1,"[65.1, 70.9]",80.0,1.65,866.5,0.0

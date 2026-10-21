@@ -1,0 +1,13 @@
+contrast,metric,b10,b01,RD [95\% CI],p_holm
+physics context (feedback on),Pass@1,200,0,"+0.200 [+0.176, +0.226]",9.956824444577827e-60
+physics context (feedback on),Pass@3,200,0,"+0.200 [+0.176, +0.226]",9.956824444577827e-60
+physics context (feedback off),Pass@1,200,0,"+0.200 [+0.176, +0.226]",9.956824444577827e-60
+physics context (feedback off),Pass@3,200,0,"+0.200 [+0.176, +0.226]",9.956824444577827e-60
+diagnostic feedback (physics on),Pass@1,0,0,"+0.000 [-0.004, +0.004]",1.0
+diagnostic feedback (physics on),Pass@3,0,0,"+0.000 [-0.004, +0.004]",1.0
+diagnostic feedback (physics off),Pass@1,0,0,"+0.000 [-0.002, +0.002]",1.0
+diagnostic feedback (physics off),Pass@3,0,0,"+0.000 [-0.002, +0.002]",1.0
+behavioural oracle,Pass@1,370,0,"+0.370 [+0.340, +0.400]",8.31632781251592e-111
+behavioural oracle,Pass@3,370,0,"+0.370 [+0.340, +0.400]",8.31632781251592e-111
+transformation baseline,Pass@1,920,0,"+0.920 [+0.901, +0.935]",2.7077915637972444e-276
+transformation baseline,Pass@3,920,0,"+0.920 [+0.901, +0.935]",2.7077915637972444e-276

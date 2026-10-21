@@ -1,0 +1,6 @@
+bug_type,Physics + diagnostic feedback,"Physics, bare rejection","No physics, diagnostic feedback","No physics, bare rejection"
+gate_redundancy,100.0,100.0,100.0,100.0
+physics_violation,100.0,100.0,0.0,0.0
+semantic_deviation,98.5,70.5,98.5,70.5
+structural,86.5,70.0,86.5,70.0
+syntax,100.0,100.0,100.0,100.0

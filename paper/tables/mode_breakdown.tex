@@ -1,0 +1,33 @@
+\begin{table*}[t]
+\centering
+\caption{Pass@3 (\%) by fault mode. ``legacy'' modes come from the v1 injector; ``extended'' modes were added in v2. P/U = physics context on/off; D/R = diagnostic feedback / bare rejection; Static = no oracle.}
+\label{tab:mode}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrrr}
+\toprule
+bug\_type & fault\_mode & mode\_family & P+D & U+R & n \\
+\midrule
+gate\_redundancy & cxcx & legacy & 100.0 & 100.0 & 64 \\
+gate\_redundancy & hh & legacy & 100.0 & 100.0 & 61 \\
+gate\_redundancy & xx & legacy & 100.0 & 100.0 & 75 \\
+physics\_violation & coherence\_delay & legacy & 100.0 & 0.0 & 103 \\
+physics\_violation & unmapped & legacy & 100.0 & 0.0 & 97 \\
+semantic\_deviation & axis\_change & legacy & 100.0 & 100.0 & 14 \\
+semantic\_deviation & compound & extended & 100.0 & 100.0 & 33 \\
+semantic\_deviation & gate\_replace & legacy & 100.0 & 100.0 & 50 \\
+semantic\_deviation & negate & legacy & 100.0 & 100.0 & 27 \\
+semantic\_deviation & scale & extended & 100.0 & 100.0 & 16 \\
+semantic\_deviation & shift\_pi2 & legacy & 100.0 & 100.0 & 30 \\
+semantic\_deviation & shift\_pi3 & extended & 100.0 & 100.0 & 30 \\
+structural & invert\_cnot & legacy & 100.0 & 100.0 & 44 \\
+structural & remove\_gate & legacy & 82.4 & 82.4 & 74 \\
+structural & twoqubit\_replace & extended & 63.0 & 63.0 & 27 \\
+structural & wrong\_qubit & legacy & 87.3 & 87.3 & 55 \\
+syntax & corrupt\_keyword & legacy & 100.0 & 100.0 & 60 \\
+syntax & illegal\_bracket & legacy & 100.0 & 100.0 & 50 \\
+syntax & invalid\_gate & legacy & 100.0 & 100.0 & 37 \\
+syntax & missing\_semicolon & legacy & 100.0 & 100.0 & 53 \\
+\bottomrule
+\end{tabular}
+\end{table*}
