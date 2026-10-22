@@ -125,3 +125,118 @@ def test_llm_only_arm_may_resubmit_the_same_circuit(stub_server):
     tabu = {circuit_key(qiskit.qasm3.loads(first))}
     second = agent.repair(buggy_text(), {"bug_type": "structural"}, {"num_qubits": 3}, tabu=tabu)
     assert agent.last_strategy == "llm" and second == first
+
+
+# ------------------------------------------------------------------ Gemini client (stub server)
+class GeminiStub(BaseHTTPRequestHandler):
+    reply = ""
+    fail_first = 0                      # answer this many requests with 429 before succeeding
+    seen = []
+
+    def do_POST(self):
+        body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
+        GeminiStub.seen.append({"path": self.path, "key": self.headers.get("x-goog-api-key"), "body": body})
+        if GeminiStub.fail_first > 0:
+            GeminiStub.fail_first -= 1
+            out, code = {"error": {"message": "quota, key=SECRETKEY", "details": [{"retryDelay": "0s"}]}}, 429
+        else:
+            out = {"candidates": [{"content": {"parts": [{"text": GeminiStub.reply}]}}],
+                   "usageMetadata": {"promptTokenCount": 40, "candidatesTokenCount": 25, "thoughtsTokenCount": 7}}
+            code = 200
+        raw = json.dumps(out).encode()
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(raw)))
+        self.end_headers()
+        self.wfile.write(raw)
+
+    def log_message(self, *a):
+        pass
+
+
+@pytest.fixture()
+def gemini_stub(monkeypatch):
+    srv = HTTPServer(("127.0.0.1", 0), GeminiStub)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    GeminiStub.seen, GeminiStub.fail_first, GeminiStub.reply = [], 0, ""
+    monkeypatch.setenv("QREPAIR_GEMINI_BASE", f"http://127.0.0.1:{srv.server_address[1]}")
+    monkeypatch.setenv("GEMINI_API_KEY", "SECRETKEY")
+    monkeypatch.setenv("QREPAIR_LLM_MIN_INTERVAL", "0")
+    yield GeminiStub
+    srv.shutdown()
+
+
+def _msgs(system="be exact", user="fix it"):
+    from langchain_core.messages import HumanMessage, SystemMessage
+    return [SystemMessage(content=system), HumanMessage(content=user)]
+
+
+def test_gemini_request_shape_key_in_header_and_token_accounting(gemini_stub):
+    from agents.llm import GeminiChat
+    gemini_stub.reply = "ok"
+    llm = GeminiChat("gemini-test")
+    assert llm.invoke(_msgs()).content == "ok"
+    req = gemini_stub.seen[0]
+    assert req["path"] == "/v1beta/models/gemini-test:generateContent" and "SECRETKEY" not in req["path"]
+    assert req["key"] == "SECRETKEY"
+    assert req["body"]["systemInstruction"]["parts"][0]["text"] == "be exact"
+    assert req["body"]["contents"] == [{"role": "user", "parts": [{"text": "fix it"}]}]
+    assert req["body"]["generationConfig"]["temperature"] == 0.0
+    assert (llm.calls, llm.prompt_tokens, llm.output_tokens, llm.thought_tokens) == (1, 40, 25, 7)
+
+
+def test_gemini_retries_on_429_then_succeeds(gemini_stub):
+    from agents.llm import GeminiChat
+    gemini_stub.reply, gemini_stub.fail_first = "ok", 2
+    llm = GeminiChat("m", max_retries=3)
+    llm.RETRYABLE = (429,)
+    import time as _t
+    real = _t.sleep
+    _t.sleep = lambda s: None                        # do not actually wait in the test
+    try:
+        assert llm.invoke(_msgs()).content == "ok"
+    finally:
+        _t.sleep = real
+    assert llm.retries == 2 and llm.rate_limited == 2 and llm.calls == 1 and llm.errors == 0
+
+
+def test_gemini_gives_up_and_never_leaks_the_key(gemini_stub):
+    from agents.llm import GeminiChat, LLMError
+    gemini_stub.fail_first = 99
+    llm = GeminiChat("m", max_retries=1)
+    import time as _t
+    real = _t.sleep
+    _t.sleep = lambda s: None
+    try:
+        with pytest.raises(LLMError) as ei:
+            llm.invoke(_msgs())
+    finally:
+        _t.sleep = real
+    assert "SECRETKEY" not in str(ei.value) and llm.errors == 1
+
+
+def test_gemini_needs_a_key(monkeypatch):
+    from agents.llm import GeminiChat, LLMError
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
+    with pytest.raises(LLMError, match="GEMINI_API_KEY"):
+        GeminiChat("m")
+
+
+def test_gemini_arm_in_the_repair_agent_separates_api_failures_from_wrong_answers(gemini_stub):
+    gemini_stub.reply = "```qasm\n" + qiskit.qasm3.dumps(ghz()) + "\n```"
+    agent = RepairerAgent(llm_model="gemini:gemini-test", llm_only=True)
+    out = agent.repair(buggy_text(), {"bug_type": "structural"}, {"num_qubits": 3})
+    assert agent.last_strategy == "llm" and "cx q[0], q[1]" in out and agent.llm_errors == 0
+    gemini_stub.fail_first = 99
+    agent.llm.max_retries = 0
+    assert agent.repair(buggy_text(), {"bug_type": "structural"}, {"num_qubits": 3}) == buggy_text()
+    assert agent.last_strategy == "llm_failed" and agent.llm_errors == 1
+
+
+def test_make_llm_dispatch(monkeypatch):
+    from agents.llm import GeminiChat, OllamaChat, make_llm
+    monkeypatch.setenv("GEMINI_API_KEY", "k")
+    assert isinstance(make_llm("gemini:x"), GeminiChat) and make_llm("gemini:x").model == "x"
+    assert isinstance(make_llm("ollama:qwen"), OllamaChat) and make_llm("ollama:qwen").model == "qwen"
+    assert make_llm("qwen2.5-coder:1.5b").model == "qwen2.5-coder:1.5b"

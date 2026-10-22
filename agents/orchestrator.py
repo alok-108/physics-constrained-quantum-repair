@@ -94,6 +94,7 @@ class Orchestrator:
         start = time.time()
         llm = self.repairer.llm
         llm0 = (getattr(llm, "tokens", 0), getattr(llm, "calls", 0)) if llm is not None else (0, 0)
+        err0 = getattr(self.repairer, "llm_errors", 0)
 
         for it in range(1, self.max_iterations + 1):
             t0 = time.time()
@@ -163,6 +164,7 @@ class Orchestrator:
             "holdout": gap,
             "llm_tokens": (getattr(self.repairer.llm, "tokens", 0) - llm0[0]) if self.repairer.llm is not None else 0,
             "llm_calls": (getattr(self.repairer.llm, "calls", 0) - llm0[1]) if self.repairer.llm is not None else 0,
+            "llm_errors": getattr(self.repairer, "llm_errors", 0) - err0,
             "total_duration_s": round(time.time() - start, 3),
             "final_candidate_qasm": final_candidate,
             "history": history,

@@ -106,9 +106,10 @@ class RepairerAgent:
         self.api_key = os.getenv("OPENAI_API_KEY")
         self.llm = None
         self.last_strategy = "none"
+        self.llm_errors = 0             # API/transport failures (not wrong answers), cumulative
         if llm_model:
-            from agents.llm import OllamaChat
-            self.llm = OllamaChat(llm_model)
+            from agents.llm import make_llm
+            self.llm = make_llm(llm_model)
         elif self.api_key and ChatOpenAI is not None and not self.api_key.startswith("your-"):
             try:
                 self.llm = ChatOpenAI(model=self.model_name, temperature=self.temperature,
@@ -153,7 +154,11 @@ class RepairerAgent:
                 msg += f"Validator feedback:\n{feedback}\n\n"
             msg += "Produce the complete, corrected OpenQASM 3.0 circuit now."
             system = self.SYSTEM_PROMPT_PHYSICS if self.use_physics_context else self.SYSTEM_PROMPT_NO_PHYSICS
-            content = self.llm.invoke([SystemMessage(content=system), HumanMessage(content=msg)]).content.strip()
+            try:
+                content = self.llm.invoke([SystemMessage(content=system), HumanMessage(content=msg)]).content.strip()
+            except Exception:
+                self.llm_errors += 1
+                return None
             m = re.search(r"```(?:qasm)?\n(.*?)```", content, re.DOTALL)
             cand = m.group(1).strip() if m else content
             qiskit.qasm3.loads(cand)
