@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quantum Circuit Repair</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Sora:wght@500;700;800&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Design plan. Layout: one long guided scroll, each section = a plain-English claim plus one hands-on widget.
+   Colour: deep indigo ink with a single amber accent; qubit wires in periwinkle. Type: Sora (display), Source Sans 3 (body), JetBrains Mono (code and data). */
+:root{
+  --bg:#f3f5fb; --panel:#ffffff; --panel2:#eaeefa; --ink:#0f1830; --muted:#525d7d; --line:#d3daec;
+  --accent:#b85c00; --accent-ink:#ffffff; --wire:#3c4fa3; --good:#13805a; --bad:#c23a2c; --warn:#a56a00;
+  --font-display:"Sora",system-ui,sans-serif; --font-body:"Source Sans 3",system-ui,sans-serif; --font-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --shadow:0 10px 30px rgba(15,24,48,.10);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#080d1c; --panel:#10172d; --panel2:#17203d; --ink:#e8ecf8; --muted:#95a1c6; --line:#27325a;
+  --accent:#f5b73a; --accent-ink:#1a1200; --wire:#8296ea; --good:#4fd1a1; --bad:#ff7a6b; --warn:#f5b73a;
+  --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#080d1c; --panel:#10172d; --panel2:#17203d; --ink:#e8ecf8; --muted:#95a1c6; --line:#27325a;
+  --accent:#f5b73a; --accent-ink:#1a1200; --wire:#8296ea; --good:#4fd1a1; --bad:#ff7a6b; --warn:#f5b73a;
+  --shadow:0 10px 30px rgba(0,0,0,.45); color-scheme:dark;}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.65 var(--font-body);
+  padding-block:0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+.wrap{max-width:1080px;margin-inline:auto}
+h1,h2,h3{font-family:var(--font-display);line-height:1.15;text-wrap:balance;margin:0}
+h2{font-size:clamp(1.55rem,3.2vw,2.15rem);font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:.7em 0;max-width:68ch}
+a{color:var(--accent)}
+code,.mono{font-family:var(--font-mono);font-size:.88em}
+code{background:var(--panel2);padding:.1em .35em;border-radius:5px}
+.muted{color:var(--muted)}
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:14px;padding-block:10px}
+.brand{font:700 .95rem var(--font-display);white-space:nowrap}
+.nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0}
+.nav a{color:var(--muted);text-decoration:none;font-size:.88rem;padding:6px 10px;border-radius:8px;white-space:nowrap}
+.nav a:hover,.nav a.on{background:var(--panel2);color:var(--ink)}
+.toggle{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:6px 10px;font:600 .8rem var(--font-mono);cursor:pointer}
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:28px;align-items:center;padding-block:36px 24px}
+.hero h1{font-size:clamp(2.1rem,5.6vw,3.7rem);font-weight:800;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.lede{font-size:1.18rem;color:var(--muted)}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.pill{font:600 .78rem var(--font-mono);border:1px solid var(--line);background:var(--panel);padding:5px 10px;border-radius:999px}
+.stage{position:relative;aspect-ratio:1/1;max-height:460px;width:100%;border:1px solid var(--line);border-radius:18px;background:radial-gradient(120% 120% at 30% 20%,var(--panel2),var(--panel));overflow:hidden;box-shadow:var(--shadow);touch-action:none;cursor:grab}
+.stage canvas{display:block;width:100%;height:100%}
+.hint{position:absolute;left:12px;bottom:10px;font:.74rem var(--font-mono);color:var(--muted);pointer-events:none}
+/* sections */
+section.s{padding-block:46px;border-top:1px solid var(--line)}
+.kicker{font:600 .78rem var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.grid{display:grid;gap:14px;margin-top:20px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;min-width:0}
+.card p{margin:.4em 0}
+.card .tag{font:600 .72rem var(--font-mono);color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.widget{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:22px;box-shadow:var(--shadow);min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:10px;padding:8px 14px;font:600 .88rem var(--font-body);cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn:focus-visible,.toggle:focus-visible,.nav a:focus-visible,summary:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.scroll-x{overflow-x:auto}
+svg{max-width:100%;height:auto;display:block}
+svg text{font-family:var(--font-mono);fill:var(--ink)}
+.small{font-size:.86rem}
+.meter{display:grid;grid-template-columns:70px 1fr 52px;gap:8px;align-items:center;font:.82rem var(--font-mono);margin:5px 0}
+.meter .bar{height:10px;background:var(--panel2);border-radius:6px;overflow:hidden}
+.meter .bar i{display:block;height:100%;background:var(--bad);transition:width .35s,background .35s}
+.meter.ok .bar i{background:var(--good)}
+.status{font:700 .95rem var(--font-display);padding:8px 12px;border-radius:10px;background:var(--panel2);display:inline-block}
+.status.good{color:var(--good)} .status.bad{color:var(--bad)}
+.badge{font:600 .72rem var(--font-mono);padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.badge.warn{color:var(--warn);border-color:var(--warn)}
+.log{font:.82rem/1.55 var(--font-mono);background:var(--panel2);border-radius:10px;padding:10px 12px;min-height:3.2em;white-space:pre-wrap;overflow-wrap:anywhere}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tab{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;padding:6px 14px;font:600 .82rem var(--font-body);cursor:pointer}
+.tab[aria-selected=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.tip{position:fixed;z-index:50;pointer-events:none;background:var(--ink);color:var(--bg);padding:6px 10px;border-radius:8px;font:.78rem/1.4 var(--font-mono);max-width:260px;opacity:0;transition:opacity .12s}
+.term{background:#0b1226;color:#dbe4ff;border-radius:12px;padding:14px 16px;font:.82rem/1.55 var(--font-mono);overflow-x:auto;white-space:pre;position:relative}
+.term .c{color:#f5b73a}.term .w{color:#ff9d8f}.term .g{color:#6fe3b5}.term .d{color:#8ea0d6}
+.copy{position:absolute;right:10px;top:10px;font:600 .72rem var(--font-mono);background:#1c2750;color:#dbe4ff;border:1px solid #31407a;border-radius:8px;padding:4px 9px;cursor:pointer}
+table.heat{border-collapse:collapse;width:100%;min-width:640px;font:.82rem var(--font-mono)}
+table.heat th,table.heat td{padding:7px 8px;text-align:center;border:1px solid var(--line)}
+table.heat th:first-child,table.heat td:first-child{text-align:left}
+details{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin:10px 0}
+summary{cursor:pointer;font:700 1rem var(--font-display)}
+details p{margin:.6em 0 .2em}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font:.78rem var(--font-mono);color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+footer{padding-block:40px 60px;border-top:1px solid var(--line);color:var(--muted);font-size:.92rem}
+.files{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:8px;margin-top:12px;font:.82rem var(--font-mono)}
+.files div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+@media (max-width:820px){.hero{grid-template-columns:1fr}.two{grid-template-columns:1fr}.stage{max-height:340px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+
+<header class="top"><div class="wrap">
+  <span class="brand">Quantum Circuit Repair</span>
+  <nav class="nav" id="nav">
+    <a href="#idea">The idea</a><a href="#qubit">Meet a qubit</a><a href="#demo">Repair it yourself</a>
+    <a href="#how">How it works</a><a href="#angle">Angle trick</a><a href="#bench">The benchmark</a>
+    <a href="#results">Results</a><a href="#tool">The tool</a><a href="#limits">Limits</a><a href="#faq">FAQ</a>
+  </nav>
+  <button class="toggle" id="themeBtn" type="button" aria-label="Switch colour theme">theme</button>
+</div></header>
+
+<main class="wrap">
+
+<section class="hero" id="top">
+  <div>
+    <div class="kicker">A research project, explained simply</div>
+    <h1>Find the bug in a quantum circuit. <em>Fix it.</em> Prove it.</h1>
+    <p class="lede">A quantum program is a short list of steps called gates. One wrong gate and the answer is wrong. This project builds a tool that finds the wrong step, repairs it with the smallest change, and then checks the fix very carefully.</p>
+    <div class="pills"><span class="pill">1000 test circuits</span><span class="pill">98.8% repaired</span><span class="pill">57 tests pass</span><span class="pill">no LLM used</span></div>
+    <p class="small muted">Drag the 3D circuit on the right. Scroll down to play with every idea on this page.</p>
+  </div>
+  <div class="stage" id="heroStage" aria-label="3D picture of a three-qubit circuit. Drag to rotate."><div class="hint">drag to rotate</div></div>
+</section>
+
+<section class="s" id="idea">
+  <div class="kicker">The idea</div>
+  <h2>Think of a recipe with one wrong step</h2>
+  <p>A quantum circuit is like a recipe. Each gate is one step. If one step is wrong, the dish is wrong. A repair tool should find that step and change it, and change nothing else.</p>
+  <p>The hard part is honesty. A tool that is allowed to read the answer key can just copy it. So in this project the repair tool <b>never sees the correct circuit</b>. It can only ask one kind of question: "how close is my circuit to the right behaviour?" Every question is counted.</p>
+  <div class="grid g4">
+    <div class="card"><div class="tag">Problem</div><h3>Bugs hide</h3><p>Quantum results are fuzzy numbers, so a wrong gate is hard to spot by reading the code.</p></div>
+    <div class="card"><div class="tag">Idea</div><h3>Ask, don't peek</h3><p>The tool only gets a score from a hidden test. It tries small edits and keeps the ones that raise the score.</p></div>
+    <div class="card"><div class="tag">Proof</div><h3>A strict judge</h3><p>A separate judge checks the final circuit exactly, on the real hardware rules, and with noise.</p></div>
+    <div class="card"><div class="tag">Honesty</div><h3>Limits are listed</h3><p>The test circuits are small and simple. We say so, and we show where the tool still fails.</p></div>
+  </div>
+</section>
+
+<section class="s" id="qubit">
+  <div class="kicker">Step 1</div>
+  <h2>Meet a qubit: a point on a sphere</h2>
+  <p>A normal bit is 0 or 1. A qubit is a point on a sphere. The top is 0, the bottom is 1, and every point between is a mix. A gate moves the point. Try the gates, then drag the sphere to look around.</p>
+  <div class="widget">
+    <div class="two">
+      <div class="stage" id="blochStage" style="max-height:380px" aria-label="3D Bloch sphere. Drag to rotate."><div class="hint">drag to rotate</div></div>
+      <div>
+        <div class="row" id="gateBtns">
+          <button class="btn" data-g="H" type="button">H</button><button class="btn" data-g="X" type="button">X</button>
+          <button class="btn" data-g="Y" type="button">Y</button><button class="btn" data-g="Z" type="button">Z</button>
+          <button class="btn" data-g="S" type="button">S</button><button class="btn" data-g="T" type="button">T</button>
+          <button class="btn" data-g="R" type="button">Reset to 0</button>
+        </div>
+        <p class="small muted" id="gateNote">H puts the qubit exactly halfway between 0 and 1.</p>
+        <label class="small" for="rxSlider">Turn around the x-axis: <b id="rxVal">0</b> degrees</label>
+        <input id="rxSlider" type="range" min="0" max="360" value="0">
+        <div class="meter" style="margin-top:14px"><span>P(0)</span><div class="bar"><i id="p0bar" style="width:100%;background:var(--good)"></i></div><span id="p0txt">100%</span></div>
+        <div class="meter"><span>P(1)</span><div class="bar"><i id="p1bar" style="width:0%;background:var(--accent)"></i></div><span id="p1txt">0%</span></div>
+        <p class="small muted">P(0) and P(1) are the chances of seeing 0 or 1 when you measure. Note that Z, S and T move the point sideways but never change these two numbers. That is a <b>phase</b> change, and it is exactly the kind of bug that simple checks miss (see "The benchmark").</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="demo">
+  <div class="kicker">Step 2</div>
+  <h2>Repair a circuit yourself</h2>
+  <p>This 3-qubit circuit should create a GHZ state, where all three qubits agree. It has one bug: the first CX gate points the wrong way. Click any gate to change it. The meters show how closely the circuit matches four hidden tests. This is a real simulation running in your browser.</p>
+  <div class="widget">
+    <div class="scroll-x"><svg id="circSvg" viewBox="0 0 640 230" role="img" aria-label="Three-qubit circuit with three editable gates"></svg></div>
+    <div class="row" style="margin:6px 0 10px">
+      <button class="btn" id="btnLocate" type="button">1. Find the bug</button>
+      <button class="btn primary" id="btnRepair" type="button">2. Let the tool repair it</button>
+      <button class="btn" id="btnReset" type="button">Put the bug back</button>
+      <span class="status bad" id="status">4 of 4 tests fail</span>
+    </div>
+    <div class="two">
+      <div id="meters"></div>
+      <div><div class="log" id="demoLog">Click a gate to change it, or press "Find the bug".</div>
+      <p class="small muted" style="margin-top:10px">Qubits 0, 1 and 2 sit in a line on the chip, like houses on a street. A gate between qubit 0 and qubit 2 skips a house, so real hardware cannot do it directly. The judge rejects that too.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="how">
+  <div class="kicker">Step 3</div>
+  <h2>How the tool works</h2>
+  <p>Three helpers work in a loop, up to three tries. Press a step to see what it does.</p>
+  <div class="widget">
+    <div class="scroll-x"><svg id="flowSvg" viewBox="0 0 760 250" role="img" aria-label="Pipeline diagram: diagnose, repair, judge"></svg></div>
+    <div class="log" id="flowLog" style="margin-top:8px"></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h3>The wall that keeps it fair</h3><p>The correct circuit is behind a wall. Only the judge can see it. The repair helper gets a small window: a score for each circuit it tries, plus a counter that tracks how many scores it asked for. We never tell it the type of bug.</p></div>
+    <div class="card"><h3>Why not just trust the score?</h3><p>The repair helper only sees a few test inputs, so it could fool itself. The judge checks the whole circuit and also uses hidden inputs. We measure the gap between the two to see how often this happens.</p></div>
+  </div>
+  <div class="widget">
+    <h3>What the judge checks, in order</h3>
+    <div class="row small" id="judgeRow" style="gap:6px;margin-top:10px"></div>
+    <div class="log" id="judgeLog" style="margin-top:10px">Press a stage to read what it checks.</div>
+  </div>
+</section>
+
+<section class="s" id="angle">
+  <div class="kicker">A clever trick</div>
+  <h2>Find the best angle in just three questions</h2>
+  <p>Many gates turn a qubit by an angle. If the angle is wrong, how do we find the right one? Trying many angles is slow. But there is a shortcut: the score always follows a smooth wave as the angle changes. A wave is fully known from three points. So we ask three questions, fit the wave, and jump straight to its top.</p>
+  <div class="widget">
+    <label class="small" for="trueAngle">The hidden correct angle: <b id="trueVal"></b></label>
+    <input id="trueAngle" type="range" min="0" max="628" value="120">
+    <div class="scroll-x"><svg id="waveSvg" viewBox="0 0 640 250" role="img" aria-label="Score as a wave of the angle with three probe points"></svg></div>
+    <div class="log" id="waveLog"></div>
+  </div>
+  <p class="small muted">The three questions are asked at 0, 120 and 240 degrees. The formula behind the wave is score = c0 + c1 cos(angle) + s1 sin(angle). Three numbers, three points, one exact answer.</p>
+</section>
+
+<section class="s" id="bench">
+  <div class="kicker">How we know the test is fair</div>
+  <h2>The first test set was broken. We fixed it.</h2>
+  <p>Before trusting any score, we checked the test set itself. We found two serious problems in the first version.</p>
+  <div class="widget">
+    <h3>Problem 1: the "right answers" were not allowed on the chip</h3>
+    <div class="tabs" role="tablist"><button class="tab" role="tab" aria-selected="true" data-v="1">First version (v1)</button><button class="tab" role="tab" aria-selected="false" data-v="2">Fixed version (v2)</button></div>
+    <div class="scroll-x"><svg id="dotsSvg" viewBox="0 0 700 330" role="img" aria-label="One thousand reference circuits as dots"></svg></div>
+    <div class="log" id="dotsLog"></div>
+    <div class="legend"><span><i style="background:var(--good)"></i>reference circuit is valid on the chip</span><span><i style="background:var(--bad)"></i>reference breaks the chip's own rules</span></div>
+    <p class="small muted">In v1, 367 of 1000 reference circuits broke the connection rule: every QFT circuit and 117 QAOA circuits. The count is exact. Which QAOA dots are red here is only illustrative.</p>
+  </div>
+  <div class="widget">
+    <h3>Problem 2: the old check was blind to a phase bug</h3>
+    <p class="small">Compare a correct 4-qubit QFT circuit with a copy where every controlled-phase gate is flipped. Pick which check to use.</p>
+    <div class="tabs" role="tablist"><button class="tab" role="tab" aria-selected="true" data-c="old">Old check: one input, |0000&gt;</button><button class="tab" role="tab" aria-selected="false" data-c="new">New check: the whole circuit</button></div>
+    <div class="meter" style="grid-template-columns:110px 1fr 60px"><span>match</span><div class="bar"><i id="blindBar"></i></div><span id="blindTxt"></span></div>
+    <div class="log" id="blindLog"></div>
+  </div>
+</section>
+
+<section class="s" id="results">
+  <div class="kicker">The numbers</div>
+  <h2>What happened on 1000 circuits</h2>
+  <p>Each system gets three tries per circuit. A circuit counts as fixed only if the judge accepts it. All numbers come from the saved result files in the repository. Hover or tap a bar for details.</p>
+  <div class="widget">
+    <div class="tabs" role="tablist" id="resTabs">
+      <button class="tab" role="tab" aria-selected="true" data-m="p3">Fixed within 3 tries (%)</button>
+      <button class="tab" role="tab" aria-selected="false" data-m="pv">Valid on the chip (%)</button>
+      <button class="tab" role="tab" aria-selected="false" data-m="q">Questions asked (average)</button>
+      <button class="tab" role="tab" aria-selected="false" data-m="weak">Weak tests (1 test input)</button>
+    </div>
+    <div class="scroll-x"><svg id="barSvg" viewBox="0 0 700 410" role="img" aria-label="Bar chart of results for each system"></svg></div>
+    <div class="log" id="barLog"></div>
+  </div>
+  <div class="grid g2">
+    <div class="widget" style="margin-top:14px">
+      <h3>More questions, better repairs</h3>
+      <label class="small" for="budSlider">Question budget: <b id="budVal"></b></label>
+      <input id="budSlider" type="range" min="0" max="6" value="3">
+      <div class="scroll-x"><svg id="budSvg" viewBox="0 0 360 230" role="img" aria-label="Line chart of repair rate against question budget"></svg></div>
+      <p class="small muted">The no-hardware-knowledge line is always exactly 20 points lower. That gap is the 200 hardware-fault circuits.</p>
+    </div>
+    <div class="widget" style="margin-top:14px">
+      <h3>Where each system succeeds</h3>
+      <div class="scroll-x"><table class="heat" id="heat"></table></div>
+      <p class="small muted">Percent fixed, by type of injected bug. Darker means better.</p>
+    </div>
+  </div>
+  <div class="widget">
+    <h3>Where it still fails, and what the extra edits fixed</h3>
+    <div class="scroll-x"><svg id="modeSvg" viewBox="0 0 700 250" role="img" aria-label="Repair rate by fault mode, base and extended"></svg></div>
+  </div>
+  <div class="grid g4">
+    <div class="card"><div class="tag">Reading 1</div><p><b>Hardware knowledge adds 20 points, but only on hardware bugs.</b> Without routing, a hardware fault cannot be fixed. On other bugs the two versions tie.</p></div>
+    <div class="card"><div class="tag">Reading 2</div><p><b>The hidden test is what makes semantic repair possible.</b> Without it the tool fixes only 60%.</p></div>
+    <div class="card"><div class="tag">Reading 3</div><p><b>Feedback helps only when tests are weak.</b> With one test input it lifts repairs from 88.1% to 97.0%.</p></div>
+    <div class="card"><div class="tag">Reading 4</div><p><b>A normal compiler is not enough.</b> Qiskit alone fixes 29.7%, because most bugs are not compile problems.</p></div>
+  </div>
+</section>
+
+<section class="s" id="tool">
+  <div class="kicker">Use it</div>
+  <h2>The command-line tool</h2>
+  <p>The project ships a small tool called <code>qrepair</code>. It has four commands. You give it a circuit, and either the correct circuit or a short file of tests. These are real outputs from the repository's example files.</p>
+  <div class="widget">
+    <div class="tabs" role="tablist" id="cliTabs">
+      <button class="tab" role="tab" aria-selected="true" data-t="lint">lint</button>
+      <button class="tab" role="tab" aria-selected="false" data-t="verify">verify</button>
+      <button class="tab" role="tab" aria-selected="false" data-t="localize">localize</button>
+      <button class="tab" role="tab" aria-selected="false" data-t="repair">repair</button>
+    </div>
+    <div class="term" id="term"><button class="copy" id="copyBtn" type="button">copy command</button></div>
+    <p class="small muted" id="cliNote"></p>
+  </div>
+</section>
+
+<section class="s" id="limits">
+  <div class="kicker">Be careful with these numbers</div>
+  <h2>What this project does not prove</h2>
+  <div class="grid g2">
+    <div class="card"><h3>The bugs are small</h3><p>Each bug is one or two changed gates, and the fix is inside the tool's search space. So 98.8% does <b>not</b> show general repair skill. The weak cells in the results charts matter more.</p></div>
+    <div class="card"><h3>Only part of the language</h3><p>The judge compares unitary circuits. Loops, timing, measurement and reset in OpenQASM 3 are not checked.</p></div>
+    <div class="card"><h3>No language model, no rivals</h3><p>No AI chatbot was used, and we did not run HornBro, UnitAR or QBugLM on this test. We make no claim to beat them.</p></div>
+    <div class="card"><h3>A model of a chip, not a chip</h3><p>Connections are checked with the simplest qubit layout and a software model of the IBM Sherbrooke device. Real devices drift and have extra rules.</p></div>
+  </div>
+</section>
+
+<section class="s" id="faq">
+  <div class="kicker">Questions</div>
+  <h2>Plain answers</h2>
+  <details><summary>What is a qubit, gate or circuit?</summary><p>A qubit is the quantum version of a bit. A gate is one operation on one or two qubits. A circuit is a list of gates. The program here is written in OpenQASM 3, a plain text format for circuits.</p></details>
+  <details><summary>What was wrong with the first results (77.5% and 99.1%)?</summary><p>The repair step was allowed to read the correct circuit and return it. Baseline results were typed in by hand, attempt counts were unequal, and bug labels leaked. After fixing all that we found the test set itself was broken. Those old numbers are kept in <code>legacy_v1/</code> for the record only.</p></details>
+  <details><summary>What does "fixed" mean?</summary><p>The judge accepts a circuit only if it parses, has the right number of qubits, follows the chip's connection and timing rules, has no gate pair that cancels itself, matches the correct circuit exactly (up to a global phase), and behaves the same under noise.</p></details>
+  <details><summary>Why count the questions?</summary><p>Searching costs something. If a tool asks a million questions it is not really repairing, it is guessing. Reporting the count keeps the comparison fair.</p></details>
+  <details><summary>What is a physical (hardware) fault?</summary><p>Two kinds: a circuit that uses a connection the chip does not have (it must be re-routed with swaps), or a wait step so long that the qubits forget their state.</p></details>
+  <details><summary>Can I trust a repair made from tests only?</summary><p>Less than one made from a reference circuit. Passing tests does not prove the circuit is right. The tool says this in its report. Use tests that include phase-sensitive inputs.</p></details>
+  <details><summary>How do I run it?</summary><p><code>pip install -r requirements.txt</code>, then <code>python -m src.cli repair examples/ghz3_buggy.qasm --tests examples/ghz3_tests.json</code>. Run <code>pytest -q</code> for the 57 tests.</p></details>
+</section>
+
+</main>
+
+<footer><div class="wrap">
+  <p><b>Repository:</b> <a href="https://github.com/alok-108/physics-constrained-quantum-repair" target="_blank" rel="noopener">github.com/alok-108/physics-constrained-quantum-repair</a></p>
+  <div class="files">
+    <div>agents/ : the helpers (diagnose, repair, judge, oracle)</div>
+    <div>src/ : benchmark, runner, analysis, CLI</div>
+    <div>data/ : 1000 circuits (buggy + correct)</div>
+    <div>experiments/ : saved results (CSV)</div>
+    <div>paper/ and research_paper/ : tables, figures, manuscript</div>
+    <div>docs/ : protocol, benchmark notes, comparison, roadmap</div>
+  </div>
+  <p class="small">All figures on this page come from the repository's result files. The 3D scenes and the repair demo are teaching tools, not the research code.</p>
+</div></footer>
+
+<div class="tip" id="tip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+"use strict";
+(function(){
+var $=function(s,r){return (r||document).querySelector(s)}, $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+var REDUCED=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var NS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent,text){var e=document.createElementNS(NS,tag);for(var k in attrs){e.setAttribute(k,attrs[k]);}if(text!=null)e.textContent=text;if(parent)parent.appendChild(e);return e;}
+function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+var tipEl=$("#tip");
+function showTip(ev,html){tipEl.innerHTML=html;tipEl.style.opacity=1;var x=ev.clientX+14,y=ev.clientY+14;var w=tipEl.offsetWidth;if(x+w>window.innerWidth-8)x=window.innerWidth-w-8;tipEl.style.left=x+"px";tipEl.style.top=y+"px";}
+function hideTip(){tipEl.style.opacity=0;}
+function tipOn(node,html){node.addEventListener("mousemove",function(e){showTip(e,html)});node.addEventListener("mouseleave",hideTip);node.addEventListener("click",function(e){showTip(e,html);setTimeout(hideTip,2500)});}
+
+/* ---------- theme ---------- */
+var themeBtn=$("#themeBtn");
+function currentDark(){var t=document.documentElement.getAttribute("data-theme");if(t)return t==="dark";return window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;}
+themeBtn.addEventListener("click",function(){document.documentElement.setAttribute("data-theme",currentDark()?"light":"dark");try{localStorage.setItem("qcr-theme",document.documentElement.getAttribute("data-theme"));}catch(e){}refreshTheme();});
+try{var saved=localStorage.getItem("qcr-theme");if(saved)document.documentElement.setAttribute("data-theme",saved);}catch(e){}
+var themeHooks=[];
+function refreshTheme(){themeHooks.forEach(function(f){try{f()}catch(e){}});}
+if(window.matchMedia){var mq=window.matchMedia("(prefers-color-scheme: dark)");if(mq.addEventListener)mq.addEventListener("change",refreshTheme);}
+
+/* ---------- active nav ---------- */
+if("IntersectionObserver" in window){
+  var links=$$("#nav a"),secs=links.map(function(a){return $(a.getAttribute("href"))});
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){links.forEach(function(a){a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id)});}})},{rootMargin:"-40% 0px -55% 0px"});
+  secs.forEach(function(s){if(s)io.observe(s)});
+}
+
+/* ---------- Three.js helpers ---------- */
+var HAS3=typeof THREE!=="undefined";
+function makeScene(container,camZ){
+  var w=container.clientWidth||400,h=container.clientHeight||400;
+  var renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));renderer.setSize(w,h);
+  container.insertBefore(renderer.domElement,container.firstChild);
+  var scene=new THREE.Scene();var cam=new THREE.PerspectiveCamera(45,w/h,0.1,100);cam.position.set(0,0,camZ);
+  scene.add(new THREE.AmbientLight(0xffffff,0.8));var dl=new THREE.DirectionalLight(0xffffff,0.7);dl.position.set(3,4,5);scene.add(dl);
+  var group=new THREE.Group();scene.add(group);
+  var drag={on:false,x:0,y:0,vx:0.004,vy:0};
+  container.addEventListener("pointerdown",function(e){drag.on=true;drag.x=e.clientX;drag.y=e.clientY;container.style.cursor="grabbing";try{container.setPointerCapture(e.pointerId)}catch(_){}});
+  container.addEventListener("pointermove",function(e){if(!drag.on)return;var dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;group.rotation.y+=dx*0.01;group.rotation.x=Math.max(-1.3,Math.min(1.3,group.rotation.x+dy*0.01));drag.vx=dx*0.0005;});
+  function up(){drag.on=false;container.style.cursor="grab";}
+  container.addEventListener("pointerup",up);container.addEventListener("pointercancel",up);
+  function resize(){var w2=container.clientWidth,h2=container.clientHeight;if(!w2||!h2)return;renderer.setSize(w2,h2);cam.aspect=w2/h2;cam.updateProjectionMatrix();}
+  window.addEventListener("resize",resize);
+  var visible=true;if("IntersectionObserver" in window){new IntersectionObserver(function(es){visible=es[0].isIntersecting}).observe(container);}
+  return {renderer:renderer,scene:scene,cam:cam,group:group,drag:drag,isVisible:function(){return visible;},resize:resize};
+}
+function hexCol(n){return new THREE.Color(cssVar(n));}
+
+/* ---------- hero scene: a 3-qubit circuit in 3D ---------- */
+if(HAS3){try{(function(){
+  var c=$("#heroStage"),S=makeScene(c,9.2),g=S.group,mats=[],photons=[];
+  var ys=[1.4,0,-1.4],len=7;
+  function box(x,y,color,label){var m=new THREE.MeshStandardMaterial({color:color,roughness:.4,metalness:.15});mats.push({m:m,v:label==="H"?"--accent":"--wire"});
+    var b=new THREE.Mesh(new THREE.BoxGeometry(.8,.8,.8),m);b.position.set(x,y,0);g.add(b);return b;}
+  var wireMat=new THREE.MeshStandardMaterial({color:0x888888});mats.push({m:wireMat,v:"--wire"});
+  ys.forEach(function(y,i){var w=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,len,10),wireMat);w.rotation.z=Math.PI/2;w.position.set(0,y,0);g.add(w);
+    for(var k=0;k<3;k++){var p=new THREE.Mesh(new THREE.SphereGeometry(.07,12,12),new THREE.MeshBasicMaterial({color:0xffffff}));mats.push({m:p.material,v:"--accent"});p.userData={y:y,t:k/3,sp:.18+.04*i};g.add(p);photons.push(p);}});
+  box(-2.2,ys[0],0,"H");
+  /* CX 0->1 at x=-0.4, CX 1->2 at x=1.8 */
+  function cx(x,yc,yt){var cm=new THREE.MeshStandardMaterial({color:0xffffff});mats.push({m:cm,v:"--accent"});var d=new THREE.Mesh(new THREE.SphereGeometry(.17,16,16),cm);d.position.set(x,yc,0);g.add(d);
+    var tm=new THREE.MeshStandardMaterial({color:0xffffff});mats.push({m:tm,v:"--accent"});var t=new THREE.Mesh(new THREE.TorusGeometry(.32,.05,12,32),tm);t.position.set(x,yt,0);g.add(t);
+    var lm=new THREE.MeshStandardMaterial({color:0xffffff});mats.push({m:lm,v:"--accent"});var l=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,Math.abs(yc-yt),8),lm);l.position.set(x,(yc+yt)/2,0);g.add(l);}
+  cx(-0.4,ys[0],ys[1]);cx(1.8,ys[1],ys[2]);
+  g.rotation.set(-.25,-.55,0);
+  function colors(){mats.forEach(function(o){o.m.color=hexCol(o.v);});}colors();themeHooks.push(colors);
+  var t0=performance.now();
+  function frame(){requestAnimationFrame(frame);if(!S.isVisible())return;var t=(performance.now()-t0)/1000;
+    if(!S.drag.on&&!REDUCED){g.rotation.y+=S.drag.vx;S.drag.vx+=(0.0035-S.drag.vx)*0.02;}
+    photons.forEach(function(p){var u=(p.userData.t+t*p.userData.sp)%1;p.position.set(-len/2+u*len,p.userData.y,0);});
+    S.renderer.render(S.scene,S.cam);}
+  frame();
+})();}catch(err){var hh=$("#heroStage .hint");if(hh)hh.textContent="3D view needs WebGL";}}
+
+/* ---------- Bloch sphere explorer ---------- */
+var bl={a:[1,0],b:[0,0]}; /* amplitude of |0> and |1> as [re,im] */
+function cmul(x,y){return [x[0]*y[0]-x[1]*y[1],x[0]*y[1]+x[1]*y[0]];}
+function cadd(x,y){return [x[0]+y[0],x[1]+y[1]];}
+function cscale(x,s){return [x[0]*s,x[1]*s];}
+var GATES={H:[[[Math.SQRT1_2,0],[Math.SQRT1_2,0]],[[Math.SQRT1_2,0],[-Math.SQRT1_2,0]]],X:[[[0,0],[1,0]],[[1,0],[0,0]]],Y:[[[0,0],[0,-1]],[[0,1],[0,0]]],Z:[[[1,0],[0,0]],[[0,0],[-1,0]]],S:[[[1,0],[0,0]],[[0,0],[0,1]]],T:[[[1,0],[0,0]],[[0,0],[Math.SQRT1_2,Math.SQRT1_2]]]};
+function apply(U,s){return {a:cadd(cmul(U[0][0],s.a),cmul(U[0][1],s.b)),b:cadd(cmul(U[1][0],s.a),cmul(U[1][1],s.b))};}
+function rxMat(th){var c=Math.cos(th/2),s=Math.sin(th/2);return [[[c,0],[0,-s]],[[0,-s],[c,0]]];}
+function blochVec(s){var re=s.a[0]*s.b[0]+s.a[1]*s.b[1],im=s.a[0]*s.b[1]-s.a[1]*s.b[0];var p0=s.a[0]*s.a[0]+s.a[1]*s.a[1],p1=s.b[0]*s.b[0]+s.b[1]*s.b[1];return {x:2*re,y:2*im,z:p0-p1,p0:p0,p1:p1};}
+var committed={a:[1,0],b:[0,0]};
+var NOTES={H:"H puts the qubit exactly halfway between 0 and 1.",X:"X flips the qubit: 0 becomes 1 and 1 becomes 0.",Y:"Y flips it and also turns it around the y-axis.",Z:"Z turns the point around the vertical axis. The chances of 0 and 1 stay the same: this is a phase change.",S:"S is a quarter turn around the vertical axis. Only the phase changes.",T:"T is an eighth turn around the vertical axis. Only the phase changes.",R:"Back to the start: the point is at the top, so the qubit is 0."};
+var blochUpdate=function(){};
+function setBloch(){var th=parseFloat($("#rxSlider").value)*Math.PI/180;var s=apply(rxMat(th),committed);var v=blochVec(s);$("#rxVal").textContent=$("#rxSlider").value;
+  var p0=Math.round(v.p0*100),p1=100-p0;$("#p0bar").style.width=p0+"%";$("#p1bar").style.width=p1+"%";$("#p0txt").textContent=p0+"%";$("#p1txt").textContent=p1+"%";blochUpdate(v);}
+$$("#gateBtns .btn").forEach(function(b){b.addEventListener("click",function(){var th=parseFloat($("#rxSlider").value)*Math.PI/180;var s=apply(rxMat(th),committed);$("#rxSlider").value=0;
+  committed=b.dataset.g==="R"?{a:[1,0],b:[0,0]}:apply(GATES[b.dataset.g],s);$("#gateNote").textContent=NOTES[b.dataset.g];setBloch();});});
+$("#rxSlider").addEventListener("input",setBloch);
+if(HAS3){try{(function(){
+  var c=$("#blochStage"),S=makeScene(c,4.6),g=S.group;
+  var sph=new THREE.Mesh(new THREE.SphereGeometry(1.4,32,24),new THREE.MeshBasicMaterial({wireframe:true,transparent:true,opacity:.28,color:0x888888}));g.add(sph);
+  var shell=new THREE.Mesh(new THREE.SphereGeometry(1.39,32,24),new THREE.MeshStandardMaterial({transparent:true,opacity:.12,color:0x888888}));g.add(shell);
+  function axis(a,b,col){var geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(a[0],a[1],a[2]),new THREE.Vector3(b[0],b[1],b[2])]);var m=new THREE.LineBasicMaterial({color:col});var l=new THREE.Line(geo,m);g.add(l);return m;}
+  var axM=[axis([-1.9,0,0],[1.9,0,0],0x888888),axis([0,-1.9,0],[0,1.9,0],0x888888),axis([0,0,-1.9],[0,0,1.9],0x888888)];
+  var arrowMat=new THREE.MeshStandardMaterial({color:0xffaa00});
+  var shaft=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,1,12),arrowMat),head=new THREE.Mesh(new THREE.ConeGeometry(.11,.28,16),arrowMat),tip=new THREE.Group();tip.add(shaft);tip.add(head);g.add(tip);
+  var dot=new THREE.Mesh(new THREE.SphereGeometry(.07,12,12),arrowMat);g.add(dot);
+  function label(txt,pos){var cv=document.createElement("canvas");cv.width=128;cv.height=64;var x=cv.getContext("2d");x.font="bold 34px monospace";x.fillStyle="#999";x.textAlign="center";x.fillText(txt,64,42);var t=new THREE.CanvasTexture(cv);var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true}));sp.position.set(pos[0],pos[1],pos[2]);sp.scale.set(.7,.35,1);g.add(sp);}
+  label("|0>",[0,1.75,0]);label("|1>",[0,-1.75,0]);label("x",[2.05,0,0]);label("y",[0,0,2.05]);
+  g.rotation.set(.35,-.5,0);
+  function colors(){var w=hexCol("--wire");sph.material.color=w;shell.material.color=w;axM.forEach(function(m){m.color=w});arrowMat.color=hexCol("--accent");}colors();themeHooks.push(colors);
+  /* Bloch (x,y,z) -> three (x, z, y): z points up */
+  blochUpdate=function(v){var X=v.x*1.4,Y=v.z*1.4,Z=v.y*1.4;var len=Math.sqrt(X*X+Y*Y+Z*Z)||1e-6;var dir=new THREE.Vector3(X,Y,Z).normalize();
+    shaft.scale.set(1,len,1);shaft.position.set(0,len/2,0);head.position.set(0,len+.14,0);tip.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir);dot.position.set(X,Y,Z);};
+  function frame(){requestAnimationFrame(frame);if(!S.isVisible())return;S.renderer.render(S.scene,S.cam);}frame();setBloch();
+})();}catch(err){var bh=$("#blochStage .hint");if(bh)bh.textContent="3D view needs WebGL";setBloch();}} else {setBloch();}
+
+/* ---------- repair demo with a real 3-qubit simulator ---------- */
+var SLOTS=[
+ {opts:[{n:"H",k:"h",q:0},{n:"X",k:"x",q:0},{n:"Z",k:"z",q:0},{n:"S",k:"s",q:0},{n:"off",k:"off"}],good:0},
+ {opts:[{n:"CX 0>1",k:"cx",c:0,t:1},{n:"CX 1>0",k:"cx",c:1,t:0},{n:"CX 0>2",k:"cx",c:0,t:2},{n:"CX 2>0",k:"cx",c:2,t:0},{n:"off",k:"off"}],good:0},
+ {opts:[{n:"CX 1>2",k:"cx",c:1,t:2},{n:"CX 2>1",k:"cx",c:2,t:1},{n:"CX 0>2",k:"cx",c:0,t:2},{n:"CX 2>0",k:"cx",c:2,t:0},{n:"off",k:"off"}],good:0}];
+var BUGGY=[0,1,0], sel=BUGGY.slice();
+function adj(a,b){return Math.abs(a-b)===1;}
+function simGate(st,o){if(o.k==="off")return st;var out=st.map(function(x){return [0,0]});
+  if(o.k==="cx"){for(var i=0;i<8;i++){var cbit=(i>>o.c)&1;var j=cbit?(i^(1<<o.t)):i;out[j]=cadd(out[j],st[i]);}return out;}
+  var U=GATES[o.k.toUpperCase()];for(var i2=0;i2<8;i2++){var b=(i2>>o.q)&1,i0=i2&~(1<<o.q),i1=i2|(1<<o.q);var amp=st[i2];
+    for(var r=0;r<2;r++){var tgt=r?i1:i0;out[tgt]=cadd(out[tgt],cmul(U[r][b],amp));}}return out;}
+function runCircuit(selection,input){var st=[];for(var i=0;i<8;i++)st.push([0,0]);st[input]=[1,0];for(var s=0;s<3;s++){st=simGate(st,SLOTS[s].opts[selection[s]]);}return st;}
+var TESTS=[{label:"000",inp:0},{label:"100",inp:4},{label:"001",inp:1},{label:"010",inp:2}];
+TESTS.forEach(function(t){t.exp=runCircuit([0,0,0],t.inp);});
+function agreement(selection){return TESTS.map(function(t){var o=runCircuit(selection,t.inp),re=0,im=0;for(var i=0;i<8;i++){re+=t.exp[i][0]*o[i][0]+t.exp[i][1]*o[i][1];im+=t.exp[i][0]*o[i][1]-t.exp[i][1]*o[i][0];}return re*re+im*im;});}
+function hwOK(selection){return selection.every(function(v,s){var o=SLOTS[s].opts[v];return o.k!=="cx"||adj(o.c,o.t);});}
+function score(selection){var a=agreement(selection);return a.reduce(function(x,y){return x+y;},0)/a.length;}
+var circSvg=$("#circSvg"),demoLog=$("#demoLog"),flash=-1;
+function drawCircuit(){circSvg.innerHTML="";var ys=[45,115,185],x0=40,x1=600;
+  ys.forEach(function(y,i){el("line",{x1:x0,y1:y,x2:x1,y2:y,stroke:cssVar("--wire"),"stroke-width":2},circSvg);el("text",{x:8,y:y+5,"font-size":14},circSvg,"q"+i);});
+  var xs=[150,310,470];
+  sel.forEach(function(v,s){var o=SLOTS[s].opts[v],x=xs[s],g=el("g",{style:"cursor:pointer",tabindex:0,role:"button","aria-label":"Gate slot "+(s+1)+": "+o.n+". Press to change."},circSvg);
+    var bad=o.k==="cx"&&!adj(o.c,o.t);var stroke=flash===s?cssVar("--accent"):(bad?cssVar("--warn"):cssVar("--line"));
+    if(o.k==="off"){el("rect",{x:x-24,y:ys[1]-22,width:48,height:44,rx:8,fill:"none",stroke:cssVar("--line"),"stroke-dasharray":"4 4"},g);el("text",{x:x,y:ys[1]+5,"text-anchor":"middle","font-size":13},g,"off");}
+    else if(o.k==="cx"){var yc=ys[o.c],yt=ys[o.t];el("line",{x1:x,y1:yc,x2:x,y2:yt,stroke:bad?cssVar("--warn"):cssVar("--accent"),"stroke-width":3},g);
+      el("circle",{cx:x,cy:yc,r:7,fill:cssVar("--accent")},g);el("circle",{cx:x,cy:yt,r:15,fill:cssVar("--bg"),stroke:bad?cssVar("--warn"):cssVar("--accent"),"stroke-width":3},g);
+      el("line",{x1:x-15,y1:yt,x2:x+15,y2:yt,stroke:bad?cssVar("--warn"):cssVar("--accent"),"stroke-width":3},g);el("line",{x1:x,y1:yt-15,x2:x,y2:yt+15,stroke:bad?cssVar("--warn"):cssVar("--accent"),"stroke-width":3},g);
+      el("rect",{x:x-26,y:Math.min(yc,yt)-22,width:52,height:Math.abs(yc-yt)+44,fill:"transparent",stroke:flash===s?cssVar("--accent"):"none","stroke-width":2,rx:10},g);
+      if(bad)el("text",{x:x+22,y:(yc+yt)/2+4,"font-size":11,fill:cssVar("--warn"),style:"fill:"+cssVar("--warn")},g,"skips a qubit");}
+    else{el("rect",{x:x-22,y:ys[o.q]-22,width:44,height:44,rx:8,fill:cssVar("--panel2"),stroke:stroke,"stroke-width":flash===s?3:1.5},g);el("text",{x:x,y:ys[o.q]+6,"text-anchor":"middle","font-size":17,"font-weight":700},g,o.n);}
+    function cycle(){sel[s]=(sel[s]+1)%SLOTS[s].opts.length;demoLog.textContent="Slot "+(s+1)+" is now "+SLOTS[s].opts[sel[s]].n+".";refreshDemo();}
+    g.addEventListener("click",cycle);g.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();cycle();}});});
+  el("text",{x:620,y:ys[1]+5,"font-size":11,"text-anchor":"end",style:"fill:"+cssVar("--muted")},circSvg,"");}
+function refreshDemo(){var a=agreement(sel),ok=hwOK(sel),all=a.every(function(x){return x>0.999;}),fails=a.filter(function(x){return x<0.999;}).length;drawCircuit();
+  $("#meters").innerHTML=TESTS.map(function(t,i){var pc=Math.round(a[i]*100);return '<div class="meter'+(a[i]>0.999?" ok":"")+'"><span>input '+t.label+'</span><div class="bar"><i style="width:'+pc+'%"></i></div><span>'+pc+'%</span></div>';}).join("");
+  var st=$("#status");if(all&&ok){st.className="status good";st.textContent="Accepted: all tests pass and the chip can run it";}
+  else if(all&&!ok){st.className="status bad";st.textContent="Tests pass, but the chip cannot run it";}
+  else{st.className="status bad";st.textContent=fails+" of 4 tests fail";}}
+function allEdits(from){var out=[];for(var s=0;s<3;s++){for(var v=0;v<SLOTS[s].opts.length;v++){if(v===from[s])continue;var t=from.slice();t[s]=v;out.push({slot:s,v:v,sel:t});}}return out;}
+$("#btnLocate").addEventListener("click",function(){var base=score(sel),per=[];allEdits(sel).forEach(function(e){if(!hwOK(e.sel))return;var gain=score(e.sel)-base;if(gain>1e-9)per.push({slot:e.slot,gain:gain,name:SLOTS[e.slot].opts[e.v].n});});
+  var best={};per.forEach(function(p){if(!best[p.slot]||p.gain>best[p.slot].gain)best[p.slot]=p;});var rows=Object.keys(best).map(function(k){return best[k];}).sort(function(a,b){return b.gain-a.gain;});
+  if(!rows.length){demoLog.textContent="No single change improves the score.";return;}
+  demoLog.textContent="Most suspicious gate first:\n"+rows.map(function(r,i){return "#"+(i+1)+"  gate "+(r.slot+1)+"  best change: "+r.name+"  (score +"+r.gain.toFixed(3)+")";}).join("\n");flash=rows[0].slot;drawCircuit();setTimeout(function(){flash=-1;drawCircuit();},1600);});
+var repairing=false;
+$("#btnRepair").addEventListener("click",function(){if(repairing)return;repairing=true;var queries=0,step=0;
+  (function loop(){var a=agreement(sel);if(a.every(function(x){return x>0.999;})&&hwOK(sel)){demoLog.textContent+="\nDone in "+step+" edit(s) and "+queries+" questions to the hidden test.";repairing=false;refreshDemo();return;}
+    var base=score(sel),best=null;allEdits(sel).forEach(function(e){queries++;if(!hwOK(e.sel))return;var gain=score(e.sel)-base;if(gain>1e-9&&(!best||gain>best.gain))best={e:e,gain:gain};});
+    if(!best){demoLog.textContent+="\nNo single edit helps any more. The tool stops.";repairing=false;return;}
+    step++;flash=best.e.slot;sel=best.e.sel;demoLog.textContent=(step===1?"":demoLog.textContent+"\n")+"Edit "+step+": slot "+(best.e.slot+1)+" -> "+SLOTS[best.e.slot].opts[best.e.v].n+" (score +"+best.gain.toFixed(3)+")";refreshDemo();setTimeout(function(){flash=-1;loop();},REDUCED?0:700);})();});
+$("#btnReset").addEventListener("click",function(){sel=BUGGY.slice();demoLog.textContent="The bug is back: the first CX points the wrong way.";repairing=false;refreshDemo();});
+themeHooks.push(drawCircuit);refreshDemo();
+
+/* ---------- pipeline diagram ---------- */
+var FLOW=[
+ {n:"Diagnose",x:30,t:"Reads the circuit and decides what kind of problem it sees: a typing mistake, a gate pair that cancels, a chip-rule problem, or a behaviour problem. It never gets the bug label from the test set."},
+ {n:"Repair",x:290,t:"Fixes syntax, cancels redundant pairs, re-routes with swaps and trims over-long waits. For behaviour bugs it tries small edits and asks the hidden test for a score. Every question is counted. It remembers circuits it already tried so a retry is never the same circuit."},
+ {n:"Judge",x:550,t:"The only part that sees the correct circuit. It runs its checks in order (syntax, qubit count, chip rules, no self-cancelling pairs, exact meaning, noise). If the circuit fails, the judge reports which check failed. In the feedback runs, a failing test input is also handed back to the repair helper."}];
+(function(){var svg=$("#flowSvg");var sel=-1;function draw(){svg.innerHTML="";
+  FLOW.forEach(function(f,i){var g=el("g",{style:"cursor:pointer",tabindex:0,role:"button","aria-label":f.n+" step"},svg);
+    el("rect",{x:f.x,y:50,width:180,height:100,rx:16,fill:sel===i?cssVar("--accent"):cssVar("--panel2"),stroke:cssVar("--line")},g);
+    el("text",{x:f.x+90,y:108,"text-anchor":"middle","font-size":20,"font-weight":700,style:"fill:"+(sel===i?cssVar("--accent-ink"):cssVar("--ink"))},g,f.n);
+    el("text",{x:f.x+90,y:35,"text-anchor":"middle","font-size":12,style:"fill:"+cssVar("--muted")},g,"step "+(i+1));
+    function pick(){sel=i;$("#flowLog").textContent=f.t;draw();}g.addEventListener("click",pick);g.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();pick();}});
+    if(i<2){el("path",{d:"M"+(f.x+185)+" 100 L"+(f.x+250)+" 100",stroke:cssVar("--wire"),"stroke-width":3,fill:"none"},svg);el("path",{d:"M"+(f.x+250)+" 100 l-9 -6 v12 z",fill:cssVar("--wire")},svg);}});
+  el("path",{d:"M640 160 Q640 225 380 225 Q120 225 120 160",stroke:cssVar("--muted"),"stroke-width":2,fill:"none","stroke-dasharray":"6 5"},svg);
+  el("text",{x:380,y:215,"text-anchor":"middle","font-size":12,style:"fill:"+cssVar("--muted")},svg,"rejected? try again (up to 3 tries)");
+  el("rect",{x:285,y:5,width:190,height:0,fill:"none"},svg);}
+  draw();$("#flowLog").textContent="Press Diagnose, Repair or Judge.";themeHooks.push(draw);})();
+(function(){var stages=[["syntax","Does the circuit parse as OpenQASM 3?"],["width","Does it use exactly the right number of qubits?"],["chip rules","Do two-qubit gates only join neighbouring qubits? Is the waiting time within what the qubits can hold? Is the depth within the limit?"],["no cancel","No gate pair left that cancels itself. Without this check an untouched circuit with a useless pair would pass."],["meaning","Is the whole circuit equal to the correct one, up to a global phase? (exact check, not just a few inputs)"],["noise","Under realistic noise, is the output within what a 4096-shot experiment could even tell apart? This uses exact probabilities, so it never rejects a perfect fix by bad luck."]];
+  var row=$("#judgeRow");stages.forEach(function(s,i){var b=document.createElement("button");b.className="btn";b.type="button";b.textContent=(i+1)+". "+s[0];b.addEventListener("click",function(){$$("#judgeRow .btn").forEach(function(x){x.classList.remove("primary")});b.classList.add("primary");$("#judgeLog").textContent=s[1];});row.appendChild(b);});})();
+
+/* ---------- angle trick ---------- */
+function drawWave(){var th0=parseInt($("#trueAngle").value,10)/100,svg=$("#waveSvg");svg.innerHTML="";var W=640,H=250,L=44,R=14,T=16,B=36;
+  function X(a){return L+(a/(2*Math.PI))*(W-L-R);}function Y(f){return T+(1-f)*(H-T-B);}
+  el("line",{x1:L,y1:Y(0),x2:W-R,y2:Y(0),stroke:cssVar("--line")},svg);el("line",{x1:L,y1:Y(1),x2:W-R,y2:Y(1),stroke:cssVar("--line"),"stroke-dasharray":"3 4"},svg);
+  [0,.5,1].forEach(function(v){el("text",{x:L-6,y:Y(v)+4,"text-anchor":"end","font-size":11},svg,v.toFixed(1));});
+  [0,90,180,270,360].forEach(function(d){el("text",{x:X(d*Math.PI/180),y:H-14,"text-anchor":"middle","font-size":11},svg,d+"°");});
+  el("text",{x:10,y:12,"font-size":11,style:"fill:"+cssVar("--muted")},svg,"score");
+  var f=function(a){return (1+Math.cos(a-th0))/2;};var d="";for(var i=0;i<=240;i++){var a=i/240*2*Math.PI;d+=(i?"L":"M")+X(a).toFixed(1)+" "+Y(f(a)).toFixed(1);}
+  el("path",{d:d,fill:"none",stroke:cssVar("--wire"),"stroke-width":2.5},svg);
+  var probes=[0,2*Math.PI/3,4*Math.PI/3],vals=probes.map(f);
+  /* solve c0 + c1 cos + s1 sin = f at the three probes (Cramer's rule) */
+  var M=probes.map(function(a){return [1,Math.cos(a),Math.sin(a)];});
+  function det(m){return m[0][0]*(m[1][1]*m[2][2]-m[1][2]*m[2][1])-m[0][1]*(m[1][0]*m[2][2]-m[1][2]*m[2][0])+m[0][2]*(m[1][0]*m[2][1]-m[1][1]*m[2][0]);}
+  function repl(c){return M.map(function(r,i){var q=r.slice();q[c]=vals[i];return q;});}
+  var D=det(M),c0=det(repl(0))/D,c1=det(repl(1))/D,s1=det(repl(2))/D;var best=Math.atan2(s1,c1);if(best<0)best+=2*Math.PI;
+  el("line",{x1:X(best),y1:T,x2:X(best),y2:H-B,stroke:cssVar("--accent"),"stroke-width":2,"stroke-dasharray":"5 4"},svg);
+  probes.forEach(function(a,i){el("circle",{cx:X(a),cy:Y(vals[i]),r:7,fill:cssVar("--accent"),stroke:cssVar("--bg"),"stroke-width":2},svg);el("text",{x:X(a),y:Y(vals[i])-12,"text-anchor":"middle","font-size":11},svg,"question "+(i+1));});
+  $("#trueVal").textContent=Math.round(th0*180/Math.PI)+"°";
+  $("#waveLog").textContent="Three scores: "+vals.map(function(v){return v.toFixed(3);}).join(", ")+"\nFitted wave: c0="+c0.toFixed(3)+"  c1="+c1.toFixed(3)+"  s1="+s1.toFixed(3)+"\nBest angle from the fit: "+Math.round(best*180/Math.PI)+"°   hidden correct angle: "+Math.round(th0*180/Math.PI)+"°";}
+$("#trueAngle").addEventListener("input",drawWave);themeHooks.push(drawWave);drawWave();
+
+/* ---------- benchmark dots ---------- */
+(function(){var svg=$("#dotsSvg"),ver=1;var fam=[["GHZ",0],["QAOA",1],["VQE",2],["QFT",3]];
+  function draw(){svg.innerHTML="";var bw=300,bh=130,gx=[20,360],gy=[24,184];
+    fam.forEach(function(f,fi){var ox=gx[fi%2],oy=gy[Math.floor(fi/2)];el("text",{x:ox,y:oy-8,"font-size":12,"font-weight":700},svg,f[0]+" (250 circuits)");
+      for(var i=0;i<250;i++){var cx=ox+(i%25)*12+4,cy=oy+Math.floor(i/25)*12+4;var bad=ver===1&&(f[0]==="QFT"||(f[0]==="QAOA"&&i<117));
+        var c=el("circle",{cx:cx,cy:cy,r:4.2,fill:bad?cssVar("--bad"):cssVar("--good"),opacity:bad?1:.75},svg);
+        tipOn(c,f[0]+" circuit "+(i+1)+": "+(bad?"reference breaks the chip's connection rule":"reference is valid on the chip"));}});
+    $("#dotsLog").textContent=ver===1?"v1: 367 of 1000 reference circuits are not allowed on the chip (250 QFT + 117 QAOA). A correct repair could still be rejected.":"v2: 0 of 1000. Every reference was re-routed with swaps (the maths result is exactly the same) and an audit tool checks all 1000.";}
+  $$("[data-v]").forEach(function(b){b.addEventListener("click",function(){ver=parseInt(b.dataset.v,10);$$("[data-v]").forEach(function(x){x.setAttribute("aria-selected",x===b)});draw();});});
+  draw();themeHooks.push(draw);})();
+(function(){var mode="old";function draw(){var v=mode==="old"?1.0:0.0156;$("#blindBar").style.width=(v*100)+"%";$("#blindBar").style.background=mode==="old"?"var(--good)":"var(--bad)";$("#blindTxt").textContent=(v*100).toFixed(mode==="old"?0:1)+"%";
+  $("#blindLog").textContent=mode==="old"?"Old check: a QFT turns |0000> into an even mix, and flipping the phases does not change that mix. The check says 100% match, so it calls the broken circuit correct.":"New check: compares what the circuit does to every input. The broken circuit matches only 1.6%. It is rejected, correctly.";}
+  $$("[data-c]").forEach(function(b){b.addEventListener("click",function(){mode=b.dataset.c;$$("[data-c]").forEach(function(x){x.setAttribute("aria-selected",x===b)});draw();});});draw();})();
+
+/* ---------- results ---------- */
+var ARMS=[
+ {id:"pd",n:"Full tool",p3:97.0,lo:95.7,hi:97.9,pv:100,q:553,kind:"ours"},
+ {id:"pde",n:"Full tool + extended edits",p3:98.8,lo:97.9,hi:99.3,pv:100,q:547,kind:"ours"},
+ {id:"pr",n:"Bare-rejection feedback",p3:97.0,lo:95.7,hi:97.9,pv:100,q:555,kind:"ours"},
+ {id:"pdq",n:"Full tool, Qiskit router",p3:97.0,lo:95.7,hi:97.9,pv:100,q:553,kind:"ours"},
+ {id:"ud",n:"No hardware knowledge",p3:77.0,lo:74.3,hi:79.5,pv:80.1,q:963,kind:"abl"},
+ {id:"st",n:"No oracle (static fixes)",p3:60.0,lo:56.9,hi:63.0,pv:100,q:0,kind:"abl"},
+ {id:"q1",n:"Qiskit compiler (O1)",p3:29.7,lo:26.9,hi:32.6,pv:69.7,q:0,kind:"base"},
+ {id:"q0",n:"Qiskit compiler (O0)",p3:9.7,lo:8.0,hi:11.7,pv:69.7,q:0,kind:"base"},
+ {id:"pz",n:"PyZX simplifier",p3:5.0,lo:3.8,hi:6.5,pv:15.1,q:0,kind:"base"}];
+var WEAK=[{n:"Full tool (feedback)",p3:97.0,lo:95.7,hi:97.9,kind:"ours"},{n:"Bare rejection",p3:88.1,lo:85.9,hi:90.0,kind:"ours"},{n:"No hardware, feedback",p3:77.0,lo:74.3,hi:79.5,kind:"abl"},{n:"No hardware, bare rejection",p3:68.1,lo:65.1,hi:70.9,kind:"abl"}];
+(function(){var metric="p3";var svg=$("#barSvg");
+  function colOf(k){return k==="ours"?cssVar("--accent"):k==="abl"?cssVar("--wire"):cssVar("--muted");}
+  function draw(){svg.innerHTML="";var data=metric==="weak"?WEAK:ARMS.slice();var key=metric==="weak"?"p3":metric;
+    if(metric!=="weak")data.sort(function(a,b){return b[key]-a[key];});
+    var max=metric==="q"?1000:100,L=190,R=70,T=10,rowH=metric==="weak"?64:40,H=T+data.length*rowH+30;svg.setAttribute("viewBox","0 0 700 "+H);
+    [0,.25,.5,.75,1].forEach(function(f){var x=L+f*(700-L-R);el("line",{x1:x,y1:T,x2:x,y2:H-24,stroke:cssVar("--line")},svg);el("text",{x:x,y:H-8,"text-anchor":"middle","font-size":11},svg,Math.round(f*max));});
+    data.forEach(function(d,i){var y=T+i*rowH+6,w=(d[key]/max)*(700-L-R);var g=el("g",{},svg);
+      el("text",{x:L-10,y:y+rowH/2-6,"text-anchor":"end","font-size":12},g,d.n);
+      var r=el("rect",{x:L,y:y,width:0,height:rowH-18,rx:6,fill:colOf(d.kind)},g);
+      requestAnimationFrame(function(){r.setAttribute("width",Math.max(w,1.5));r.style.transition=REDUCED?"none":"width .6s";});
+      if(key==="p3"&&d.lo!=null){var xl=L+(d.lo/max)*(700-L-R),xh=L+(d.hi/max)*(700-L-R),ym=y+(rowH-18)/2;el("line",{x1:xl,y1:ym,x2:xh,y2:ym,stroke:cssVar("--ink"),"stroke-width":2},g);el("line",{x1:xl,y1:ym-6,x2:xl,y2:ym+6,stroke:cssVar("--ink"),"stroke-width":2},g);el("line",{x1:xh,y1:ym-6,x2:xh,y2:ym+6,stroke:cssVar("--ink"),"stroke-width":2},g);}
+      el("text",{x:L+w+8,y:y+(rowH-18)/2+4,"font-size":12,"font-weight":700},g,d[key]+(metric==="q"?"":"%"));
+      var hit=el("rect",{x:0,y:y-4,width:700,height:rowH,fill:"transparent"},g);
+      tipOn(hit,"<b>"+d.n+"</b><br>"+(key==="p3"?"fixed: "+d.p3+"% (95% range "+d.lo+" to "+d.hi+")":key==="pv"?"valid on the chip: "+d.pv+"%":"questions asked on average: "+d.q));});
+    var msgs={p3:"Each bar is the share of the 1000 circuits that the judge accepted within three tries. Lines show the 95% range. Amber = this project's tool, blue = with a part switched off, grey = other approaches.",pv:"Share of final circuits that obey the chip's connection, timing and depth rules. A circuit that could not be produced (for example a broken file) counts as not valid.",q:"Average number of questions the repair helper asked the hidden test. Zero means the system never used it.",weak:"The hidden test is reduced to a single input state. Here the feedback loop (a failing test input is handed back) matters a lot: 97.0% against 88.1%."};
+    $("#barLog").textContent=msgs[metric];}
+  $$("#resTabs .tab").forEach(function(b){b.addEventListener("click",function(){metric=b.dataset.m;$$("#resTabs .tab").forEach(function(x){x.setAttribute("aria-selected",x===b)});draw();});});
+  draw();themeHooks.push(draw);})();
+(function(){var B=[50,100,200,400,800,1600,3200],A=[77.7,85.1,88.3,91.4,93.7,95.6,96.7],U=[57.7,65.1,68.3,71.4,73.7,75.6,76.7];var svg=$("#budSvg"),sl=$("#budSlider");
+  function draw(){svg.innerHTML="";var W=360,H=230,L=40,R=12,T=14,Bt=36,i=parseInt(sl.value,10);function X(k){return L+k/(B.length-1)*(W-L-R);}function Y(v){return T+(1-v/100)*(H-T-Bt);}
+    [0,25,50,75,100].forEach(function(v){el("line",{x1:L,y1:Y(v),x2:W-R,y2:Y(v),stroke:cssVar("--line")},svg);el("text",{x:L-6,y:Y(v)+4,"text-anchor":"end","font-size":10},svg,v);});
+    B.forEach(function(b,k){el("text",{x:X(k),y:H-16,"text-anchor":"middle","font-size":9},svg,b);});
+    [[A,"--accent"],[U,"--wire"]].forEach(function(p){var d=p[0].map(function(v,k){return (k?"L":"M")+X(k).toFixed(1)+" "+Y(v).toFixed(1);}).join("");el("path",{d:d,fill:"none",stroke:cssVar(p[1]),"stroke-width":2.5},svg);p[0].forEach(function(v,k){el("circle",{cx:X(k),cy:Y(v),r:k===i?6:3,fill:cssVar(p[1])},svg);});});
+    el("line",{x1:X(i),y1:T,x2:X(i),y2:H-Bt,stroke:cssVar("--muted"),"stroke-dasharray":"3 4"},svg);
+    el("text",{x:W/2,y:H-2,"text-anchor":"middle","font-size":10,style:"fill:"+cssVar("--muted")},svg,"questions allowed per repair");
+    $("#budVal").textContent=B[i]+" questions: full tool "+A[i]+"%, no hardware knowledge "+U[i]+"%";}
+  sl.addEventListener("input",draw);draw();themeHooks.push(draw);})();
+(function(){var cols=["Full tool","+ extended","No hardware","No oracle","Qiskit O1","Qiskit O0","PyZX"];var rows=[["Gate pair cancels",[100,100,100,100,100,0,25]],["Hardware fault",[100,100,0,100,48.5,48.5,0]],["Wrong behaviour",[100,99,100,0,0,0,0]],["Structural error",[85,95,85,0,0,0,0]],["Syntax error",[100,100,100,100,0,0,0]]];
+  var h='<tr><th></th>'+cols.map(function(c){return "<th>"+c+"</th>";}).join("")+"</tr>";rows.forEach(function(r){h+="<tr><td>"+r[0]+"</td>"+r[1].map(function(v){return '<td style="background:color-mix(in srgb,var(--accent) '+Math.round(v*0.8)+'%,var(--panel));'+(v>60?"color:var(--accent-ink)":"")+'">'+v+"</td>";}).join("")+"</tr>";});$("#heat").innerHTML=h;})();
+(function(){var svg=$("#modeSvg");var M=[["remove a gate (74)",82.4,95.9],["CX replaced by CZ (27)",63.0,100],["gate on wrong qubit (55)",87.3,87.3],["two bugs at once (33)",100,93.9],["reverse a CX (44)",100,100]];
+  function draw(){svg.innerHTML="";var L=210,R=60,W=700,rowH=44,T=10;M.forEach(function(m,i){var y=T+i*rowH;el("text",{x:L-10,y:y+22,"text-anchor":"end","font-size":12},svg,m[0]);
+    [[m[1],"--wire",0],[m[2],"--accent",16]].forEach(function(p){var w=(p[0]/100)*(W-L-R);el("rect",{x:L,y:y+p[2]+2,width:w,height:12,rx:4,fill:cssVar(p[1])},svg);el("text",{x:L+w+6,y:y+p[2]+12,"font-size":11},svg,p[0]+"%");});});
+    el("rect",{x:L,y:T+M.length*rowH+8,width:12,height:12,rx:3,fill:cssVar("--wire")},svg);el("text",{x:L+18,y:T+M.length*rowH+18,"font-size":11},svg,"base search");
+    el("rect",{x:L+130,y:T+M.length*rowH+8,width:12,height:12,rx:3,fill:cssVar("--accent")},svg);el("text",{x:L+148,y:T+M.length*rowH+18,"font-size":11},svg,"with extended edits");
+    svg.setAttribute("viewBox","0 0 700 "+(T+M.length*rowH+34));}
+  draw();themeHooks.push(draw);})();
+
+/* ---------- CLI terminal ---------- */
+(function(){var C={
+ lint:{cmd:"python -m src.cli lint examples/needs_lint.qasm",out:'<span class="w">WARNING W101</span> (instruction 3): two-qubit gate on non-adjacent device qubits [0, 3]: cx q[0,3] (identity layout)\n<span class="w">WARNING W202</span> (instruction 4): rotation by a multiple of 2*pi has no effect: rz(0) q[2]\n<span class="w">WARNING W201</span>: 2 instruction(s) cancel as adjacent inverse pairs\n<span class="d">INFO    I302</span>: 5 instructions, depth 2, 1 two-qubit gates',note:"Needs no specification. Exit status 1 because there are warnings."},
+ verify:{cmd:"python -m src.cli verify examples/ghz3_buggy.qasm --tests examples/ghz3_tests.json",out:'<span class="w">FAIL</span> (rejected at stage \'tests\')\n4 of 4 tests fail (worst agreement 0.2500).',note:"Runs the judge and names the stage that failed. Exit status 1."},
+ localize:{cmd:"python -m src.cli localize examples/ghz3_buggy.qasm --tests examples/ghz3_tests.json",out:'#1  wrong instruction 1: cx q[1,0]   [reverse, +0.750]\n#2  missing instruction before 1: cx q[1,0]   [insert_swap, +0.750]\n#3  missing instruction before 2: cx q[1,2]   [insert_cx, +0.750]\n#4  wrong instruction 0: h q[0]   [retarget, +0.250]\n#5  missing instruction before 3: (end of circuit)   [insert_h, +0.125]',note:"Ranks instructions by how much a single edit there would raise the score. On the benchmark it ranks the real faulty instruction first in 86% of 400 cases (random: 7.7%)."},
+ repair:{cmd:"python -m src.cli repair examples/ghz3_buggy.qasm --tests examples/ghz3_tests.json",out:'status: <span class="g">PASS</span>   attempts: 1   oracle queries: 67\nacceptance means: agreement >= 0.999 with every supplied test plus device\n  admissibility and irreducibility; NOT an equivalence certificate\n  attempt 1: search -> <span class="g">PASS</span>\n\n--- buggy.qasm\n+++ repaired.qasm\n@@ -2,5 +2,5 @@\n include "stdgates.inc";\n qubit[3] q;\n h q[0];\n<span class="w">-cx q[1], q[0];</span>\n<span class="g">+cx q[0], q[1];</span>\n cx q[1], q[2];\n\nwarning: test-suite specification: acceptance is not an equivalence\n  certificate; add more tests (including phase-sensitive ones)',note:"Prints a minimal diff and can also write JSON (--json) or the fixed file (--out). With a reference circuit instead of tests, acceptance is the full exact check."}};
+  var cur="lint",term=$("#term");
+  function draw(){var c=C[cur];term.innerHTML='<button class="copy" id="copyBtn" type="button">copy command</button><span class="c">$ </span>'+c.cmd+"\n\n"+c.out;$("#cliNote").textContent=c.note;
+    $("#copyBtn").addEventListener("click",function(){var b=this;function done(t){b.textContent=t;setTimeout(function(){b.textContent="copy command"},1500);}
+      try{navigator.clipboard.writeText(c.cmd).then(function(){done("copied")},function(){done("select and copy")});}catch(e){done("select and copy");}});}
+  $$("#cliTabs .tab").forEach(function(b){b.addEventListener("click",function(){cur=b.dataset.t;$$("#cliTabs .tab").forEach(function(x){x.setAttribute("aria-selected",x===b)});draw();});});draw();})();
+})();
+</script>
+
+</body>
+</html>

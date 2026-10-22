@@ -10,6 +10,8 @@ constraints (IBM FakeSherbrooke model).
 > [docs/BENCHMARK_V2.md](docs/BENCHMARK_V2.md)). They are kept under
 > [`legacy_v1/`](legacy_v1/) for audit only. Everything below is v2.
 
+**Interactive guide (plain English, 3D qubit, live repair demo, charts):** open [`docs/site/index.html`](docs/site/index.html) in a browser (self-contained; loads Three.js and fonts from CDNs).
+
 ## Use it: `qrepair`
 
 ```bash
