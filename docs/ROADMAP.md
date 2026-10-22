@@ -35,6 +35,9 @@ statement below as "reported by the literature search, not re-derived".
 | Sampled (Haar-state) semantic check for > 10 qubits, with noise stage skipped and flagged | `src/sim.py`, `agents/validator.py`, `tests/test_scalable_semantics.py` |
 | Compiler-only baseline (Qiskit SABRE + exact layout undo) | `qiskit_transpile` arm |
 | `qrepair` CLI (lint, localize, verify, repair), test-file specifications, localisation benchmark | `src/product.py`, `src/cli.py`, `src/eval_localization.py` |
+| Dynamic programs (measure, reset, if, for), benchmark v3 with wiring / control-flow / reset / loop / multi-fault classes | `src/dynamic.py`, `src/generate_v3.py`, `src/run_v3.py` |
+| Calibration-based chip estimate (ESP, duration, T1/T2; identity vs compiler layout) | `src/hardware.py`, `hardware` CLI command |
+| Local-LLM arm (Ollama), per-circuit token accounting | `agents/llm.py`, `llm_ollama` arm |
 | Extended edit neighbourhood (two-qubit substitution, analytic rotation insertion) | `extended_edits` flag, `ours_full_ext` arm |
 | Router-robustness check (own router vs Qiskit's) | `ours_full_qiskit_router` arm |
 | Positioning against Bugs4Q, HornBro, UnitAR, AutoQ, QCEC-ZX, noise-adaptive mapping | `research_paper/manuscript.tex` |

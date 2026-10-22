@@ -50,8 +50,12 @@ reversed) is confined to the physical fault class, where an arm without routing
 cannot succeed; on logical faults the arms are indistinguishable. Diagnostic
 feedback has no effect when the oracle is strong but raises Pass@3 from $88.1\%$
 to $97.0\%$ ($+8.9$ points, $p<10^{-24}$) when the initial test suite is a single
-state. No language model was executed; all results concern the deterministic
-agent.
+state. On 600 programs with measurement, reset, classical control and loops, guided repair
+fixes $92.3\%$ against $48.5\%$ for random search, and a calibration-based estimate shows that
+the benchmark's identity layout is much looser than a compiler layout (median success
+estimate $0.66$ against $0.89$). A small local language model (1.5 billion parameters, 60
+circuits) repairs $16.7\%$; this is a floor, not a verdict on language models. No circuit was
+run on real hardware.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -111,7 +115,7 @@ circuits whose inverse lies inside the agent's edit neighbourhood, so a high rat
 on single-edit faults is expected and is not evidence of general repair ability;
 the informative cells are the fault modes outside the neighbourhood and the
 weak-oracle and low-budget regimes. Hardware is a device model, connectivity is
-checked under the identity layout, and no language model was run.
+checked under the identity layout, and the only language model we ran is a small local one.
 
 \section{Related Work and Scope}
 
@@ -617,6 +621,110 @@ better than it fits the specification.
 
 \input{../paper/tables/oracle_cost.tex}
 
+\section{Beyond Unitary Circuits and the Chip Model}
+\label{sec:v3}
+
+The limitations of the main experiments (Section~\ref{sec:threats}) invite two follow-ups that
+we could carry out: programs with measurement, reset, classical control and loops, and a more
+realistic chip estimate. Both are additions to the released code, not replacements of the
+results above.
+
+\subsection{Dynamic programs (benchmark v3)}
+
+We extended the semantics to the subset of OpenQASM~3 consisting of standard gates,
+\texttt{measure}, \texttt{reset}, single-bit \texttt{if}/\texttt{else} and constant-body
+\texttt{for} loops. The classical output distribution of a program is computed exactly by
+branching on measurement outcomes. It matches Qiskit Aer on teleportation, a reset-based
+parity check and a loop program to within shot noise (maximum TVD between $0.003$ and $0.004$
+at $2\times10^5$ shots). Acceptance requires matching register sizes, adjacency of every
+two-qubit gate (also inside blocks) and equality of the output distribution (TVD $\le10^{-6}$)
+on 16 held-out inputs. The search signal uses a 4-input suite with the same query accounting
+and counterexample protocol as before.
+
+The edit grammar gains operators for these programs: re-pointing a measurement, coordinated
+swaps of two measurements (a swap cannot be undone one edit at a time, because the
+intermediate program scores worse), flipping or re-targeting a classical condition,
+deleting or inserting a reset, changing a loop count, inserting a classical correction, and a
+one-dimensional angle search (a loop repeats a rotation, so the score is multi-modal in its
+angle).
+
+Benchmark v3 has 600 programs from four families (GHZ with terminal measurement,
+teleportation, a parity check that reuses one ancilla after a reset, a loop) and six fault
+classes of 100 programs: measurement wiring, control flow, reset, loop, single gate faults and
+programs with two or three simultaneous faults. Every fault is verified observable.
+Table~\ref{tab:v3rates} and Table~\ref{tab:v3class} give the results.
+
+\input{../paper/tables/v3_rates.tex}
+
+\input{../paper/tables/v3_by_class.tex}
+
+Guided search repairs $92.3\%$ of the programs ($[89.9,94.2]$) against $48.5\%$ for random
+mutation hill climbing over the same grammar with the same oracle budget, a paired difference of
+$+0.438$ ($[0.396,0.478]$; 268 programs repaired by guided search only, 5 by random search only;
+Holm $p<10^{-70}$). Submitting the faulty program unchanged is accepted for none, so every
+fault is real. Counterexample feedback makes no measurable difference here (1 against 0
+discordant programs). Multi-fault programs are the hardest class ($67\%$): the greedy search
+needs each edit to raise the score, which two or three interacting faults do not always allow.
+
+\textbf{Unitary-blind faults.} $52.7\%$ of the faults (all wiring, control-flow and reset
+faults and $16\%$ of the multi-fault programs) leave the unitary of the gate sequence
+unchanged. This is true by definition, since measurement, reset and conditionals are not part
+of a unitary, and it means the predicate of the main experiments could not have scored them.
+Guided search repairs $98.4\%$ of these 316 programs. The remaining limits are that dynamic
+programs have no noise stage and no minimality check, loops have constant bodies, there is no
+\texttt{while} loop or multi-bit condition, and the faults are again edits whose inverse lies
+in the grammar.
+
+\subsection{A calibration-based chip estimate}
+
+Adjacency under the identity layout is a weak notion of ``runs on the chip''. We therefore
+compile circuits to FakeSherbrooke's native gates with either the identity layout or a
+compiler-chosen layout and estimate the success probability (ESP) from the snapshot's
+per-gate and readout errors, together with the duration relative to $\min(T_1,T_2)$. On 200
+benchmark references the compiler layout has the higher ESP in every case
+(Table~\ref{tab:hardware}). Under the identity layout the median ESP is $0.34$ for QFT and
+$0.22$ for QAOA, against $0.76$ and $0.79$ with the compiler layout, and the median
+QFT duration is $0.47$ of $\min(T_1,T_2)$. Two consequences follow. The acceptance predicate's
+``physically valid'' is much looser than ``would run well'', and the agent's swap-in/swap-back
+routing, which preserves the unitary exactly, is expensive on hardware. This is an estimate for
+one calibration snapshot of a simulated device; no circuit was executed on a quantum
+computer.
+
+\input{../paper/tables/hardware.tex}
+
+\subsection{A small local language model}
+
+The repository carried a language-model path that none of the numbers above used. We ran it
+with a local model (\texttt{qwen2.5-coder:1.5b} served by Ollama on a laptop CPU; temperature
+$0$, fixed seed, replies capped at 500 tokens) as the \emph{only} repair engine: no oracle
+queries, no search and no heuristic fallback, so a reply that does not parse leaves the circuit
+unchanged. It gets the same three attempts, the same stage-named feedback and the same
+acceptance predicate. Because a run takes about an hour, we used a stratified subset of 60
+circuits (three per fault class and circuit family) and compare on exactly those circuits
+(Table~\ref{tab:llm}).
+
+\input{../paper/tables/llm_rates.tex}
+
+The model repairs $16.7\%$ of the circuits within three attempts ($[9.3,28.0]$; $11.7\%$ at the
+first). Guided search repairs $98.3\%$ of the same circuits, a paired difference of $+0.817$
+($[0.686,0.891]$; 49 circuits repaired by guided search only, none by the model only). Static
+repairs without any oracle reach $60.0\%$, and the model never succeeded where they failed
+(26 against 0 discordant circuits). By class, the model repaired $4$ of $12$ syntax and $6$ of
+$12$ hardware-fault circuits and none of the gate-redundancy, semantic and structural circuits;
+it often returned the faulty circuit unchanged, and $26.7\%$ of the circuits never received a
+parsable reply. The 50 unrepaired circuits ended at the semantic stage (26), the minimality
+stage (10), the syntax stage (8) or the connectivity stage (6). A run cost on average $2.7$ calls
+and $2{,}261$ tokens per circuit and $61$ seconds of wall-clock time ($1.0$ hour in total).
+
+This result is a floor, not a verdict on language models. A $1.5$-billion-parameter model on a CPU
+is far from the frontier models used in other work, whose authors report much higher rates with
+a single retry~\cite{pham2026qbuglm} on a different benchmark and protocol; with 60 circuits and a
+single run our interval is wide; and we did not tune prompts beyond the physical-constraint
+text already in the repository. What the run does show is that the harness can host a language
+model under the same predicate and budgets, records its token and time cost, and that
+a model of this size does not substitute for the oracle-guided search here.
+
+
 \section{Threats to Validity and Limitations}
 \label{sec:threats}
 
@@ -626,17 +734,16 @@ characterises the agent on this fault distribution and says little about
 unrestricted faults. The informative evidence is the per-mode table, the
 weak-oracle regime and the budget sweep.
 
-\textbf{Language and fault coverage.} The acceptance predicate compares unitaries,
-device admissibility and noisy output distributions, so it covers the purely
-unitary subset of OpenQASM~3~\cite{cross2022openqasm3}. Control flow, timing,
-\texttt{measure}, \texttt{reset} and declared inputs and outputs need structural
-or path-level oracles that we do not implement. Empirical studies of real
-quantum bugs report that a large share concern API usage, platform and
-cross-layer behaviour rather than gate-level edits~\cite{luo2022bugfixes,
-paltenghi2021bugs}, and some of these (measurement wiring, output format,
-declaration errors) are not observable in the unitary at all. Our five classes
-therefore do not represent field prevalence; a v3 benchmark should include
-non-single-gate and non-unitary-observable faults (\texttt{docs/ROADMAP.md}).
+\textbf{Language and fault coverage.} The acceptance predicate of the main experiments compares
+unitaries, device admissibility and noisy output distributions, so it covers the purely unitary
+subset of OpenQASM~3~\cite{cross2022openqasm3}. Section~\ref{sec:v3} adds an exact semantics for
+measurement, reset, single-bit conditionals and constant-body loops, but not \texttt{while}
+loops, multi-bit conditions, timing beyond \texttt{delay}, or a noise stage for such programs.
+Empirical studies of real quantum bugs report that a large share concern API usage, platform and
+cross-layer behaviour rather than gate-level edits~\cite{luo2022bugfixes, paltenghi2021bugs}.
+Benchmarks v2 and v3 therefore do not represent field prevalence: v3 widens the fault types
+(wiring, classical control, reset, loops, multi-fault) but its faults are still injected edits
+whose inverse lies in the search grammar.
 
 \textbf{Routing by construction.} The agent's default router equals the
 construction used to build physical-fault references. We tested this directly by
@@ -666,10 +773,10 @@ structure-aware verification such as automata-based~\cite{chen2023automata} or
 ZX-based~\cite{peham2022zx} equivalence checking would be the principled
 replacement. All reported results use the exact check ($\le 8$ qubits).
 
-\textbf{Missing baselines.} No language model was executed, because no API key
-was configured; the repository contains the language-model path but every
-reported number is from the deterministic path, so nothing here is evidence
-about language-model repair. We report no externally executed QBugLM run.
+\textbf{Missing baselines.} The language-model evidence is one small local model (1.5 billion
+parameters) on 60 circuits; no frontier model was run, so nothing here characterises language-model
+repair in general. We report no externally executed QBugLM, HornBro or UnitAR run: a search on 2026-10-22
+found no public code repository for any of them. No circuit was executed on real quantum hardware.
 
 \textbf{Statistics.} The 1000 circuits are not independent draws of real
 faults; they are a generated population, so intervals describe sampling over
@@ -688,9 +795,11 @@ repair agent with analytic angle solving and oracle-guided search is accepted on
 $97.0\%$ of circuits at a matched budget of three attempts; the contribution of
 physical knowledge is confined to the physical fault class, oracle access is
 what separates semantic repair from static repair, and diagnostic feedback
-matters when the oracle is weak. The natural next steps are a language-model
-configuration, harder fault distributions outside the edit neighbourhood, and
-evaluation across device models and calibration snapshots.
+matters when the oracle is weak. Extending the semantics to measurement, reset and classical
+control lets the protocol score faults a unitary check cannot see, and a calibration-based
+estimate shows how much looser ``valid on the chip'' is than ``runs well''. The natural next
+steps are frontier language models and the published repair tools under the same predicate,
+hard faults outside the edit neighbourhood, and execution on real devices.
 
 \section*{Acknowledgment}
 

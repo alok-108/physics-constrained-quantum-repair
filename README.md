@@ -94,7 +94,10 @@ src/
   routing.py           swap-in/swap-back routing, inverse cancellation
   sim.py, edits.py     batched simulator, single-instruction edits
   run_experiments.py   parallel, resumable benchmark runner (12 arms: 2x2 factorial, no-oracle, PyZX, Qiskit levels 0-3, Qiskit-router, extended edits)
-  product.py, cli.py   the qrepair tool: lint, localize, verify, repair
+  product.py, cli.py   the qrepair tool: lint, localize, verify, repair, hardware
+  dynamic.py           measurement / reset / if / for programs: exact semantics, oracle, repair
+  generate_v3.py, run_v3.py, analyze_v3.py   benchmark v3 (600 dynamic programs)
+  hardware.py, eval_hardware.py   calibration-based chip estimate
   eval_localization.py fault-localisation accuracy on the benchmark
   analyze_results.py   exact McNemar, Newcombe intervals, Holm; tables and figures
 data/                 1000 circuits: buggy/, ground_truth/, metadata.csv
@@ -128,6 +131,29 @@ Regenerating the dataset (`python src/generate_dataset.py`, ~1 min) reproduces
 To compile the paper: `cd research_paper && pdflatex manuscript && bibtex manuscript && pdflatex manuscript && pdflatex manuscript`
 (tables and figures are read from `../paper/`).
 
+## Beyond unitary circuits, a chip estimate, and an LLM arm (benchmark v3)
+
+* **Dynamic programs.** `src/dynamic.py` gives an exact semantics for measurement, reset, `if`/`else`
+  on one bit and constant-body `for` loops (cross-checked against Qiskit Aer). Benchmark v3
+  (`python src/generate_v3.py`, 600 programs; wiring, control-flow, reset, loop, gate and
+  multi-fault classes) is scored by exact output distributions. Guided repair: **92.3 %**
+  Pass@3 [89.9, 94.2] vs 48.5 % for random search with the same budget; multi-fault programs
+  67 %. 52.7 % of these faults are invisible to a unitary-equivalence check. The CLI handles such
+  programs with `--reference` (`lint`, `verify`, `repair`).
+* **Chip estimate.** `python -m src.cli hardware circuit.qasm` compiles to FakeSherbrooke's native
+  gates and reports an estimated success probability from the calibration snapshot. On 200
+  references the benchmark's identity layout has median ESP 0.66 against 0.89 with a compiler
+  layout (QFT 0.34 vs 0.76): "physically valid" in the predicate is looser than "runs well".
+  This is a model, not a hardware run.
+* **Local LLM arm.** `agents/llm.py` talks to a local Ollama server; the `llm_ollama` arm uses the
+  model as the only repair engine (no oracle, no search). A 1.5B model (`qwen2.5-coder:1.5b`, CPU) repairs
+  **16.7 %** Pass@3 [9.3, 28.0] on 60 circuits where guided search repairs 98.3 %; this is a floor, not a
+  verdict on frontier models. See [docs/BENCHMARK_V3.md](docs/BENCHMARK_V3.md).
+* **Not possible here:** running QBugLM, HornBro or UnitAR (no public code was found), and running on
+  a real quantum computer (needs an IBM Quantum account).
+
+Details, limits and commands: [docs/BENCHMARK_V3.md](docs/BENCHMARK_V3.md).
+
 ## Protocol in one paragraph
 
 The repair side never sees the reference circuit or the injected fault label. It
@@ -141,7 +167,8 @@ process fidelity). Details: [docs/PROTOCOL.md](docs/PROTOCOL.md).
 
 ## Limitations
 
-Small edits of short circuits; connectivity under the identity layout; device
+Small injected edits (v3 widens the fault types but they are still injected); connectivity under the
+identity layout (the calibration estimate shows this is much looser than "runs well"); a device
 model rather than live hardware; no externally executed QBugLM run, no
 language-model results; the acceptance predicate covers only the purely unitary subset of
 OpenQASM 3 and the benchmark does not represent real-fault prevalence (see `docs/ROADMAP.md`). See

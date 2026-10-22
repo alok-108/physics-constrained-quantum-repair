@@ -115,7 +115,7 @@ footer{padding-block:40px 60px;border-top:1px solid var(--line);color:var(--mute
   <nav class="nav" id="nav">
     <a href="#idea">The idea</a><a href="#qubit">Meet a qubit</a><a href="#demo">Repair it yourself</a>
     <a href="#how">How it works</a><a href="#angle">Angle trick</a><a href="#bench">The benchmark</a>
-    <a href="#results">Results</a><a href="#tool">The tool</a><a href="#limits">Limits</a><a href="#faq">FAQ</a>
+    <a href="#results">Results</a><a href="#beyond">Beyond unitary</a><a href="#tool">The tool</a><a href="#limits">Limits</a><a href="#faq">FAQ</a>
   </nav>
   <button class="toggle" id="themeBtn" type="button" aria-label="Switch colour theme">theme</button>
 </div></header>
@@ -127,7 +127,7 @@ footer{padding-block:40px 60px;border-top:1px solid var(--line);color:var(--mute
     <div class="kicker">A research project, explained simply</div>
     <h1>Find the bug in a quantum circuit. <em>Fix it.</em> Prove it.</h1>
     <p class="lede">A quantum program is a short list of steps called gates. One wrong gate and the answer is wrong. This project builds a tool that finds the wrong step, repairs it with the smallest change, and then checks the fix very carefully.</p>
-    <div class="pills"><span class="pill">1000 test circuits</span><span class="pill">98.8% repaired</span><span class="pill">57 tests pass</span><span class="pill">no LLM used</span></div>
+    <div class="pills"><span class="pill">1000 test circuits</span><span class="pill">98.8% repaired</span><span class="pill">600 dynamic programs</span><span class="pill">82 tests pass</span><span class="pill">tiny local LLM: 16.7%</span></div>
     <p class="small muted">Drag the 3D circuit on the right. Scroll down to play with every idea on this page.</p>
   </div>
   <div class="stage" id="heroStage" aria-label="3D picture of a three-qubit circuit. Drag to rotate."><div class="hint">drag to rotate</div></div>
@@ -284,6 +284,34 @@ footer{padding-block:40px 60px;border-top:1px solid var(--line);color:var(--mute
   </div>
 </section>
 
+<section class="s" id="beyond">
+  <div class="kicker">Going further</div>
+  <h2>Beyond simple circuits</h2>
+  <p>Real quantum programs do more than apply gates. They <b>measure</b> qubits, <b>react</b> to the result with an if-statement, <b>reset</b> qubits to reuse them, and <b>loop</b>. The first test set could not even describe these. So we built a second one with 600 such programs, six kinds of bugs, and an exact way to compare what two programs print.</p>
+  <div class="widget">
+    <h3>How often the bug is fixed (600 programs, 3 tries each)</h3>
+    <div class="tabs" role="tablist" id="v3Tabs">
+      <button class="tab" role="tab" aria-selected="true" data-w="all">Overall</button>
+      <button class="tab" role="tab" aria-selected="false" data-w="cls">By kind of bug</button>
+    </div>
+    <div class="scroll-x"><svg id="v3Svg" viewBox="0 0 700 300" role="img" aria-label="Repair rate on dynamic programs"></svg></div>
+    <div class="log" id="v3Log"></div>
+    <div class="legend"><span><i style="background:var(--accent)"></i>guided search (this project)</span><span><i style="background:var(--muted)"></i>random edits, same budget</span></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h3>Faults a gate-only check cannot see</h3><p>If two measurements write to each other's result bit, the gates are exactly the same as before. A check that only compares gates says "fine". In the new test set, <b>52.7%</b> of the bugs are like this (by definition: a gate-only check ignores measurements, resets and if-statements). The tool fixes 98.4% of them.</p></div>
+    <div class="card"><h3>How the engine knows what a program prints</h3><p>It follows every possible measurement result, one branch at a time, and adds up the chances. No random sampling, so the answer is exact. We compared it with the Qiskit Aer simulator on three programs and the difference was only shot noise.</p></div>
+  </div>
+  <div class="widget">
+    <h3>Would a repaired circuit run well on the chip?</h3>
+    <p class="small">The judge only checks that two-qubit gates join neighbours. A better test is to compile the circuit to the chip's own gates and use the chip's published error rates to estimate the chance that the whole circuit works (ESP). Pick a circuit family.</p>
+    <div class="tabs" role="tablist" id="hwTabs"></div>
+    <div class="scroll-x"><svg id="hwSvg" viewBox="0 0 700 190" role="img" aria-label="Estimated success probability for two layouts"></svg></div>
+    <div class="log" id="hwLog"></div>
+    <p class="small muted">Medians over 50 benchmark circuits per family, using one saved calibration snapshot of a simulated IBM Sherbrooke. This is an estimate. No circuit was run on a real quantum computer.</p>
+  </div>
+</section>
+
 <section class="s" id="tool">
   <div class="kicker">Use it</div>
   <h2>The command-line tool</h2>
@@ -303,11 +331,12 @@ footer{padding-block:40px 60px;border-top:1px solid var(--line);color:var(--mute
 <section class="s" id="limits">
   <div class="kicker">Be careful with these numbers</div>
   <h2>What this project does not prove</h2>
+  <p class="small muted">Each limit below was first listed as a gap. Here is what was done about it and what is still open.</p>
   <div class="grid g2">
-    <div class="card"><h3>The bugs are small</h3><p>Each bug is one or two changed gates, and the fix is inside the tool's search space. So 98.8% does <b>not</b> show general repair skill. The weak cells in the results charts matter more.</p></div>
-    <div class="card"><h3>Only part of the language</h3><p>The judge compares unitary circuits. Loops, timing, measurement and reset in OpenQASM 3 are not checked.</p></div>
-    <div class="card"><h3>No language model, no rivals</h3><p>No AI chatbot was used, and we did not run HornBro, UnitAR or QBugLM on this test. We make no claim to beat them.</p></div>
-    <div class="card"><h3>A model of a chip, not a chip</h3><p>Connections are checked with the simplest qubit layout and a software model of the IBM Sherbrooke device. Real devices drift and have extra rules.</p></div>
+    <div class="card"><div class="tag">Bugs are small</div><h3>Wider now, still injected</h3><p>The second test set adds wrong measurement wiring, wrong if-conditions, missing resets, loop errors and programs with two or three bugs at once. But every bug is still put in by a script, and the fix lies in the tool's search space. 92% there, 98.8% on the first set: neither shows general repair skill. Several bugs at once (67%) is where it breaks.</p></div>
+    <div class="card"><div class="tag">Only part of the language</div><h3>More covered, not all</h3><p>The judge now also handles measurement, reset, one-bit if-statements and fixed loops exactly. Still missing: while loops, conditions on several bits, timing, and a noise check for such programs.</p></div>
+    <div class="card"><div class="tag">No LLM, no rivals</div><h3>A small local model, no rivals</h3><p>A small local model (1.5 billion parameters, on a laptop CPU) was tried as the only repair engine. On 60 circuits it fixed 16.7%, while the guided search fixed 98.3% of the same circuits. That is a floor, not a verdict on large language models. HornBro, UnitAR and QBugLM could not be run: no public code was found for any of them. We make no claim to beat them.</p></div>
+    <div class="card"><div class="tag">A model of a chip</div><h3>Better estimate, still no chip</h3><p>A saved calibration snapshot now gives a success estimate. It shows the simple qubit layout is much worse than a good one (QFT: 0.34 against 0.76), so "valid on the chip" in the judge is looser than "runs well". No circuit was run on a real quantum computer.</p></div>
   </div>
 </section>
 
@@ -320,7 +349,12 @@ footer{padding-block:40px 60px;border-top:1px solid var(--line);color:var(--mute
   <details><summary>Why count the questions?</summary><p>Searching costs something. If a tool asks a million questions it is not really repairing, it is guessing. Reporting the count keeps the comparison fair.</p></details>
   <details><summary>What is a physical (hardware) fault?</summary><p>Two kinds: a circuit that uses a connection the chip does not have (it must be re-routed with swaps), or a wait step so long that the qubits forget their state.</p></details>
   <details><summary>Can I trust a repair made from tests only?</summary><p>Less than one made from a reference circuit. Passing tests does not prove the circuit is right. The tool says this in its report. Use tests that include phase-sensitive inputs.</p></details>
-  <details><summary>How do I run it?</summary><p><code>pip install -r requirements.txt</code>, then <code>python -m src.cli repair examples/ghz3_buggy.qasm --tests examples/ghz3_tests.json</code>. Run <code>pytest -q</code> for the 57 tests.</p></details>
+  <details><summary>How do I run it?</summary><p><code>pip install -r requirements.txt</code>, then <code>python -m src.cli repair examples/ghz3_buggy.qasm --tests examples/ghz3_tests.json</code>. Run <code>pytest -q</code> for the 82 tests.</p></details>
+
+  <details><summary>What is a program with measurements and if-statements?</summary><p>Some quantum programs measure a qubit in the middle, then act on the result, for example "if the bit is 1, flip another qubit". Teleportation works this way. Such programs cannot be compared as plain matrices, so the second test set compares what they print, exactly.</p></details>
+  <details><summary>What does the chip estimate (ESP) mean?</summary><p>ESP is the estimated chance that every gate and every readout in the compiled circuit works, from the chip's published error rates. It is a quick estimate from one saved snapshot of a simulated device, not a test on real hardware.</p></details>
+  <details><summary>Why was no real quantum computer used?</summary><p>That needs an IBM Quantum account, a saved set of calibration data, and waiting time in a queue. None of those are in this repository, so the chip results are estimates.</p></details>
+  <details><summary>Why are HornBro, UnitAR and QBugLM missing?</summary><p>We searched and found no public code for them, so running them was not possible. Rebuilding them from the papers would not be a fair test of the real tools, so we do not report that.</p></details>
 </section>
 
 </main>
@@ -607,6 +641,42 @@ var WEAK=[{n:"Full tool (feedback)",p3:97.0,lo:95.7,hi:97.9,kind:"ours"},{n:"Bar
     el("rect",{x:L+130,y:T+M.length*rowH+8,width:12,height:12,rx:3,fill:cssVar("--accent")},svg);el("text",{x:L+148,y:T+M.length*rowH+18,"font-size":11},svg,"with extended edits");
     svg.setAttribute("viewBox","0 0 700 "+(T+M.length*rowH+34));}
   draw();themeHooks.push(draw);})();
+
+/* ---------- beyond unitary circuits: v3 results and chip estimate ---------- */
+(function(){
+  var ALL=[{n:"Guided search + feedback",v:92.3,lo:89.9,hi:94.2,k:"a"},{n:"Guided search, bare rejection",v:92.2,lo:89.7,hi:94.1,k:"a"},{n:"Random edits, same budget",v:48.5,lo:44.5,hi:52.5,k:"m"},{n:"Program left unchanged",v:0,lo:0,hi:0.6,k:"m"}];
+  var CLS=[["Measurement wiring",100,75],["Classical if-statement",100,70],["Missing reset",100,19],["Loop",91,47],["Single gate",96,51],["2 or 3 bugs at once",67,29]];
+  var mode="all",svg=$("#v3Svg");
+  function draw(){svg.innerHTML="";var L=210,R=70,W=700;
+    if(mode==="all"){svg.setAttribute("viewBox","0 0 700 250");
+      ALL.forEach(function(d,i){var y=14+i*52,w=d.v/100*(W-L-R),g=el("g",{},svg);el("text",{x:L-10,y:y+22,"text-anchor":"end","font-size":12},g,d.n);
+        el("rect",{x:L,y:y,width:Math.max(w,1.5),height:28,rx:6,fill:cssVar(d.k==="a"?"--accent":"--muted")},g);
+        var xl=L+d.lo/100*(W-L-R),xh=L+d.hi/100*(W-L-R);el("line",{x1:xl,y1:y+14,x2:xh,y2:y+14,stroke:cssVar("--ink"),"stroke-width":2},g);
+        el("text",{x:L+w+8,y:y+19,"font-size":12,"font-weight":700},g,d.v+"%");
+        var h=el("rect",{x:0,y:y-6,width:W,height:40,fill:"transparent"},g);tipOn(h,"<b>"+d.n+"</b><br>fixed: "+d.v+"% (95% range "+d.lo+" to "+d.hi+")");});
+      el("text",{x:L,y:240,"font-size":11,style:"fill:"+cssVar("--muted")},svg,"0%");el("text",{x:W-R,y:240,"font-size":11,"text-anchor":"end",style:"fill:"+cssVar("--muted")},svg,"100%");
+      $("#v3Log").textContent="Guided search fixes 92.3% of the programs. Random edits fix 48.5% with the same number of questions, so the guidance matters. Handing back the broken program unchanged fixes none, which proves every bug is real.";}
+    else{svg.setAttribute("viewBox","0 0 700 330");
+      CLS.forEach(function(c,i){var y=10+i*50,g=el("g",{},svg);el("text",{x:L-10,y:y+25,"text-anchor":"end","font-size":12},g,c[0]);
+        [[c[1],"--accent",0],[c[2],"--muted",20]].forEach(function(p){var w=p[0]/100*(W-L-R);el("rect",{x:L,y:y+p[2],width:Math.max(w,1.5),height:15,rx:4,fill:cssVar(p[1])},g);el("text",{x:L+w+6,y:y+p[2]+12,"font-size":11},g,p[0]+"%");});
+        var h=el("rect",{x:0,y:y-4,width:W,height:46,fill:"transparent"},g);tipOn(h,"<b>"+c[0]+"</b><br>guided: "+c[1]+"%<br>random: "+c[2]+"%");});
+      $("#v3Log").textContent="Missing resets and wrong if-statements are fixed every time. Several bugs at once are the hardest (67%): the search keeps an edit only if it helps by itself, and interacting bugs do not always allow that.";}}
+  $$("#v3Tabs .tab").forEach(function(b){b.addEventListener("click",function(){mode=b.dataset.w;$$("#v3Tabs .tab").forEach(function(x){x.setAttribute("aria-selected",x===b)});draw();});});
+  draw();themeHooks.push(draw);
+
+  var HW={"GHZ":[0.895,0.956,3.5,3],"QAOA":[0.223,0.794,36,26],"VQE":[0.880,0.938,6,6],"QFT":[0.342,0.760,110,31]};
+  var fam="QFT",hs=$("#hwSvg");
+  var tabs=$("#hwTabs");Object.keys(HW).forEach(function(k){var b=document.createElement("button");b.className="tab";b.type="button";b.setAttribute("role","tab");b.setAttribute("aria-selected",k===fam);b.textContent=k;
+    b.addEventListener("click",function(){fam=k;$$("#hwTabs .tab").forEach(function(x){x.setAttribute("aria-selected",x===b)});drawHw();});tabs.appendChild(b);});
+  function drawHw(){hs.innerHTML="";var d=HW[fam],L=190,R=70,W=700;
+    [["Simple layout (qubit i on chip qubit i)",d[0],"--wire",d[2]],["Layout picked by the compiler",d[1],"--accent",d[3]]].forEach(function(r,i){var y=14+i*70,w=r[1]*(W-L-R),g=el("g",{},hs);
+      el("text",{x:L-10,y:y+20,"text-anchor":"end","font-size":12},g,r[0].split(" (")[0]);if(r[0].indexOf("(")>0)el("text",{x:L-10,y:y+36,"text-anchor":"end","font-size":10,style:"fill:"+cssVar("--muted")},g,"("+r[0].split(" (")[1]);
+      el("rect",{x:L,y:y,width:w,height:34,rx:7,fill:cssVar(r[2])},g);el("text",{x:L+w+8,y:y+22,"font-size":13,"font-weight":700},g,r[1].toFixed(2));
+      el("text",{x:L,y:y+52,"font-size":11,style:"fill:"+cssVar("--muted")},g,r[3]+" two-qubit gates after compiling");});
+    el("text",{x:L,y:182,"font-size":10,style:"fill:"+cssVar("--muted")},hs,"estimated chance that the whole circuit works (1.00 = perfect)");
+    $("#hwLog").textContent=fam+": with the simple layout the chance is "+d[0].toFixed(2)+", with a better layout it is "+d[1].toFixed(2)+". "+(d[0]===d[1]||d[2]===d[3]?"Small circuits barely change.":"The circuit needs "+d[2]+" two-qubit gates on the simple layout but only "+d[3]+" on a good one.");}
+  drawHw();themeHooks.push(drawHw);
+})();
 
 /* ---------- CLI terminal ---------- */
 (function(){var C={

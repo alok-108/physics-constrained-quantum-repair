@@ -113,6 +113,11 @@ for Q in 50 100 200 400 800 1600 3200; do
          --systems ours_full unconstrained_reject_only
 done
 python src/run_experiments.py --workers 8 --out experiments/results_extra.csv        --systems ours_full_qiskit_router qiskit_transpile      # compiler baseline, router robustness
+python src/generate_v3.py                      # benchmark v3 (data_v3/, 600 dynamic programs)
+python src/run_v3.py --workers 8               # experiments/results_v3.csv (4 arms)
+python src/analyze_v3.py                       # paper/tables/v3_*.csv|tex
+python src/eval_hardware.py --workers 8        # experiments/results_hardware.csv (calibration estimate)
+QREPAIR_OLLAMA_MODEL=qwen2.5-coder:1.5b python src/run_experiments.py --systems llm_ollama --limit 20        --out experiments/results_llm.csv       # local LLM arm (needs `ollama pull`)
 python src/analyze_results.py                  # tables -> paper/tables, figures -> paper/figures
 pytest -q
 ```
