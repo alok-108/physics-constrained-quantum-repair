@@ -19,7 +19,7 @@ from typing import Any, List
 
 class OllamaChat:
     def __init__(self, model: str, host: str = "", temperature: float = 0.0,
-                 num_predict: int = 700, seed: int = 0, timeout: float = 600.0):
+                 num_predict: int = 500, seed: int = 0, timeout: float = 600.0):
         self.model, self.temperature = model, temperature
         self.host = (host or os.environ.get("QREPAIR_OLLAMA_HOST", "http://localhost:11434")).rstrip("/")
         self.num_predict, self.seed, self.timeout = num_predict, seed, timeout

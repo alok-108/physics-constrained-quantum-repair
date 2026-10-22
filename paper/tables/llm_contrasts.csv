@@ -1,0 +1,3 @@
+contrast (A vs LLM),b10,b01,risk_difference,ci_lo,ci_hi,p_exact,p_holm
+guided search vs LLM,49,0,0.817,0.686,0.891,3.552713678800501e-15,7.105427357601002e-15
+static repairs vs LLM,26,0,0.433,0.298,0.544,2.9802322387695312e-08,2.9802322387695312e-08

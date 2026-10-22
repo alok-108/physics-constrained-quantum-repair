@@ -114,3 +114,14 @@ def test_llm_token_counts_are_per_run_not_cumulative(stub_server, validator):
     a = orch.run("r1", buggy_text(), qiskit.qasm3.dumps(ghz()), {"num_qubits": 3})
     b = orch.run("r2", buggy_text(), qiskit.qasm3.dumps(ghz()), {"num_qubits": 3})
     assert a["llm_tokens"] == b["llm_tokens"] == 34 and a["llm_calls"] == b["llm_calls"] == 1
+
+
+def test_llm_only_arm_may_resubmit_the_same_circuit(stub_server):
+    """No forced diversification for the LLM: a repeated reply is returned, not turned into a failure."""
+    stub_server.reply = "```qasm\n" + buggy_text() + "\n```"
+    agent = RepairerAgent(llm_model="stub", llm_only=True)
+    first = agent.repair(buggy_text(), {"bug_type": "structural"}, {"num_qubits": 3})
+    from src.routing import circuit_key
+    tabu = {circuit_key(qiskit.qasm3.loads(first))}
+    second = agent.repair(buggy_text(), {"bug_type": "structural"}, {"num_qubits": 3}, tabu=tabu)
+    assert agent.last_strategy == "llm" and second == first

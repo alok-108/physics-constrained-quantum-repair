@@ -1,0 +1,7 @@
+system,n,P@1 (%),P@3 (%),P@3 95% CI
+local LLM only (1.5B),60,11.7,16.7,"[9.3, 28.0]"
+guided search + oracle,60,98.3,98.3,"[91.1, 99.7]"
+"static repairs, no oracle",60,60.0,60.0,"[47.4, 71.4]"
+no hardware knowledge,60,78.3,78.3,"[66.4, 86.9]"
+Qiskit compiler (O1),60,30.0,30.0,"[19.9, 42.5]"
+PyZX,60,5.0,5.0,"[1.7, 13.7]"

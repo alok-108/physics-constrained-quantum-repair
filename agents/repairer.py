@@ -128,7 +128,9 @@ class RepairerAgent:
 
         if self.llm is not None:
             cand = self._llm_repair(buggy_qasm, bug_report, spec, feedback)
-            if cand is not None and self._key_of(cand) not in tabu:
+            # In the LLM-only arm the model is not forced to diversify: resubmitting the same circuit
+            # is its own choice and is simply rejected again. "llm_failed" means no parsable reply.
+            if cand is not None and (self.llm_only or self._key_of(cand) not in tabu):
                 self.last_strategy = "llm"
                 return cand
             if self.llm_only:

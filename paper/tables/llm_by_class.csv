@@ -1,0 +1,6 @@
+bug_type,llm_ollama,ours_full,static_no_oracle
+gate_redundancy,0.0,100.0,100.0
+physics_violation,50.0,100.0,100.0
+semantic_deviation,0.0,100.0,0.0
+structural,0.0,91.7,0.0
+syntax,33.3,100.0,100.0
