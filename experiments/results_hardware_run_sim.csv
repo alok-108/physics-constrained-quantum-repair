@@ -1,0 +1,15 @@
+circuit_id,variant,num_qubits,shots,tvd_to_ideal,backend
+circuit_0001,reference,4,1000,0.1,FakeSherbrooke-simulator
+circuit_0001,repaired,4,1000,0.1,FakeSherbrooke-simulator
+circuit_0009,reference,3,1000,0.073,FakeSherbrooke-simulator
+circuit_0009,buggy,3,1000,0.499,FakeSherbrooke-simulator
+circuit_0009,repaired,3,1000,0.073,FakeSherbrooke-simulator
+circuit_0013,reference,4,1000,0.1,FakeSherbrooke-simulator
+circuit_0013,buggy,4,1000,0.1,FakeSherbrooke-simulator
+circuit_0013,repaired,4,1000,0.1,FakeSherbrooke-simulator
+circuit_0022,reference,4,1000,0.1,FakeSherbrooke-simulator
+circuit_0022,buggy,4,1000,0.544,FakeSherbrooke-simulator
+circuit_0022,repaired,4,1000,0.1,FakeSherbrooke-simulator
+circuit_0025,reference,3,1000,0.115,FakeSherbrooke-simulator
+circuit_0025,buggy,3,1000,0.556,FakeSherbrooke-simulator
+circuit_0025,repaired,3,1000,0.115,FakeSherbrooke-simulator

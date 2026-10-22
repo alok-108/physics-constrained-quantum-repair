@@ -1,0 +1,7 @@
+circuit_id,bugs4q_entry,arm,buggy_fails_at,accepted,oracle_queries,duration_s,description
+real_01,StackExchange/9,dyn_full,semantic,1,55,0.08,measurement results written to the classical bits in the wrong order (bit order bug)
+real_01,StackExchange/9,dyn_random,semantic,1,11,0.05,measurement results written to the classical bits in the wrong order (bit order bug)
+real_02,stackoverflow-6-10/bug_2,dyn_full,semantic,1,39,0.07,H gate used where an X gate was intended (wrong gate)
+real_02,stackoverflow-6-10/bug_2,dyn_random,semantic,1,29,0.06,H gate used where an X gate was intended (wrong gate)
+real_03,StackExchange/10,dyn_full,connectivity,1,107,0.28,teleportation-style fix-up written as non-adjacent CX/CZ gates after measurement instead of a Z correction
+real_03,StackExchange/10,dyn_random,connectivity,0,162,0.47,teleportation-style fix-up written as non-adjacent CX/CZ gates after measurement instead of a Z correction
