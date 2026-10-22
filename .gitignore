@@ -36,3 +36,5 @@ experiments/*.partial.jsonl
 experiments/_*.csv
 paper/build/
 .pytest_cache/
+
+experiments/llm_runs/*.partial.jsonl

@@ -31,6 +31,13 @@ class LLMError(RuntimeError):
     """An API or transport failure (not a wrong answer)."""
 
 
+class QuotaExhausted(LLMError):
+    """The API says the quota will not reset for a long time; retrying would only burn time."""
+
+
+QUOTA_WAIT_LIMIT = 300.0          # a server-supplied retryDelay above this (seconds) means "out of quota"
+
+
 class _Usage:
     calls = 0
     prompt_tokens = 0
@@ -74,7 +81,11 @@ class GeminiChat(_Usage):
 
     RETRYABLE = (429, 500, 502, 503, 504)
 
-    def __init__(self, model: str, api_key: str = "", temperature: float = 0.0, max_output_tokens: int = 2048,
+    @property
+    def tokens(self) -> int:                      # thinking tokens are billed as output
+        return self.prompt_tokens + self.output_tokens + self.thought_tokens
+
+    def __init__(self, model: str, api_key: str = "", temperature: float = 0.0, max_output_tokens: int = 8192,
                  timeout: float = 120.0, min_interval: Optional[float] = None, max_retries: int = 6,
                  thinking_budget: Optional[int] = None, base: str = ""):
         key = api_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or ""
@@ -90,6 +101,7 @@ class GeminiChat(_Usage):
         self.retries = 0
         self.rate_limited = 0
         self.thought_tokens = 0
+        self.inline_system = False          # models without systemInstruction (Gemma): system text goes in the user turn
         self._last = 0.0
 
     def _scrub(self, text: str) -> str:
@@ -103,7 +115,9 @@ class GeminiChat(_Usage):
         if self.thinking_budget is not None:
             cfg["thinkingConfig"] = {"thinkingBudget": self.thinking_budget}
         payload = {"contents": contents, "generationConfig": cfg}
-        if system:
+        if system and self.inline_system and contents:
+            contents[0]["parts"][0]["text"] = "\n\n".join(system) + "\n\n" + contents[0]["parts"][0]["text"]
+        elif system:
             payload["systemInstruction"] = {"parts": [{"text": "\n\n".join(system)}]}
         return payload
 
@@ -114,7 +128,6 @@ class GeminiChat(_Usage):
 
     def invoke(self, messages: List[Any]) -> SimpleNamespace:
         url = f"{self.base}/v1beta/models/{self.model}:generateContent"
-        data = json.dumps(self._payload(messages)).encode("utf-8")
         headers = {"Content-Type": "application/json", "x-goog-api-key": self._key}
         last_err = ""
         for attempt in range(self.max_retries + 1):
@@ -123,6 +136,7 @@ class GeminiChat(_Usage):
                 time.sleep(wait)
             t0 = time.time()
             try:
+                data = json.dumps(self._payload(messages)).encode("utf-8")
                 req = urllib.request.Request(url, data=data, headers=headers)
                 with urllib.request.urlopen(req, timeout=self.timeout) as r:
                     out = json.loads(r.read().decode("utf-8"))
@@ -130,6 +144,14 @@ class GeminiChat(_Usage):
                 body = self._scrub(e.read().decode("utf-8", "replace"))
                 self._last = time.time()
                 last_err = f"HTTP {e.code}: {body[:200]}"
+                if (e.code == 400 and "instruction" in body.lower() and not self.inline_system
+                        and any(getattr(m, "type", "") == "system" for m in messages)):
+                    self.inline_system = True                           # retry once with the system text inlined
+                    continue
+                if e.code == 429 and self._retry_delay(body) > QUOTA_WAIT_LIMIT:
+                    self.errors += 1
+                    raise QuotaExhausted(self._scrub(f"Gemini quota exhausted (resets in about "
+                                                     f"{self._retry_delay(body) / 3600:.1f} h)")) from None
                 if e.code in self.RETRYABLE and attempt < self.max_retries:
                     self.retries += 1
                     self.rate_limited += int(e.code == 429)

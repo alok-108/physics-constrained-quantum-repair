@@ -131,14 +131,23 @@ def test_llm_only_arm_may_resubmit_the_same_circuit(stub_server):
 class GeminiStub(BaseHTTPRequestHandler):
     reply = ""
     fail_first = 0                      # answer this many requests with 429 before succeeding
+    delay = "0s"                        # the retryDelay carried by those 429s
+    reject_system = False               # behave like Gemma: refuse systemInstruction
     seen = []
 
     def do_POST(self):
         body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
         GeminiStub.seen.append({"path": self.path, "key": self.headers.get("x-goog-api-key"), "body": body})
+        if GeminiStub.reject_system and "systemInstruction" in body:
+            raw = json.dumps({"error": {"code": 400, "message": "Developer instruction is not enabled for this model"}}).encode()
+            self.send_response(400)
+            self.send_header("Content-Length", str(len(raw)))
+            self.end_headers()
+            self.wfile.write(raw)
+            return
         if GeminiStub.fail_first > 0:
             GeminiStub.fail_first -= 1
-            out, code = {"error": {"message": "quota, key=SECRETKEY", "details": [{"retryDelay": "0s"}]}}, 429
+            out, code = {"error": {"message": "quota, key=SECRETKEY", "details": [{"retryDelay": GeminiStub.delay}]}}, 429
         else:
             out = {"candidates": [{"content": {"parts": [{"text": GeminiStub.reply}]}}],
                    "usageMetadata": {"promptTokenCount": 40, "candidatesTokenCount": 25, "thoughtsTokenCount": 7}}
@@ -158,7 +167,8 @@ class GeminiStub(BaseHTTPRequestHandler):
 def gemini_stub(monkeypatch):
     srv = HTTPServer(("127.0.0.1", 0), GeminiStub)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
-    GeminiStub.seen, GeminiStub.fail_first, GeminiStub.reply = [], 0, ""
+    GeminiStub.seen, GeminiStub.fail_first, GeminiStub.reply, GeminiStub.delay = [], 0, "", "0s"
+    GeminiStub.reject_system = False
     monkeypatch.setenv("QREPAIR_GEMINI_BASE", f"http://127.0.0.1:{srv.server_address[1]}")
     monkeypatch.setenv("GEMINI_API_KEY", "SECRETKEY")
     monkeypatch.setenv("QREPAIR_LLM_MIN_INTERVAL", "0")
@@ -183,6 +193,7 @@ def test_gemini_request_shape_key_in_header_and_token_accounting(gemini_stub):
     assert req["body"]["contents"] == [{"role": "user", "parts": [{"text": "fix it"}]}]
     assert req["body"]["generationConfig"]["temperature"] == 0.0
     assert (llm.calls, llm.prompt_tokens, llm.output_tokens, llm.thought_tokens) == (1, 40, 25, 7)
+    assert llm.tokens == 72                          # thinking tokens count towards cost
 
 
 def test_gemini_retries_on_429_then_succeeds(gemini_stub):
@@ -240,3 +251,44 @@ def test_make_llm_dispatch(monkeypatch):
     assert isinstance(make_llm("gemini:x"), GeminiChat) and make_llm("gemini:x").model == "x"
     assert isinstance(make_llm("ollama:qwen"), OllamaChat) and make_llm("ollama:qwen").model == "qwen"
     assert make_llm("qwen2.5-coder:1.5b").model == "qwen2.5-coder:1.5b"
+
+
+def test_gemini_daily_quota_fails_fast_instead_of_burning_retries(gemini_stub):
+    from agents.llm import GeminiChat, QuotaExhausted
+    gemini_stub.fail_first, gemini_stub.delay = 99, "85706s"
+    llm = GeminiChat("m", max_retries=6)
+    with pytest.raises(QuotaExhausted, match="quota"):
+        llm.invoke(_msgs())
+    assert len(gemini_stub.seen) == 1 and llm.retries == 0           # no retries, no waiting
+
+
+def test_quota_exhaustion_aborts_the_agent_run_rather_than_counting_as_a_wrong_answer(gemini_stub):
+    from agents.llm import QuotaExhausted
+    gemini_stub.fail_first, gemini_stub.delay = 99, "85706s"
+    agent = RepairerAgent(llm_model="gemini:m", llm_only=True)
+    with pytest.raises(QuotaExhausted):
+        agent.repair(buggy_text(), {"bug_type": "structural"}, {"num_qubits": 3})
+
+
+def test_repairer_works_without_langchain_installed():
+    import subprocess, sys, textwrap
+    code = textwrap.dedent("""
+        import sys
+        sys.modules['langchain_core'] = None; sys.modules['langchain_core.messages'] = None
+        sys.modules['langchain_openai'] = None
+        from agents import repairer
+        m = repairer.SystemMessage(content='x')
+        assert (m.type, m.content) == ('system', 'x') and repairer.HumanMessage(content='y').type == 'human'
+    """)
+    root = __import__("os").path.dirname(__import__("os").path.dirname(__file__))
+    r = subprocess.run([sys.executable, "-c", code], cwd=root, capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+
+
+def test_gemini_inlines_the_system_prompt_for_models_that_refuse_systeminstruction(gemini_stub):
+    from agents.llm import GeminiChat
+    gemini_stub.reply, gemini_stub.reject_system = "ok", True
+    llm = GeminiChat("gemma-like")
+    assert llm.invoke(_msgs(system="be exact", user="fix it")).content == "ok"
+    last = gemini_stub.seen[-1]["body"]
+    assert "systemInstruction" not in last and last["contents"][0]["parts"][0]["text"] == "be exact\n\nfix it"

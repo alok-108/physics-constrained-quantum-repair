@@ -212,7 +212,7 @@ def row_from_run(meta: Dict[str, Any], system: str, res: Dict[str, Any], buggy: 
         "depth_before": before["depth"], "depth_after": after["depth"],
         "overhead_vs_ref_pct": (None if after["gates"] is None else 100.0 * (after["gates"] - ref_gates) / ref_gates),
         "llm_tokens": res.get("llm_tokens", 0), "llm_calls": res.get("llm_calls", 0),
-        "llm_errors": res.get("llm_errors", 0),
+        "llm_errors": res.get("llm_errors", 0), "llm_model": res.get("llm_model"),
         "duration_s": round(duration, 3),
     }
 
@@ -299,6 +299,8 @@ def run_experiments(metadata_path: str, output_csv: str, systems: List[str],
         with open(partial, encoding="utf-8") as f:
             for line in f:
                 rec = json.loads(line)
+                if any((r.get("llm_errors") or 0) > 0 for r in rec["rows"]):
+                    continue
                 done[rec["circuit_id"]] = rec["rows"]
         print(f"Resuming: {len(done)} circuits already complete.")
     elif os.path.exists(partial):
@@ -313,22 +315,35 @@ def run_experiments(metadata_path: str, output_csv: str, systems: List[str],
     t0 = time.time()
     with open(partial, "a", encoding="utf-8") as sink:
         def record(cid, rows):
+            if any((r.get("llm_errors") or 0) > 0 for r in rows):
+                print(f"  {cid}: API error during the run; not recorded (it is redone on --resume)", flush=True)
+                return
             done[cid] = rows
             sink.write(json.dumps({"circuit_id": cid, "rows": rows}, default=str) + "\n")
             sink.flush()
             if len(done) % 25 == 0:
                 print(f"  {len(done)}/{len(meta)} circuits ({time.time() - t0:.0f}s)", flush=True)
 
-        if workers <= 1:
-            _init_worker(systems, budget, oracle_budget, suite_size)
-            for m in todo:
-                record(m["circuit_id"], _run_circuit(m, root))
-        else:
-            with ProcessPoolExecutor(max_workers=workers, initializer=_init_worker,
-                                     initargs=(systems, budget, oracle_budget, suite_size)) as pool:
-                futs = {pool.submit(_run_circuit, m, root): m["circuit_id"] for m in todo}
-                for fut in as_completed(futs):
-                    record(futs[fut], fut.result())
+        from agents.llm import QuotaExhausted
+        try:
+            if workers <= 1:
+                _init_worker(systems, budget, oracle_budget, suite_size)
+                for m in todo:
+                    record(m["circuit_id"], _run_circuit(m, root))
+            else:
+                with ProcessPoolExecutor(max_workers=workers, initializer=_init_worker,
+                                         initargs=(systems, budget, oracle_budget, suite_size)) as pool:
+                    futs = {pool.submit(_run_circuit, m, root): m["circuit_id"] for m in todo}
+                    try:
+                        for fut in as_completed(futs):
+                            record(futs[fut], fut.result())
+                    except QuotaExhausted:
+                        for f in futs:
+                            f.cancel()
+                        raise
+        except QuotaExhausted as e:
+            print(f"STOPPED EARLY: {e}. {len(done)}/{len(meta)} circuits are saved; run again with --resume "
+                  "after the quota resets.", flush=True)
 
     rows = [r for cid in sorted(done) for r in done[cid]]
     out = pd.DataFrame(rows)

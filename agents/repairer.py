@@ -43,8 +43,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 try:
-    from langchain_openai import ChatOpenAI
     from langchain_core.messages import SystemMessage, HumanMessage
+except ImportError:                                   # only .type and .content are used by the LLM clients
+    from types import SimpleNamespace as _NS
+
+    def SystemMessage(content):
+        return _NS(type="system", content=content)
+
+    def HumanMessage(content):
+        return _NS(type="human", content=content)
+
+try:
+    from langchain_openai import ChatOpenAI
 except ImportError:
     ChatOpenAI = None
 
@@ -57,6 +67,7 @@ from qiskit.circuit.library import (
 )
 
 from agents.diagnostician import LEAKY_KEYS
+from agents.llm import QuotaExhausted
 from agents.oracle import BehaviouralOracle
 from src.edits import Edit, apply_edit
 from src.physics_model import get_default_physics_model
@@ -156,6 +167,8 @@ class RepairerAgent:
             system = self.SYSTEM_PROMPT_PHYSICS if self.use_physics_context else self.SYSTEM_PROMPT_NO_PHYSICS
             try:
                 content = self.llm.invoke([SystemMessage(content=system), HumanMessage(content=msg)]).content.strip()
+            except QuotaExhausted:
+                raise                                   # abort the run: continuing would only record outages
             except Exception:
                 self.llm_errors += 1
                 return None
@@ -163,6 +176,8 @@ class RepairerAgent:
             cand = m.group(1).strip() if m else content
             qiskit.qasm3.loads(cand)
             return cand
+        except QuotaExhausted:
+            raise
         except Exception:
             return None
 

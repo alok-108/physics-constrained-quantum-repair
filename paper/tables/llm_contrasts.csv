@@ -1,3 +1,3 @@
 contrast (A vs LLM),n,b10,b01,risk_difference,ci_lo,ci_hi,p_exact,p_holm
-guided search vs local LLM only (1.5B),60,49,0,0.817,0.686,0.891,3.552713678800501e-15,7.105427357601002e-15
-static repairs vs local LLM only (1.5B),60,26,0,0.433,0.298,0.544,2.9802322387695312e-08,2.9802322387695312e-08
+guided search vs qwen2.5-coder:1.5b,60,49,0,0.817,0.686,0.891,3.552713678800501e-15,7.105427357601002e-15
+static repairs vs qwen2.5-coder:1.5b,60,26,0,0.433,0.298,0.544,2.9802322387695312e-08,2.9802322387695312e-08
