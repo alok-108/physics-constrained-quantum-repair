@@ -1,0 +1,17 @@
+\begin{table*}[t]
+\centering
+\caption{Benchmark v3 (600 dynamic programs), three attempts, oracle budget 3000. CI: Wilson 95\%.}
+\label{tab:v3rates}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrrr}
+\toprule
+system & n & P@1 (\%) & P@3 (\%) & P@3 95\% CI & Queries \\
+\midrule
+guided + feedback & 600 & 92.2 & 92.3 & [89.9, 94.2] & 257 \\
+guided, bare rejection & 600 & 92.2 & 92.2 & [89.7, 94.1] & 239 \\
+random search & 600 & 48.5 & 48.5 & [44.5, 52.5] & 195 \\
+unchanged program & 600 & 0.0 & 0.0 & [0.0, 0.6] & 0 \\
+\bottomrule
+\end{tabular}
+\end{table*}

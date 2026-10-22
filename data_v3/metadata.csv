@@ -1,0 +1,601 @@
+circuit_id,family,num_qubits,num_clbits,bug_class,fault_kinds,n_faults,buggy_file,reference_file,description
+dyn_0001,ghz,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0001_buggy.qasm,data_v3/reference/dyn_0001_reference.qasm,two measurements read each other's qubit
+dyn_0002,ghz,4,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0002_buggy.qasm,data_v3/reference/dyn_0002_reference.qasm,two measurements read each other's qubit
+dyn_0003,ghz,5,5,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0003_buggy.qasm,data_v3/reference/dyn_0003_reference.qasm,two measurements read each other's qubit
+dyn_0004,ghz,4,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0004_buggy.qasm,data_v3/reference/dyn_0004_reference.qasm,two measurements write to each other's classical bit
+dyn_0005,ghz,4,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0005_buggy.qasm,data_v3/reference/dyn_0005_reference.qasm,two measurements write to each other's classical bit
+dyn_0006,ghz,5,5,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0006_buggy.qasm,data_v3/reference/dyn_0006_reference.qasm,two measurements write to each other's classical bit
+dyn_0007,ghz,4,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0007_buggy.qasm,data_v3/reference/dyn_0007_reference.qasm,two measurements write to each other's classical bit
+dyn_0008,ghz,5,5,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0008_buggy.qasm,data_v3/reference/dyn_0008_reference.qasm,two measurements read each other's qubit
+dyn_0009,ghz,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0009_buggy.qasm,data_v3/reference/dyn_0009_reference.qasm,two measurements write to each other's classical bit
+dyn_0010,ghz,4,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0010_buggy.qasm,data_v3/reference/dyn_0010_reference.qasm,two measurements write to each other's classical bit
+dyn_0011,ghz,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0011_buggy.qasm,data_v3/reference/dyn_0011_reference.qasm,two measurements write to each other's classical bit
+dyn_0012,ghz,4,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0012_buggy.qasm,data_v3/reference/dyn_0012_reference.qasm,two measurements write to each other's classical bit
+dyn_0013,ghz,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0013_buggy.qasm,data_v3/reference/dyn_0013_reference.qasm,two measurements read each other's qubit
+dyn_0014,ghz,4,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0014_buggy.qasm,data_v3/reference/dyn_0014_reference.qasm,two measurements write to each other's classical bit
+dyn_0015,ghz,5,5,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0015_buggy.qasm,data_v3/reference/dyn_0015_reference.qasm,two measurements read each other's qubit
+dyn_0016,ghz,4,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0016_buggy.qasm,data_v3/reference/dyn_0016_reference.qasm,two measurements read each other's qubit
+dyn_0017,ghz,4,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0017_buggy.qasm,data_v3/reference/dyn_0017_reference.qasm,two measurements read each other's qubit
+dyn_0018,ghz,5,5,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0018_buggy.qasm,data_v3/reference/dyn_0018_reference.qasm,two measurements read each other's qubit
+dyn_0019,ghz,4,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0019_buggy.qasm,data_v3/reference/dyn_0019_reference.qasm,two measurements write to each other's classical bit
+dyn_0020,ghz,4,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0020_buggy.qasm,data_v3/reference/dyn_0020_reference.qasm,two measurements write to each other's classical bit
+dyn_0021,ghz,5,5,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0021_buggy.qasm,data_v3/reference/dyn_0021_reference.qasm,two measurements write to each other's classical bit
+dyn_0022,ghz,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0022_buggy.qasm,data_v3/reference/dyn_0022_reference.qasm,two measurements write to each other's classical bit
+dyn_0023,ghz,4,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0023_buggy.qasm,data_v3/reference/dyn_0023_reference.qasm,two measurements write to each other's classical bit
+dyn_0024,ghz,4,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0024_buggy.qasm,data_v3/reference/dyn_0024_reference.qasm,two measurements read each other's qubit
+dyn_0025,ghz,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0025_buggy.qasm,data_v3/reference/dyn_0025_reference.qasm,two measurements read each other's qubit
+dyn_0026,ghz,4,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0026_buggy.qasm,data_v3/reference/dyn_0026_reference.qasm,two measurements read each other's qubit
+dyn_0027,ghz,5,5,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0027_buggy.qasm,data_v3/reference/dyn_0027_reference.qasm,two measurements read each other's qubit
+dyn_0028,ghz,5,5,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0028_buggy.qasm,data_v3/reference/dyn_0028_reference.qasm,two measurements write to each other's classical bit
+dyn_0029,ghz,5,5,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0029_buggy.qasm,data_v3/reference/dyn_0029_reference.qasm,two measurements write to each other's classical bit
+dyn_0030,ghz,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0030_buggy.qasm,data_v3/reference/dyn_0030_reference.qasm,two measurements read each other's qubit
+dyn_0031,ghz,4,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0031_buggy.qasm,data_v3/reference/dyn_0031_reference.qasm,two measurements write to each other's classical bit
+dyn_0032,ghz,4,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0032_buggy.qasm,data_v3/reference/dyn_0032_reference.qasm,two measurements write to each other's classical bit
+dyn_0033,ghz,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0033_buggy.qasm,data_v3/reference/dyn_0033_reference.qasm,two measurements write to each other's classical bit
+dyn_0034,ghz,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0034_buggy.qasm,data_v3/reference/dyn_0034_reference.qasm,two measurements read each other's qubit
+dyn_0035,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0035_buggy.qasm,data_v3/reference/dyn_0035_reference.qasm,two measurements write to each other's classical bit
+dyn_0036,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0036_buggy.qasm,data_v3/reference/dyn_0036_reference.qasm,two measurements write to each other's classical bit
+dyn_0037,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0037_buggy.qasm,data_v3/reference/dyn_0037_reference.qasm,two measurements read each other's qubit
+dyn_0038,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0038_buggy.qasm,data_v3/reference/dyn_0038_reference.qasm,two measurements read each other's qubit
+dyn_0039,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0039_buggy.qasm,data_v3/reference/dyn_0039_reference.qasm,two measurements read each other's qubit
+dyn_0040,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0040_buggy.qasm,data_v3/reference/dyn_0040_reference.qasm,two measurements read each other's qubit
+dyn_0041,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0041_buggy.qasm,data_v3/reference/dyn_0041_reference.qasm,two measurements read each other's qubit
+dyn_0042,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0042_buggy.qasm,data_v3/reference/dyn_0042_reference.qasm,two measurements read each other's qubit
+dyn_0043,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0043_buggy.qasm,data_v3/reference/dyn_0043_reference.qasm,two measurements read each other's qubit
+dyn_0044,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0044_buggy.qasm,data_v3/reference/dyn_0044_reference.qasm,two measurements write to each other's classical bit
+dyn_0045,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0045_buggy.qasm,data_v3/reference/dyn_0045_reference.qasm,two measurements write to each other's classical bit
+dyn_0046,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0046_buggy.qasm,data_v3/reference/dyn_0046_reference.qasm,two measurements write to each other's classical bit
+dyn_0047,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0047_buggy.qasm,data_v3/reference/dyn_0047_reference.qasm,two measurements write to each other's classical bit
+dyn_0048,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0048_buggy.qasm,data_v3/reference/dyn_0048_reference.qasm,two measurements read each other's qubit
+dyn_0049,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0049_buggy.qasm,data_v3/reference/dyn_0049_reference.qasm,two measurements read each other's qubit
+dyn_0050,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0050_buggy.qasm,data_v3/reference/dyn_0050_reference.qasm,two measurements write to each other's classical bit
+dyn_0051,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0051_buggy.qasm,data_v3/reference/dyn_0051_reference.qasm,two measurements read each other's qubit
+dyn_0052,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0052_buggy.qasm,data_v3/reference/dyn_0052_reference.qasm,two measurements write to each other's classical bit
+dyn_0053,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0053_buggy.qasm,data_v3/reference/dyn_0053_reference.qasm,two measurements read each other's qubit
+dyn_0054,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0054_buggy.qasm,data_v3/reference/dyn_0054_reference.qasm,two measurements read each other's qubit
+dyn_0055,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0055_buggy.qasm,data_v3/reference/dyn_0055_reference.qasm,two measurements read each other's qubit
+dyn_0056,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0056_buggy.qasm,data_v3/reference/dyn_0056_reference.qasm,two measurements read each other's qubit
+dyn_0057,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0057_buggy.qasm,data_v3/reference/dyn_0057_reference.qasm,two measurements read each other's qubit
+dyn_0058,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0058_buggy.qasm,data_v3/reference/dyn_0058_reference.qasm,two measurements write to each other's classical bit
+dyn_0059,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0059_buggy.qasm,data_v3/reference/dyn_0059_reference.qasm,two measurements write to each other's classical bit
+dyn_0060,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0060_buggy.qasm,data_v3/reference/dyn_0060_reference.qasm,two measurements write to each other's classical bit
+dyn_0061,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0061_buggy.qasm,data_v3/reference/dyn_0061_reference.qasm,two measurements write to each other's classical bit
+dyn_0062,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0062_buggy.qasm,data_v3/reference/dyn_0062_reference.qasm,two measurements read each other's qubit
+dyn_0063,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0063_buggy.qasm,data_v3/reference/dyn_0063_reference.qasm,two measurements write to each other's classical bit
+dyn_0064,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0064_buggy.qasm,data_v3/reference/dyn_0064_reference.qasm,two measurements read each other's qubit
+dyn_0065,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0065_buggy.qasm,data_v3/reference/dyn_0065_reference.qasm,two measurements write to each other's classical bit
+dyn_0066,teleport,3,3,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0066_buggy.qasm,data_v3/reference/dyn_0066_reference.qasm,two measurements read each other's qubit
+dyn_0067,teleport,3,3,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0067_buggy.qasm,data_v3/reference/dyn_0067_reference.qasm,two measurements write to each other's classical bit
+dyn_0068,parity,3,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0068_buggy.qasm,data_v3/reference/dyn_0068_reference.qasm,two measurements read each other's qubit
+dyn_0069,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0069_buggy.qasm,data_v3/reference/dyn_0069_reference.qasm,two measurements write to each other's classical bit
+dyn_0070,parity,3,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0070_buggy.qasm,data_v3/reference/dyn_0070_reference.qasm,two measurements read each other's qubit
+dyn_0071,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0071_buggy.qasm,data_v3/reference/dyn_0071_reference.qasm,two measurements write to each other's classical bit
+dyn_0072,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0072_buggy.qasm,data_v3/reference/dyn_0072_reference.qasm,two measurements write to each other's classical bit
+dyn_0073,parity,3,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0073_buggy.qasm,data_v3/reference/dyn_0073_reference.qasm,two measurements read each other's qubit
+dyn_0074,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0074_buggy.qasm,data_v3/reference/dyn_0074_reference.qasm,two measurements write to each other's classical bit
+dyn_0075,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0075_buggy.qasm,data_v3/reference/dyn_0075_reference.qasm,two measurements write to each other's classical bit
+dyn_0076,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0076_buggy.qasm,data_v3/reference/dyn_0076_reference.qasm,two measurements write to each other's classical bit
+dyn_0077,parity,3,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0077_buggy.qasm,data_v3/reference/dyn_0077_reference.qasm,two measurements read each other's qubit
+dyn_0078,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0078_buggy.qasm,data_v3/reference/dyn_0078_reference.qasm,two measurements write to each other's classical bit
+dyn_0079,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0079_buggy.qasm,data_v3/reference/dyn_0079_reference.qasm,two measurements write to each other's classical bit
+dyn_0080,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0080_buggy.qasm,data_v3/reference/dyn_0080_reference.qasm,two measurements write to each other's classical bit
+dyn_0081,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0081_buggy.qasm,data_v3/reference/dyn_0081_reference.qasm,two measurements write to each other's classical bit
+dyn_0082,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0082_buggy.qasm,data_v3/reference/dyn_0082_reference.qasm,two measurements write to each other's classical bit
+dyn_0083,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0083_buggy.qasm,data_v3/reference/dyn_0083_reference.qasm,two measurements write to each other's classical bit
+dyn_0084,parity,3,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0084_buggy.qasm,data_v3/reference/dyn_0084_reference.qasm,two measurements read each other's qubit
+dyn_0085,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0085_buggy.qasm,data_v3/reference/dyn_0085_reference.qasm,two measurements write to each other's classical bit
+dyn_0086,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0086_buggy.qasm,data_v3/reference/dyn_0086_reference.qasm,two measurements write to each other's classical bit
+dyn_0087,parity,3,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0087_buggy.qasm,data_v3/reference/dyn_0087_reference.qasm,two measurements read each other's qubit
+dyn_0088,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0088_buggy.qasm,data_v3/reference/dyn_0088_reference.qasm,two measurements write to each other's classical bit
+dyn_0089,parity,3,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0089_buggy.qasm,data_v3/reference/dyn_0089_reference.qasm,two measurements read each other's qubit
+dyn_0090,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0090_buggy.qasm,data_v3/reference/dyn_0090_reference.qasm,two measurements write to each other's classical bit
+dyn_0091,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0091_buggy.qasm,data_v3/reference/dyn_0091_reference.qasm,two measurements write to each other's classical bit
+dyn_0092,parity,3,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0092_buggy.qasm,data_v3/reference/dyn_0092_reference.qasm,two measurements read each other's qubit
+dyn_0093,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0093_buggy.qasm,data_v3/reference/dyn_0093_reference.qasm,two measurements write to each other's classical bit
+dyn_0094,parity,3,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0094_buggy.qasm,data_v3/reference/dyn_0094_reference.qasm,two measurements read each other's qubit
+dyn_0095,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0095_buggy.qasm,data_v3/reference/dyn_0095_reference.qasm,two measurements write to each other's classical bit
+dyn_0096,parity,3,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0096_buggy.qasm,data_v3/reference/dyn_0096_reference.qasm,two measurements read each other's qubit
+dyn_0097,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0097_buggy.qasm,data_v3/reference/dyn_0097_reference.qasm,two measurements write to each other's classical bit
+dyn_0098,parity,3,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0098_buggy.qasm,data_v3/reference/dyn_0098_reference.qasm,two measurements read each other's qubit
+dyn_0099,parity,3,4,wiring,swap_measure_qubits,1,data_v3/buggy/dyn_0099_buggy.qasm,data_v3/reference/dyn_0099_reference.qasm,two measurements read each other's qubit
+dyn_0100,parity,3,4,wiring,swap_measure_bits,1,data_v3/buggy/dyn_0100_buggy.qasm,data_v3/reference/dyn_0100_reference.qasm,two measurements write to each other's classical bit
+dyn_0101,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0101_buggy.qasm,data_v3/reference/dyn_0101_reference.qasm,condition reads the wrong classical bit
+dyn_0102,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0102_buggy.qasm,data_v3/reference/dyn_0102_reference.qasm,correction applies the wrong gate
+dyn_0103,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0103_buggy.qasm,data_v3/reference/dyn_0103_reference.qasm,classical condition inverted
+dyn_0104,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0104_buggy.qasm,data_v3/reference/dyn_0104_reference.qasm,condition reads the wrong classical bit
+dyn_0105,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0105_buggy.qasm,data_v3/reference/dyn_0105_reference.qasm,classical condition inverted
+dyn_0106,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0106_buggy.qasm,data_v3/reference/dyn_0106_reference.qasm,correction applies the wrong gate
+dyn_0107,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0107_buggy.qasm,data_v3/reference/dyn_0107_reference.qasm,classical correction missing
+dyn_0108,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0108_buggy.qasm,data_v3/reference/dyn_0108_reference.qasm,classical correction missing
+dyn_0109,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0109_buggy.qasm,data_v3/reference/dyn_0109_reference.qasm,condition reads the wrong classical bit
+dyn_0110,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0110_buggy.qasm,data_v3/reference/dyn_0110_reference.qasm,classical correction missing
+dyn_0111,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0111_buggy.qasm,data_v3/reference/dyn_0111_reference.qasm,condition reads the wrong classical bit
+dyn_0112,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0112_buggy.qasm,data_v3/reference/dyn_0112_reference.qasm,classical condition inverted
+dyn_0113,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0113_buggy.qasm,data_v3/reference/dyn_0113_reference.qasm,correction applies the wrong gate
+dyn_0114,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0114_buggy.qasm,data_v3/reference/dyn_0114_reference.qasm,correction applies the wrong gate
+dyn_0115,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0115_buggy.qasm,data_v3/reference/dyn_0115_reference.qasm,correction applies the wrong gate
+dyn_0116,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0116_buggy.qasm,data_v3/reference/dyn_0116_reference.qasm,classical correction missing
+dyn_0117,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0117_buggy.qasm,data_v3/reference/dyn_0117_reference.qasm,correction applies the wrong gate
+dyn_0118,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0118_buggy.qasm,data_v3/reference/dyn_0118_reference.qasm,classical correction missing
+dyn_0119,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0119_buggy.qasm,data_v3/reference/dyn_0119_reference.qasm,correction applies the wrong gate
+dyn_0120,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0120_buggy.qasm,data_v3/reference/dyn_0120_reference.qasm,condition reads the wrong classical bit
+dyn_0121,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0121_buggy.qasm,data_v3/reference/dyn_0121_reference.qasm,correction applies the wrong gate
+dyn_0122,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0122_buggy.qasm,data_v3/reference/dyn_0122_reference.qasm,classical condition inverted
+dyn_0123,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0123_buggy.qasm,data_v3/reference/dyn_0123_reference.qasm,correction applies the wrong gate
+dyn_0124,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0124_buggy.qasm,data_v3/reference/dyn_0124_reference.qasm,condition reads the wrong classical bit
+dyn_0125,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0125_buggy.qasm,data_v3/reference/dyn_0125_reference.qasm,classical condition inverted
+dyn_0126,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0126_buggy.qasm,data_v3/reference/dyn_0126_reference.qasm,correction applies the wrong gate
+dyn_0127,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0127_buggy.qasm,data_v3/reference/dyn_0127_reference.qasm,correction applies the wrong gate
+dyn_0128,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0128_buggy.qasm,data_v3/reference/dyn_0128_reference.qasm,classical condition inverted
+dyn_0129,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0129_buggy.qasm,data_v3/reference/dyn_0129_reference.qasm,correction applies the wrong gate
+dyn_0130,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0130_buggy.qasm,data_v3/reference/dyn_0130_reference.qasm,classical correction missing
+dyn_0131,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0131_buggy.qasm,data_v3/reference/dyn_0131_reference.qasm,classical correction missing
+dyn_0132,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0132_buggy.qasm,data_v3/reference/dyn_0132_reference.qasm,classical condition inverted
+dyn_0133,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0133_buggy.qasm,data_v3/reference/dyn_0133_reference.qasm,classical condition inverted
+dyn_0134,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0134_buggy.qasm,data_v3/reference/dyn_0134_reference.qasm,classical correction missing
+dyn_0135,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0135_buggy.qasm,data_v3/reference/dyn_0135_reference.qasm,classical correction missing
+dyn_0136,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0136_buggy.qasm,data_v3/reference/dyn_0136_reference.qasm,classical correction missing
+dyn_0137,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0137_buggy.qasm,data_v3/reference/dyn_0137_reference.qasm,classical condition inverted
+dyn_0138,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0138_buggy.qasm,data_v3/reference/dyn_0138_reference.qasm,classical correction missing
+dyn_0139,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0139_buggy.qasm,data_v3/reference/dyn_0139_reference.qasm,classical correction missing
+dyn_0140,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0140_buggy.qasm,data_v3/reference/dyn_0140_reference.qasm,classical correction missing
+dyn_0141,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0141_buggy.qasm,data_v3/reference/dyn_0141_reference.qasm,classical correction missing
+dyn_0142,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0142_buggy.qasm,data_v3/reference/dyn_0142_reference.qasm,classical condition inverted
+dyn_0143,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0143_buggy.qasm,data_v3/reference/dyn_0143_reference.qasm,correction applies the wrong gate
+dyn_0144,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0144_buggy.qasm,data_v3/reference/dyn_0144_reference.qasm,classical condition inverted
+dyn_0145,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0145_buggy.qasm,data_v3/reference/dyn_0145_reference.qasm,correction applies the wrong gate
+dyn_0146,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0146_buggy.qasm,data_v3/reference/dyn_0146_reference.qasm,correction applies the wrong gate
+dyn_0147,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0147_buggy.qasm,data_v3/reference/dyn_0147_reference.qasm,classical condition inverted
+dyn_0148,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0148_buggy.qasm,data_v3/reference/dyn_0148_reference.qasm,correction applies the wrong gate
+dyn_0149,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0149_buggy.qasm,data_v3/reference/dyn_0149_reference.qasm,classical correction missing
+dyn_0150,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0150_buggy.qasm,data_v3/reference/dyn_0150_reference.qasm,correction applies the wrong gate
+dyn_0151,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0151_buggy.qasm,data_v3/reference/dyn_0151_reference.qasm,classical condition inverted
+dyn_0152,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0152_buggy.qasm,data_v3/reference/dyn_0152_reference.qasm,classical condition inverted
+dyn_0153,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0153_buggy.qasm,data_v3/reference/dyn_0153_reference.qasm,classical correction missing
+dyn_0154,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0154_buggy.qasm,data_v3/reference/dyn_0154_reference.qasm,classical correction missing
+dyn_0155,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0155_buggy.qasm,data_v3/reference/dyn_0155_reference.qasm,correction applies the wrong gate
+dyn_0156,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0156_buggy.qasm,data_v3/reference/dyn_0156_reference.qasm,condition reads the wrong classical bit
+dyn_0157,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0157_buggy.qasm,data_v3/reference/dyn_0157_reference.qasm,condition reads the wrong classical bit
+dyn_0158,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0158_buggy.qasm,data_v3/reference/dyn_0158_reference.qasm,correction applies the wrong gate
+dyn_0159,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0159_buggy.qasm,data_v3/reference/dyn_0159_reference.qasm,condition reads the wrong classical bit
+dyn_0160,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0160_buggy.qasm,data_v3/reference/dyn_0160_reference.qasm,correction applies the wrong gate
+dyn_0161,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0161_buggy.qasm,data_v3/reference/dyn_0161_reference.qasm,correction applies the wrong gate
+dyn_0162,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0162_buggy.qasm,data_v3/reference/dyn_0162_reference.qasm,classical condition inverted
+dyn_0163,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0163_buggy.qasm,data_v3/reference/dyn_0163_reference.qasm,classical condition inverted
+dyn_0164,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0164_buggy.qasm,data_v3/reference/dyn_0164_reference.qasm,condition reads the wrong classical bit
+dyn_0165,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0165_buggy.qasm,data_v3/reference/dyn_0165_reference.qasm,correction applies the wrong gate
+dyn_0166,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0166_buggy.qasm,data_v3/reference/dyn_0166_reference.qasm,classical condition inverted
+dyn_0167,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0167_buggy.qasm,data_v3/reference/dyn_0167_reference.qasm,condition reads the wrong classical bit
+dyn_0168,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0168_buggy.qasm,data_v3/reference/dyn_0168_reference.qasm,classical correction missing
+dyn_0169,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0169_buggy.qasm,data_v3/reference/dyn_0169_reference.qasm,correction applies the wrong gate
+dyn_0170,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0170_buggy.qasm,data_v3/reference/dyn_0170_reference.qasm,condition reads the wrong classical bit
+dyn_0171,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0171_buggy.qasm,data_v3/reference/dyn_0171_reference.qasm,correction applies the wrong gate
+dyn_0172,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0172_buggy.qasm,data_v3/reference/dyn_0172_reference.qasm,correction applies the wrong gate
+dyn_0173,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0173_buggy.qasm,data_v3/reference/dyn_0173_reference.qasm,correction applies the wrong gate
+dyn_0174,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0174_buggy.qasm,data_v3/reference/dyn_0174_reference.qasm,condition reads the wrong classical bit
+dyn_0175,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0175_buggy.qasm,data_v3/reference/dyn_0175_reference.qasm,classical correction missing
+dyn_0176,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0176_buggy.qasm,data_v3/reference/dyn_0176_reference.qasm,condition reads the wrong classical bit
+dyn_0177,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0177_buggy.qasm,data_v3/reference/dyn_0177_reference.qasm,classical condition inverted
+dyn_0178,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0178_buggy.qasm,data_v3/reference/dyn_0178_reference.qasm,classical correction missing
+dyn_0179,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0179_buggy.qasm,data_v3/reference/dyn_0179_reference.qasm,correction applies the wrong gate
+dyn_0180,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0180_buggy.qasm,data_v3/reference/dyn_0180_reference.qasm,correction applies the wrong gate
+dyn_0181,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0181_buggy.qasm,data_v3/reference/dyn_0181_reference.qasm,correction applies the wrong gate
+dyn_0182,teleport,3,3,control_flow,flip_condition,1,data_v3/buggy/dyn_0182_buggy.qasm,data_v3/reference/dyn_0182_reference.qasm,classical condition inverted
+dyn_0183,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0183_buggy.qasm,data_v3/reference/dyn_0183_reference.qasm,classical correction missing
+dyn_0184,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0184_buggy.qasm,data_v3/reference/dyn_0184_reference.qasm,condition reads the wrong classical bit
+dyn_0185,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0185_buggy.qasm,data_v3/reference/dyn_0185_reference.qasm,correction applies the wrong gate
+dyn_0186,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0186_buggy.qasm,data_v3/reference/dyn_0186_reference.qasm,correction applies the wrong gate
+dyn_0187,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0187_buggy.qasm,data_v3/reference/dyn_0187_reference.qasm,correction applies the wrong gate
+dyn_0188,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0188_buggy.qasm,data_v3/reference/dyn_0188_reference.qasm,correction applies the wrong gate
+dyn_0189,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0189_buggy.qasm,data_v3/reference/dyn_0189_reference.qasm,correction applies the wrong gate
+dyn_0190,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0190_buggy.qasm,data_v3/reference/dyn_0190_reference.qasm,classical correction missing
+dyn_0191,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0191_buggy.qasm,data_v3/reference/dyn_0191_reference.qasm,condition reads the wrong classical bit
+dyn_0192,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0192_buggy.qasm,data_v3/reference/dyn_0192_reference.qasm,condition reads the wrong classical bit
+dyn_0193,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0193_buggy.qasm,data_v3/reference/dyn_0193_reference.qasm,correction applies the wrong gate
+dyn_0194,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0194_buggy.qasm,data_v3/reference/dyn_0194_reference.qasm,correction applies the wrong gate
+dyn_0195,teleport,3,3,control_flow,condition_bit,1,data_v3/buggy/dyn_0195_buggy.qasm,data_v3/reference/dyn_0195_reference.qasm,condition reads the wrong classical bit
+dyn_0196,teleport,3,3,control_flow,delete_if,1,data_v3/buggy/dyn_0196_buggy.qasm,data_v3/reference/dyn_0196_reference.qasm,classical correction missing
+dyn_0197,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0197_buggy.qasm,data_v3/reference/dyn_0197_reference.qasm,correction applies the wrong gate
+dyn_0198,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0198_buggy.qasm,data_v3/reference/dyn_0198_reference.qasm,correction applies the wrong gate
+dyn_0199,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0199_buggy.qasm,data_v3/reference/dyn_0199_reference.qasm,correction applies the wrong gate
+dyn_0200,teleport,3,3,control_flow,body_gate,1,data_v3/buggy/dyn_0200_buggy.qasm,data_v3/reference/dyn_0200_reference.qasm,correction applies the wrong gate
+dyn_0201,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0201_buggy.qasm,data_v3/reference/dyn_0201_reference.qasm,reset applied to the wrong qubit
+dyn_0202,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0202_buggy.qasm,data_v3/reference/dyn_0202_reference.qasm,reset applied to the wrong qubit
+dyn_0203,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0203_buggy.qasm,data_v3/reference/dyn_0203_reference.qasm,reset applied to the wrong qubit
+dyn_0204,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0204_buggy.qasm,data_v3/reference/dyn_0204_reference.qasm,reset missing
+dyn_0205,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0205_buggy.qasm,data_v3/reference/dyn_0205_reference.qasm,reset applied to the wrong qubit
+dyn_0206,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0206_buggy.qasm,data_v3/reference/dyn_0206_reference.qasm,reset applied to the wrong qubit
+dyn_0207,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0207_buggy.qasm,data_v3/reference/dyn_0207_reference.qasm,reset applied to the wrong qubit
+dyn_0208,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0208_buggy.qasm,data_v3/reference/dyn_0208_reference.qasm,reset missing
+dyn_0209,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0209_buggy.qasm,data_v3/reference/dyn_0209_reference.qasm,reset missing
+dyn_0210,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0210_buggy.qasm,data_v3/reference/dyn_0210_reference.qasm,reset applied to the wrong qubit
+dyn_0211,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0211_buggy.qasm,data_v3/reference/dyn_0211_reference.qasm,reset applied to the wrong qubit
+dyn_0212,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0212_buggy.qasm,data_v3/reference/dyn_0212_reference.qasm,reset missing
+dyn_0213,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0213_buggy.qasm,data_v3/reference/dyn_0213_reference.qasm,reset missing
+dyn_0214,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0214_buggy.qasm,data_v3/reference/dyn_0214_reference.qasm,reset missing
+dyn_0215,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0215_buggy.qasm,data_v3/reference/dyn_0215_reference.qasm,reset applied to the wrong qubit
+dyn_0216,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0216_buggy.qasm,data_v3/reference/dyn_0216_reference.qasm,reset applied to the wrong qubit
+dyn_0217,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0217_buggy.qasm,data_v3/reference/dyn_0217_reference.qasm,reset missing
+dyn_0218,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0218_buggy.qasm,data_v3/reference/dyn_0218_reference.qasm,reset applied to the wrong qubit
+dyn_0219,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0219_buggy.qasm,data_v3/reference/dyn_0219_reference.qasm,reset applied to the wrong qubit
+dyn_0220,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0220_buggy.qasm,data_v3/reference/dyn_0220_reference.qasm,reset missing
+dyn_0221,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0221_buggy.qasm,data_v3/reference/dyn_0221_reference.qasm,reset missing
+dyn_0222,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0222_buggy.qasm,data_v3/reference/dyn_0222_reference.qasm,reset applied to the wrong qubit
+dyn_0223,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0223_buggy.qasm,data_v3/reference/dyn_0223_reference.qasm,reset missing
+dyn_0224,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0224_buggy.qasm,data_v3/reference/dyn_0224_reference.qasm,reset applied to the wrong qubit
+dyn_0225,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0225_buggy.qasm,data_v3/reference/dyn_0225_reference.qasm,reset applied to the wrong qubit
+dyn_0226,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0226_buggy.qasm,data_v3/reference/dyn_0226_reference.qasm,reset applied to the wrong qubit
+dyn_0227,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0227_buggy.qasm,data_v3/reference/dyn_0227_reference.qasm,reset missing
+dyn_0228,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0228_buggy.qasm,data_v3/reference/dyn_0228_reference.qasm,reset applied to the wrong qubit
+dyn_0229,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0229_buggy.qasm,data_v3/reference/dyn_0229_reference.qasm,reset missing
+dyn_0230,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0230_buggy.qasm,data_v3/reference/dyn_0230_reference.qasm,reset missing
+dyn_0231,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0231_buggy.qasm,data_v3/reference/dyn_0231_reference.qasm,reset missing
+dyn_0232,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0232_buggy.qasm,data_v3/reference/dyn_0232_reference.qasm,reset applied to the wrong qubit
+dyn_0233,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0233_buggy.qasm,data_v3/reference/dyn_0233_reference.qasm,reset applied to the wrong qubit
+dyn_0234,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0234_buggy.qasm,data_v3/reference/dyn_0234_reference.qasm,reset applied to the wrong qubit
+dyn_0235,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0235_buggy.qasm,data_v3/reference/dyn_0235_reference.qasm,reset missing
+dyn_0236,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0236_buggy.qasm,data_v3/reference/dyn_0236_reference.qasm,reset applied to the wrong qubit
+dyn_0237,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0237_buggy.qasm,data_v3/reference/dyn_0237_reference.qasm,reset applied to the wrong qubit
+dyn_0238,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0238_buggy.qasm,data_v3/reference/dyn_0238_reference.qasm,reset applied to the wrong qubit
+dyn_0239,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0239_buggy.qasm,data_v3/reference/dyn_0239_reference.qasm,reset applied to the wrong qubit
+dyn_0240,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0240_buggy.qasm,data_v3/reference/dyn_0240_reference.qasm,reset missing
+dyn_0241,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0241_buggy.qasm,data_v3/reference/dyn_0241_reference.qasm,reset missing
+dyn_0242,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0242_buggy.qasm,data_v3/reference/dyn_0242_reference.qasm,reset missing
+dyn_0243,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0243_buggy.qasm,data_v3/reference/dyn_0243_reference.qasm,reset missing
+dyn_0244,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0244_buggy.qasm,data_v3/reference/dyn_0244_reference.qasm,reset missing
+dyn_0245,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0245_buggy.qasm,data_v3/reference/dyn_0245_reference.qasm,reset applied to the wrong qubit
+dyn_0246,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0246_buggy.qasm,data_v3/reference/dyn_0246_reference.qasm,reset applied to the wrong qubit
+dyn_0247,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0247_buggy.qasm,data_v3/reference/dyn_0247_reference.qasm,reset applied to the wrong qubit
+dyn_0248,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0248_buggy.qasm,data_v3/reference/dyn_0248_reference.qasm,reset applied to the wrong qubit
+dyn_0249,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0249_buggy.qasm,data_v3/reference/dyn_0249_reference.qasm,reset applied to the wrong qubit
+dyn_0250,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0250_buggy.qasm,data_v3/reference/dyn_0250_reference.qasm,reset applied to the wrong qubit
+dyn_0251,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0251_buggy.qasm,data_v3/reference/dyn_0251_reference.qasm,reset missing
+dyn_0252,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0252_buggy.qasm,data_v3/reference/dyn_0252_reference.qasm,reset missing
+dyn_0253,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0253_buggy.qasm,data_v3/reference/dyn_0253_reference.qasm,reset missing
+dyn_0254,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0254_buggy.qasm,data_v3/reference/dyn_0254_reference.qasm,reset applied to the wrong qubit
+dyn_0255,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0255_buggy.qasm,data_v3/reference/dyn_0255_reference.qasm,reset applied to the wrong qubit
+dyn_0256,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0256_buggy.qasm,data_v3/reference/dyn_0256_reference.qasm,reset applied to the wrong qubit
+dyn_0257,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0257_buggy.qasm,data_v3/reference/dyn_0257_reference.qasm,reset applied to the wrong qubit
+dyn_0258,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0258_buggy.qasm,data_v3/reference/dyn_0258_reference.qasm,reset applied to the wrong qubit
+dyn_0259,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0259_buggy.qasm,data_v3/reference/dyn_0259_reference.qasm,reset missing
+dyn_0260,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0260_buggy.qasm,data_v3/reference/dyn_0260_reference.qasm,reset applied to the wrong qubit
+dyn_0261,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0261_buggy.qasm,data_v3/reference/dyn_0261_reference.qasm,reset applied to the wrong qubit
+dyn_0262,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0262_buggy.qasm,data_v3/reference/dyn_0262_reference.qasm,reset missing
+dyn_0263,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0263_buggy.qasm,data_v3/reference/dyn_0263_reference.qasm,reset applied to the wrong qubit
+dyn_0264,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0264_buggy.qasm,data_v3/reference/dyn_0264_reference.qasm,reset applied to the wrong qubit
+dyn_0265,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0265_buggy.qasm,data_v3/reference/dyn_0265_reference.qasm,reset missing
+dyn_0266,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0266_buggy.qasm,data_v3/reference/dyn_0266_reference.qasm,reset applied to the wrong qubit
+dyn_0267,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0267_buggy.qasm,data_v3/reference/dyn_0267_reference.qasm,reset missing
+dyn_0268,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0268_buggy.qasm,data_v3/reference/dyn_0268_reference.qasm,reset applied to the wrong qubit
+dyn_0269,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0269_buggy.qasm,data_v3/reference/dyn_0269_reference.qasm,reset applied to the wrong qubit
+dyn_0270,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0270_buggy.qasm,data_v3/reference/dyn_0270_reference.qasm,reset missing
+dyn_0271,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0271_buggy.qasm,data_v3/reference/dyn_0271_reference.qasm,reset missing
+dyn_0272,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0272_buggy.qasm,data_v3/reference/dyn_0272_reference.qasm,reset applied to the wrong qubit
+dyn_0273,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0273_buggy.qasm,data_v3/reference/dyn_0273_reference.qasm,reset applied to the wrong qubit
+dyn_0274,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0274_buggy.qasm,data_v3/reference/dyn_0274_reference.qasm,reset missing
+dyn_0275,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0275_buggy.qasm,data_v3/reference/dyn_0275_reference.qasm,reset missing
+dyn_0276,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0276_buggy.qasm,data_v3/reference/dyn_0276_reference.qasm,reset applied to the wrong qubit
+dyn_0277,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0277_buggy.qasm,data_v3/reference/dyn_0277_reference.qasm,reset applied to the wrong qubit
+dyn_0278,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0278_buggy.qasm,data_v3/reference/dyn_0278_reference.qasm,reset missing
+dyn_0279,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0279_buggy.qasm,data_v3/reference/dyn_0279_reference.qasm,reset missing
+dyn_0280,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0280_buggy.qasm,data_v3/reference/dyn_0280_reference.qasm,reset applied to the wrong qubit
+dyn_0281,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0281_buggy.qasm,data_v3/reference/dyn_0281_reference.qasm,reset missing
+dyn_0282,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0282_buggy.qasm,data_v3/reference/dyn_0282_reference.qasm,reset applied to the wrong qubit
+dyn_0283,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0283_buggy.qasm,data_v3/reference/dyn_0283_reference.qasm,reset applied to the wrong qubit
+dyn_0284,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0284_buggy.qasm,data_v3/reference/dyn_0284_reference.qasm,reset missing
+dyn_0285,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0285_buggy.qasm,data_v3/reference/dyn_0285_reference.qasm,reset applied to the wrong qubit
+dyn_0286,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0286_buggy.qasm,data_v3/reference/dyn_0286_reference.qasm,reset applied to the wrong qubit
+dyn_0287,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0287_buggy.qasm,data_v3/reference/dyn_0287_reference.qasm,reset missing
+dyn_0288,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0288_buggy.qasm,data_v3/reference/dyn_0288_reference.qasm,reset applied to the wrong qubit
+dyn_0289,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0289_buggy.qasm,data_v3/reference/dyn_0289_reference.qasm,reset applied to the wrong qubit
+dyn_0290,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0290_buggy.qasm,data_v3/reference/dyn_0290_reference.qasm,reset missing
+dyn_0291,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0291_buggy.qasm,data_v3/reference/dyn_0291_reference.qasm,reset missing
+dyn_0292,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0292_buggy.qasm,data_v3/reference/dyn_0292_reference.qasm,reset missing
+dyn_0293,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0293_buggy.qasm,data_v3/reference/dyn_0293_reference.qasm,reset applied to the wrong qubit
+dyn_0294,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0294_buggy.qasm,data_v3/reference/dyn_0294_reference.qasm,reset applied to the wrong qubit
+dyn_0295,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0295_buggy.qasm,data_v3/reference/dyn_0295_reference.qasm,reset applied to the wrong qubit
+dyn_0296,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0296_buggy.qasm,data_v3/reference/dyn_0296_reference.qasm,reset missing
+dyn_0297,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0297_buggy.qasm,data_v3/reference/dyn_0297_reference.qasm,reset missing
+dyn_0298,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0298_buggy.qasm,data_v3/reference/dyn_0298_reference.qasm,reset missing
+dyn_0299,parity,3,4,reset_fault,reset_qubit,1,data_v3/buggy/dyn_0299_buggy.qasm,data_v3/reference/dyn_0299_reference.qasm,reset applied to the wrong qubit
+dyn_0300,parity,3,4,reset_fault,delete_reset,1,data_v3/buggy/dyn_0300_buggy.qasm,data_v3/reference/dyn_0300_reference.qasm,reset missing
+dyn_0301,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0301_buggy.qasm,data_v3/reference/dyn_0301_reference.qasm,loop runs -1 iteration
+dyn_0302,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0302_buggy.qasm,data_v3/reference/dyn_0302_reference.qasm,loop runs +1 iteration
+dyn_0303,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0303_buggy.qasm,data_v3/reference/dyn_0303_reference.qasm,loop runs +1 iteration
+dyn_0304,loop,3,3,loop_fault,angle_shift,1,data_v3/buggy/dyn_0304_buggy.qasm,data_v3/reference/dyn_0304_reference.qasm,rotation angle shifted by pi/2
+dyn_0305,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0305_buggy.qasm,data_v3/reference/dyn_0305_reference.qasm,loop runs +1 iteration
+dyn_0306,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0306_buggy.qasm,data_v3/reference/dyn_0306_reference.qasm,loop runs -1 iteration
+dyn_0307,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0307_buggy.qasm,data_v3/reference/dyn_0307_reference.qasm,loop runs +1 iteration
+dyn_0308,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0308_buggy.qasm,data_v3/reference/dyn_0308_reference.qasm,loop runs -1 iteration
+dyn_0309,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0309_buggy.qasm,data_v3/reference/dyn_0309_reference.qasm,loop runs -1 iteration
+dyn_0310,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0310_buggy.qasm,data_v3/reference/dyn_0310_reference.qasm,loop runs -1 iteration
+dyn_0311,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0311_buggy.qasm,data_v3/reference/dyn_0311_reference.qasm,loop runs -1 iteration
+dyn_0312,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0312_buggy.qasm,data_v3/reference/dyn_0312_reference.qasm,loop runs -1 iteration
+dyn_0313,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0313_buggy.qasm,data_v3/reference/dyn_0313_reference.qasm,loop runs +1 iteration
+dyn_0314,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0314_buggy.qasm,data_v3/reference/dyn_0314_reference.qasm,loop runs -1 iteration
+dyn_0315,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0315_buggy.qasm,data_v3/reference/dyn_0315_reference.qasm,rotation angle negated
+dyn_0316,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0316_buggy.qasm,data_v3/reference/dyn_0316_reference.qasm,loop runs -1 iteration
+dyn_0317,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0317_buggy.qasm,data_v3/reference/dyn_0317_reference.qasm,rotation angle negated
+dyn_0318,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0318_buggy.qasm,data_v3/reference/dyn_0318_reference.qasm,loop runs +1 iteration
+dyn_0319,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0319_buggy.qasm,data_v3/reference/dyn_0319_reference.qasm,loop runs -1 iteration
+dyn_0320,loop,3,3,loop_fault,angle_shift,1,data_v3/buggy/dyn_0320_buggy.qasm,data_v3/reference/dyn_0320_reference.qasm,rotation angle shifted by pi/2
+dyn_0321,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0321_buggy.qasm,data_v3/reference/dyn_0321_reference.qasm,loop runs -1 iteration
+dyn_0322,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0322_buggy.qasm,data_v3/reference/dyn_0322_reference.qasm,loop runs -1 iteration
+dyn_0323,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0323_buggy.qasm,data_v3/reference/dyn_0323_reference.qasm,loop runs -1 iteration
+dyn_0324,loop,3,3,loop_fault,angle_shift,1,data_v3/buggy/dyn_0324_buggy.qasm,data_v3/reference/dyn_0324_reference.qasm,rotation angle shifted by pi/2
+dyn_0325,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0325_buggy.qasm,data_v3/reference/dyn_0325_reference.qasm,loop runs -1 iteration
+dyn_0326,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0326_buggy.qasm,data_v3/reference/dyn_0326_reference.qasm,rotation angle negated
+dyn_0327,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0327_buggy.qasm,data_v3/reference/dyn_0327_reference.qasm,rotation angle negated
+dyn_0328,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0328_buggy.qasm,data_v3/reference/dyn_0328_reference.qasm,loop runs -1 iteration
+dyn_0329,loop,3,3,loop_fault,angle_shift,1,data_v3/buggy/dyn_0329_buggy.qasm,data_v3/reference/dyn_0329_reference.qasm,rotation angle shifted by pi/2
+dyn_0330,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0330_buggy.qasm,data_v3/reference/dyn_0330_reference.qasm,loop runs -1 iteration
+dyn_0331,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0331_buggy.qasm,data_v3/reference/dyn_0331_reference.qasm,loop runs +1 iteration
+dyn_0332,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0332_buggy.qasm,data_v3/reference/dyn_0332_reference.qasm,loop runs +1 iteration
+dyn_0333,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0333_buggy.qasm,data_v3/reference/dyn_0333_reference.qasm,loop runs -1 iteration
+dyn_0334,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0334_buggy.qasm,data_v3/reference/dyn_0334_reference.qasm,loop runs -1 iteration
+dyn_0335,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0335_buggy.qasm,data_v3/reference/dyn_0335_reference.qasm,rotation angle negated
+dyn_0336,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0336_buggy.qasm,data_v3/reference/dyn_0336_reference.qasm,loop runs +1 iteration
+dyn_0337,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0337_buggy.qasm,data_v3/reference/dyn_0337_reference.qasm,loop runs +1 iteration
+dyn_0338,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0338_buggy.qasm,data_v3/reference/dyn_0338_reference.qasm,loop runs -1 iteration
+dyn_0339,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0339_buggy.qasm,data_v3/reference/dyn_0339_reference.qasm,loop runs -1 iteration
+dyn_0340,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0340_buggy.qasm,data_v3/reference/dyn_0340_reference.qasm,loop runs -1 iteration
+dyn_0341,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0341_buggy.qasm,data_v3/reference/dyn_0341_reference.qasm,rotation angle negated
+dyn_0342,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0342_buggy.qasm,data_v3/reference/dyn_0342_reference.qasm,loop runs -1 iteration
+dyn_0343,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0343_buggy.qasm,data_v3/reference/dyn_0343_reference.qasm,rotation angle negated
+dyn_0344,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0344_buggy.qasm,data_v3/reference/dyn_0344_reference.qasm,loop runs -1 iteration
+dyn_0345,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0345_buggy.qasm,data_v3/reference/dyn_0345_reference.qasm,loop runs -1 iteration
+dyn_0346,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0346_buggy.qasm,data_v3/reference/dyn_0346_reference.qasm,loop runs +1 iteration
+dyn_0347,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0347_buggy.qasm,data_v3/reference/dyn_0347_reference.qasm,loop runs +1 iteration
+dyn_0348,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0348_buggy.qasm,data_v3/reference/dyn_0348_reference.qasm,rotation angle negated
+dyn_0349,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0349_buggy.qasm,data_v3/reference/dyn_0349_reference.qasm,rotation angle negated
+dyn_0350,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0350_buggy.qasm,data_v3/reference/dyn_0350_reference.qasm,loop runs -1 iteration
+dyn_0351,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0351_buggy.qasm,data_v3/reference/dyn_0351_reference.qasm,loop runs -1 iteration
+dyn_0352,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0352_buggy.qasm,data_v3/reference/dyn_0352_reference.qasm,loop runs +1 iteration
+dyn_0353,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0353_buggy.qasm,data_v3/reference/dyn_0353_reference.qasm,loop runs -1 iteration
+dyn_0354,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0354_buggy.qasm,data_v3/reference/dyn_0354_reference.qasm,loop runs +1 iteration
+dyn_0355,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0355_buggy.qasm,data_v3/reference/dyn_0355_reference.qasm,rotation angle negated
+dyn_0356,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0356_buggy.qasm,data_v3/reference/dyn_0356_reference.qasm,rotation angle negated
+dyn_0357,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0357_buggy.qasm,data_v3/reference/dyn_0357_reference.qasm,loop runs -1 iteration
+dyn_0358,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0358_buggy.qasm,data_v3/reference/dyn_0358_reference.qasm,loop runs -1 iteration
+dyn_0359,loop,3,3,loop_fault,angle_shift,1,data_v3/buggy/dyn_0359_buggy.qasm,data_v3/reference/dyn_0359_reference.qasm,rotation angle shifted by pi/2
+dyn_0360,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0360_buggy.qasm,data_v3/reference/dyn_0360_reference.qasm,rotation angle negated
+dyn_0361,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0361_buggy.qasm,data_v3/reference/dyn_0361_reference.qasm,rotation angle negated
+dyn_0362,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0362_buggy.qasm,data_v3/reference/dyn_0362_reference.qasm,loop runs +1 iteration
+dyn_0363,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0363_buggy.qasm,data_v3/reference/dyn_0363_reference.qasm,loop runs -1 iteration
+dyn_0364,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0364_buggy.qasm,data_v3/reference/dyn_0364_reference.qasm,loop runs +1 iteration
+dyn_0365,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0365_buggy.qasm,data_v3/reference/dyn_0365_reference.qasm,loop runs +1 iteration
+dyn_0366,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0366_buggy.qasm,data_v3/reference/dyn_0366_reference.qasm,loop runs -1 iteration
+dyn_0367,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0367_buggy.qasm,data_v3/reference/dyn_0367_reference.qasm,loop runs +1 iteration
+dyn_0368,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0368_buggy.qasm,data_v3/reference/dyn_0368_reference.qasm,rotation angle negated
+dyn_0369,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0369_buggy.qasm,data_v3/reference/dyn_0369_reference.qasm,loop runs -1 iteration
+dyn_0370,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0370_buggy.qasm,data_v3/reference/dyn_0370_reference.qasm,loop runs +1 iteration
+dyn_0371,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0371_buggy.qasm,data_v3/reference/dyn_0371_reference.qasm,loop runs +1 iteration
+dyn_0372,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0372_buggy.qasm,data_v3/reference/dyn_0372_reference.qasm,loop runs +1 iteration
+dyn_0373,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0373_buggy.qasm,data_v3/reference/dyn_0373_reference.qasm,loop runs +1 iteration
+dyn_0374,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0374_buggy.qasm,data_v3/reference/dyn_0374_reference.qasm,rotation angle negated
+dyn_0375,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0375_buggy.qasm,data_v3/reference/dyn_0375_reference.qasm,loop runs +1 iteration
+dyn_0376,loop,3,3,loop_fault,angle_shift,1,data_v3/buggy/dyn_0376_buggy.qasm,data_v3/reference/dyn_0376_reference.qasm,rotation angle shifted by pi/2
+dyn_0377,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0377_buggy.qasm,data_v3/reference/dyn_0377_reference.qasm,loop runs -1 iteration
+dyn_0378,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0378_buggy.qasm,data_v3/reference/dyn_0378_reference.qasm,rotation angle negated
+dyn_0379,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0379_buggy.qasm,data_v3/reference/dyn_0379_reference.qasm,loop runs +1 iteration
+dyn_0380,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0380_buggy.qasm,data_v3/reference/dyn_0380_reference.qasm,loop runs -1 iteration
+dyn_0381,loop,3,3,loop_fault,angle_shift,1,data_v3/buggy/dyn_0381_buggy.qasm,data_v3/reference/dyn_0381_reference.qasm,rotation angle shifted by pi/2
+dyn_0382,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0382_buggy.qasm,data_v3/reference/dyn_0382_reference.qasm,rotation angle negated
+dyn_0383,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0383_buggy.qasm,data_v3/reference/dyn_0383_reference.qasm,loop runs +1 iteration
+dyn_0384,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0384_buggy.qasm,data_v3/reference/dyn_0384_reference.qasm,loop runs -1 iteration
+dyn_0385,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0385_buggy.qasm,data_v3/reference/dyn_0385_reference.qasm,loop runs -1 iteration
+dyn_0386,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0386_buggy.qasm,data_v3/reference/dyn_0386_reference.qasm,rotation angle negated
+dyn_0387,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0387_buggy.qasm,data_v3/reference/dyn_0387_reference.qasm,loop runs -1 iteration
+dyn_0388,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0388_buggy.qasm,data_v3/reference/dyn_0388_reference.qasm,rotation angle negated
+dyn_0389,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0389_buggy.qasm,data_v3/reference/dyn_0389_reference.qasm,rotation angle negated
+dyn_0390,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0390_buggy.qasm,data_v3/reference/dyn_0390_reference.qasm,loop runs -1 iteration
+dyn_0391,loop,3,3,loop_fault,angle_shift,1,data_v3/buggy/dyn_0391_buggy.qasm,data_v3/reference/dyn_0391_reference.qasm,rotation angle shifted by pi/2
+dyn_0392,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0392_buggy.qasm,data_v3/reference/dyn_0392_reference.qasm,loop runs -1 iteration
+dyn_0393,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0393_buggy.qasm,data_v3/reference/dyn_0393_reference.qasm,loop runs +1 iteration
+dyn_0394,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0394_buggy.qasm,data_v3/reference/dyn_0394_reference.qasm,rotation angle negated
+dyn_0395,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0395_buggy.qasm,data_v3/reference/dyn_0395_reference.qasm,loop runs +1 iteration
+dyn_0396,loop,3,3,loop_fault,angle_negate,1,data_v3/buggy/dyn_0396_buggy.qasm,data_v3/reference/dyn_0396_reference.qasm,rotation angle negated
+dyn_0397,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0397_buggy.qasm,data_v3/reference/dyn_0397_reference.qasm,loop runs -1 iteration
+dyn_0398,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0398_buggy.qasm,data_v3/reference/dyn_0398_reference.qasm,loop runs -1 iteration
+dyn_0399,loop,3,3,loop_fault,loop_count,1,data_v3/buggy/dyn_0399_buggy.qasm,data_v3/reference/dyn_0399_reference.qasm,loop runs -1 iteration
+dyn_0400,loop,3,3,loop_fault,angle_shift,1,data_v3/buggy/dyn_0400_buggy.qasm,data_v3/reference/dyn_0400_reference.qasm,rotation angle shifted by pi/2
+dyn_0401,ghz,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0401_buggy.qasm,data_v3/reference/dyn_0401_reference.qasm,single-qubit gate replaced
+dyn_0402,ghz,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0402_buggy.qasm,data_v3/reference/dyn_0402_reference.qasm,CX control and target swapped
+dyn_0403,ghz,5,5,gate_fault,substitute,1,data_v3/buggy/dyn_0403_buggy.qasm,data_v3/reference/dyn_0403_reference.qasm,single-qubit gate replaced
+dyn_0404,ghz,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0404_buggy.qasm,data_v3/reference/dyn_0404_reference.qasm,CX control and target swapped
+dyn_0405,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0405_buggy.qasm,data_v3/reference/dyn_0405_reference.qasm,single-qubit gate replaced
+dyn_0406,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0406_buggy.qasm,data_v3/reference/dyn_0406_reference.qasm,single-qubit gate replaced
+dyn_0407,ghz,4,4,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0407_buggy.qasm,data_v3/reference/dyn_0407_reference.qasm,CX control and target swapped
+dyn_0408,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0408_buggy.qasm,data_v3/reference/dyn_0408_reference.qasm,single-qubit gate replaced
+dyn_0409,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0409_buggy.qasm,data_v3/reference/dyn_0409_reference.qasm,single-qubit gate replaced
+dyn_0410,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0410_buggy.qasm,data_v3/reference/dyn_0410_reference.qasm,single-qubit gate replaced
+dyn_0411,ghz,5,5,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0411_buggy.qasm,data_v3/reference/dyn_0411_reference.qasm,CX control and target swapped
+dyn_0412,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0412_buggy.qasm,data_v3/reference/dyn_0412_reference.qasm,single-qubit gate replaced
+dyn_0413,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0413_buggy.qasm,data_v3/reference/dyn_0413_reference.qasm,single-qubit gate replaced
+dyn_0414,ghz,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0414_buggy.qasm,data_v3/reference/dyn_0414_reference.qasm,single-qubit gate replaced
+dyn_0415,ghz,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0415_buggy.qasm,data_v3/reference/dyn_0415_reference.qasm,CX control and target swapped
+dyn_0416,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0416_buggy.qasm,data_v3/reference/dyn_0416_reference.qasm,single-qubit gate replaced
+dyn_0417,ghz,4,4,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0417_buggy.qasm,data_v3/reference/dyn_0417_reference.qasm,CX control and target swapped
+dyn_0418,ghz,5,5,gate_fault,substitute,1,data_v3/buggy/dyn_0418_buggy.qasm,data_v3/reference/dyn_0418_reference.qasm,single-qubit gate replaced
+dyn_0419,ghz,4,4,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0419_buggy.qasm,data_v3/reference/dyn_0419_reference.qasm,CX control and target swapped
+dyn_0420,ghz,5,5,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0420_buggy.qasm,data_v3/reference/dyn_0420_reference.qasm,CX control and target swapped
+dyn_0421,ghz,5,5,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0421_buggy.qasm,data_v3/reference/dyn_0421_reference.qasm,CX control and target swapped
+dyn_0422,ghz,5,5,gate_fault,substitute,1,data_v3/buggy/dyn_0422_buggy.qasm,data_v3/reference/dyn_0422_reference.qasm,single-qubit gate replaced
+dyn_0423,ghz,4,4,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0423_buggy.qasm,data_v3/reference/dyn_0423_reference.qasm,CX control and target swapped
+dyn_0424,ghz,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0424_buggy.qasm,data_v3/reference/dyn_0424_reference.qasm,single-qubit gate replaced
+dyn_0425,ghz,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0425_buggy.qasm,data_v3/reference/dyn_0425_reference.qasm,single-qubit gate replaced
+dyn_0426,ghz,5,5,gate_fault,substitute,1,data_v3/buggy/dyn_0426_buggy.qasm,data_v3/reference/dyn_0426_reference.qasm,single-qubit gate replaced
+dyn_0427,ghz,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0427_buggy.qasm,data_v3/reference/dyn_0427_reference.qasm,single-qubit gate replaced
+dyn_0428,ghz,5,5,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0428_buggy.qasm,data_v3/reference/dyn_0428_reference.qasm,CX control and target swapped
+dyn_0429,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0429_buggy.qasm,data_v3/reference/dyn_0429_reference.qasm,single-qubit gate replaced
+dyn_0430,ghz,4,4,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0430_buggy.qasm,data_v3/reference/dyn_0430_reference.qasm,CX control and target swapped
+dyn_0431,ghz,4,4,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0431_buggy.qasm,data_v3/reference/dyn_0431_reference.qasm,CX control and target swapped
+dyn_0432,ghz,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0432_buggy.qasm,data_v3/reference/dyn_0432_reference.qasm,single-qubit gate replaced
+dyn_0433,ghz,4,4,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0433_buggy.qasm,data_v3/reference/dyn_0433_reference.qasm,CX control and target swapped
+dyn_0434,ghz,5,5,gate_fault,substitute,1,data_v3/buggy/dyn_0434_buggy.qasm,data_v3/reference/dyn_0434_reference.qasm,single-qubit gate replaced
+dyn_0435,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0435_buggy.qasm,data_v3/reference/dyn_0435_reference.qasm,single-qubit gate replaced
+dyn_0436,ghz,4,4,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0436_buggy.qasm,data_v3/reference/dyn_0436_reference.qasm,CX control and target swapped
+dyn_0437,ghz,5,5,gate_fault,substitute,1,data_v3/buggy/dyn_0437_buggy.qasm,data_v3/reference/dyn_0437_reference.qasm,single-qubit gate replaced
+dyn_0438,ghz,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0438_buggy.qasm,data_v3/reference/dyn_0438_reference.qasm,CX control and target swapped
+dyn_0439,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0439_buggy.qasm,data_v3/reference/dyn_0439_reference.qasm,single-qubit gate replaced
+dyn_0440,ghz,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0440_buggy.qasm,data_v3/reference/dyn_0440_reference.qasm,single-qubit gate replaced
+dyn_0441,ghz,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0441_buggy.qasm,data_v3/reference/dyn_0441_reference.qasm,CX control and target swapped
+dyn_0442,ghz,5,5,gate_fault,substitute,1,data_v3/buggy/dyn_0442_buggy.qasm,data_v3/reference/dyn_0442_reference.qasm,single-qubit gate replaced
+dyn_0443,ghz,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0443_buggy.qasm,data_v3/reference/dyn_0443_reference.qasm,CX control and target swapped
+dyn_0444,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0444_buggy.qasm,data_v3/reference/dyn_0444_reference.qasm,single-qubit gate replaced
+dyn_0445,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0445_buggy.qasm,data_v3/reference/dyn_0445_reference.qasm,single-qubit gate replaced
+dyn_0446,ghz,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0446_buggy.qasm,data_v3/reference/dyn_0446_reference.qasm,single-qubit gate replaced
+dyn_0447,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0447_buggy.qasm,data_v3/reference/dyn_0447_reference.qasm,single-qubit gate replaced
+dyn_0448,ghz,5,5,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0448_buggy.qasm,data_v3/reference/dyn_0448_reference.qasm,CX control and target swapped
+dyn_0449,ghz,5,5,gate_fault,substitute,1,data_v3/buggy/dyn_0449_buggy.qasm,data_v3/reference/dyn_0449_reference.qasm,single-qubit gate replaced
+dyn_0450,ghz,4,4,gate_fault,substitute,1,data_v3/buggy/dyn_0450_buggy.qasm,data_v3/reference/dyn_0450_reference.qasm,single-qubit gate replaced
+dyn_0451,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0451_buggy.qasm,data_v3/reference/dyn_0451_reference.qasm,single-qubit gate replaced
+dyn_0452,loop,3,3,gate_fault,angle_negate,1,data_v3/buggy/dyn_0452_buggy.qasm,data_v3/reference/dyn_0452_reference.qasm,rotation angle negated
+dyn_0453,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0453_buggy.qasm,data_v3/reference/dyn_0453_reference.qasm,single-qubit gate replaced
+dyn_0454,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0454_buggy.qasm,data_v3/reference/dyn_0454_reference.qasm,single-qubit gate replaced
+dyn_0455,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0455_buggy.qasm,data_v3/reference/dyn_0455_reference.qasm,single-qubit gate replaced
+dyn_0456,loop,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0456_buggy.qasm,data_v3/reference/dyn_0456_reference.qasm,CX control and target swapped
+dyn_0457,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0457_buggy.qasm,data_v3/reference/dyn_0457_reference.qasm,single-qubit gate replaced
+dyn_0458,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0458_buggy.qasm,data_v3/reference/dyn_0458_reference.qasm,single-qubit gate replaced
+dyn_0459,loop,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0459_buggy.qasm,data_v3/reference/dyn_0459_reference.qasm,CX control and target swapped
+dyn_0460,loop,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0460_buggy.qasm,data_v3/reference/dyn_0460_reference.qasm,CX control and target swapped
+dyn_0461,loop,3,3,gate_fault,angle_shift,1,data_v3/buggy/dyn_0461_buggy.qasm,data_v3/reference/dyn_0461_reference.qasm,rotation angle shifted by pi/2
+dyn_0462,loop,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0462_buggy.qasm,data_v3/reference/dyn_0462_reference.qasm,CX control and target swapped
+dyn_0463,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0463_buggy.qasm,data_v3/reference/dyn_0463_reference.qasm,single-qubit gate replaced
+dyn_0464,loop,3,3,gate_fault,angle_negate,1,data_v3/buggy/dyn_0464_buggy.qasm,data_v3/reference/dyn_0464_reference.qasm,rotation angle negated
+dyn_0465,loop,3,3,gate_fault,angle_shift,1,data_v3/buggy/dyn_0465_buggy.qasm,data_v3/reference/dyn_0465_reference.qasm,rotation angle shifted by pi/2
+dyn_0466,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0466_buggy.qasm,data_v3/reference/dyn_0466_reference.qasm,single-qubit gate replaced
+dyn_0467,loop,3,3,gate_fault,angle_negate,1,data_v3/buggy/dyn_0467_buggy.qasm,data_v3/reference/dyn_0467_reference.qasm,rotation angle negated
+dyn_0468,loop,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0468_buggy.qasm,data_v3/reference/dyn_0468_reference.qasm,CX control and target swapped
+dyn_0469,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0469_buggy.qasm,data_v3/reference/dyn_0469_reference.qasm,single-qubit gate replaced
+dyn_0470,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0470_buggy.qasm,data_v3/reference/dyn_0470_reference.qasm,single-qubit gate replaced
+dyn_0471,loop,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0471_buggy.qasm,data_v3/reference/dyn_0471_reference.qasm,CX control and target swapped
+dyn_0472,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0472_buggy.qasm,data_v3/reference/dyn_0472_reference.qasm,single-qubit gate replaced
+dyn_0473,loop,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0473_buggy.qasm,data_v3/reference/dyn_0473_reference.qasm,CX control and target swapped
+dyn_0474,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0474_buggy.qasm,data_v3/reference/dyn_0474_reference.qasm,single-qubit gate replaced
+dyn_0475,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0475_buggy.qasm,data_v3/reference/dyn_0475_reference.qasm,single-qubit gate replaced
+dyn_0476,loop,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0476_buggy.qasm,data_v3/reference/dyn_0476_reference.qasm,CX control and target swapped
+dyn_0477,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0477_buggy.qasm,data_v3/reference/dyn_0477_reference.qasm,single-qubit gate replaced
+dyn_0478,loop,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0478_buggy.qasm,data_v3/reference/dyn_0478_reference.qasm,CX control and target swapped
+dyn_0479,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0479_buggy.qasm,data_v3/reference/dyn_0479_reference.qasm,single-qubit gate replaced
+dyn_0480,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0480_buggy.qasm,data_v3/reference/dyn_0480_reference.qasm,single-qubit gate replaced
+dyn_0481,loop,3,3,gate_fault,angle_negate,1,data_v3/buggy/dyn_0481_buggy.qasm,data_v3/reference/dyn_0481_reference.qasm,rotation angle negated
+dyn_0482,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0482_buggy.qasm,data_v3/reference/dyn_0482_reference.qasm,single-qubit gate replaced
+dyn_0483,loop,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0483_buggy.qasm,data_v3/reference/dyn_0483_reference.qasm,CX control and target swapped
+dyn_0484,loop,3,3,gate_fault,angle_shift,1,data_v3/buggy/dyn_0484_buggy.qasm,data_v3/reference/dyn_0484_reference.qasm,rotation angle shifted by pi/2
+dyn_0485,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0485_buggy.qasm,data_v3/reference/dyn_0485_reference.qasm,single-qubit gate replaced
+dyn_0486,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0486_buggy.qasm,data_v3/reference/dyn_0486_reference.qasm,single-qubit gate replaced
+dyn_0487,loop,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0487_buggy.qasm,data_v3/reference/dyn_0487_reference.qasm,CX control and target swapped
+dyn_0488,loop,3,3,gate_fault,angle_shift,1,data_v3/buggy/dyn_0488_buggy.qasm,data_v3/reference/dyn_0488_reference.qasm,rotation angle shifted by pi/2
+dyn_0489,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0489_buggy.qasm,data_v3/reference/dyn_0489_reference.qasm,single-qubit gate replaced
+dyn_0490,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0490_buggy.qasm,data_v3/reference/dyn_0490_reference.qasm,single-qubit gate replaced
+dyn_0491,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0491_buggy.qasm,data_v3/reference/dyn_0491_reference.qasm,single-qubit gate replaced
+dyn_0492,loop,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0492_buggy.qasm,data_v3/reference/dyn_0492_reference.qasm,CX control and target swapped
+dyn_0493,loop,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0493_buggy.qasm,data_v3/reference/dyn_0493_reference.qasm,CX control and target swapped
+dyn_0494,loop,3,3,gate_fault,reverse_cx,1,data_v3/buggy/dyn_0494_buggy.qasm,data_v3/reference/dyn_0494_reference.qasm,CX control and target swapped
+dyn_0495,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0495_buggy.qasm,data_v3/reference/dyn_0495_reference.qasm,single-qubit gate replaced
+dyn_0496,loop,3,3,gate_fault,angle_negate,1,data_v3/buggy/dyn_0496_buggy.qasm,data_v3/reference/dyn_0496_reference.qasm,rotation angle negated
+dyn_0497,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0497_buggy.qasm,data_v3/reference/dyn_0497_reference.qasm,single-qubit gate replaced
+dyn_0498,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0498_buggy.qasm,data_v3/reference/dyn_0498_reference.qasm,single-qubit gate replaced
+dyn_0499,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0499_buggy.qasm,data_v3/reference/dyn_0499_reference.qasm,single-qubit gate replaced
+dyn_0500,loop,3,3,gate_fault,substitute,1,data_v3/buggy/dyn_0500_buggy.qasm,data_v3/reference/dyn_0500_reference.qasm,single-qubit gate replaced
+dyn_0501,ghz,5,5,multi_fault,swap_measure_qubits+substitute+swap_measure_bits,3,data_v3/buggy/dyn_0501_buggy.qasm,data_v3/reference/dyn_0501_reference.qasm,two measurements read each other's qubit; single-qubit gate replaced; two measurements write to each other's classical bit
+dyn_0502,ghz,3,3,multi_fault,swap_measure_bits+swap_measure_qubits+reverse_cx,3,data_v3/buggy/dyn_0502_buggy.qasm,data_v3/reference/dyn_0502_reference.qasm,two measurements write to each other's classical bit; two measurements read each other's qubit; CX control and target swapped
+dyn_0503,ghz,3,3,multi_fault,swap_measure_qubits+substitute,2,data_v3/buggy/dyn_0503_buggy.qasm,data_v3/reference/dyn_0503_reference.qasm,two measurements read each other's qubit; single-qubit gate replaced
+dyn_0504,ghz,4,4,multi_fault,reverse_cx+swap_measure_qubits,2,data_v3/buggy/dyn_0504_buggy.qasm,data_v3/reference/dyn_0504_reference.qasm,CX control and target swapped; two measurements read each other's qubit
+dyn_0505,ghz,5,5,multi_fault,substitute+swap_measure_qubits+reverse_cx,3,data_v3/buggy/dyn_0505_buggy.qasm,data_v3/reference/dyn_0505_reference.qasm,single-qubit gate replaced; two measurements read each other's qubit; CX control and target swapped
+dyn_0506,ghz,5,5,multi_fault,swap_measure_bits+swap_measure_qubits+substitute,3,data_v3/buggy/dyn_0506_buggy.qasm,data_v3/reference/dyn_0506_reference.qasm,two measurements write to each other's classical bit; two measurements read each other's qubit; single-qubit gate replaced
+dyn_0507,ghz,4,4,multi_fault,swap_measure_qubits+reverse_cx+substitute,3,data_v3/buggy/dyn_0507_buggy.qasm,data_v3/reference/dyn_0507_reference.qasm,two measurements read each other's qubit; CX control and target swapped; single-qubit gate replaced
+dyn_0508,ghz,5,5,multi_fault,reverse_cx+substitute,2,data_v3/buggy/dyn_0508_buggy.qasm,data_v3/reference/dyn_0508_reference.qasm,CX control and target swapped; single-qubit gate replaced
+dyn_0509,ghz,4,4,multi_fault,swap_measure_bits+swap_measure_qubits,2,data_v3/buggy/dyn_0509_buggy.qasm,data_v3/reference/dyn_0509_reference.qasm,two measurements write to each other's classical bit; two measurements read each other's qubit
+dyn_0510,ghz,3,3,multi_fault,swap_measure_bits+reverse_cx+substitute,3,data_v3/buggy/dyn_0510_buggy.qasm,data_v3/reference/dyn_0510_reference.qasm,two measurements write to each other's classical bit; CX control and target swapped; single-qubit gate replaced
+dyn_0511,ghz,3,3,multi_fault,swap_measure_bits+reverse_cx+swap_measure_qubits,3,data_v3/buggy/dyn_0511_buggy.qasm,data_v3/reference/dyn_0511_reference.qasm,two measurements write to each other's classical bit; CX control and target swapped; two measurements read each other's qubit
+dyn_0512,ghz,3,3,multi_fault,reverse_cx+swap_measure_qubits+substitute,3,data_v3/buggy/dyn_0512_buggy.qasm,data_v3/reference/dyn_0512_reference.qasm,CX control and target swapped; two measurements read each other's qubit; single-qubit gate replaced
+dyn_0513,ghz,3,3,multi_fault,reverse_cx+swap_measure_bits+swap_measure_qubits,3,data_v3/buggy/dyn_0513_buggy.qasm,data_v3/reference/dyn_0513_reference.qasm,CX control and target swapped; two measurements write to each other's classical bit; two measurements read each other's qubit
+dyn_0514,ghz,5,5,multi_fault,swap_measure_bits+reverse_cx,2,data_v3/buggy/dyn_0514_buggy.qasm,data_v3/reference/dyn_0514_reference.qasm,two measurements write to each other's classical bit; CX control and target swapped
+dyn_0515,ghz,5,5,multi_fault,reverse_cx+swap_measure_bits,2,data_v3/buggy/dyn_0515_buggy.qasm,data_v3/reference/dyn_0515_reference.qasm,CX control and target swapped; two measurements write to each other's classical bit
+dyn_0516,ghz,3,3,multi_fault,reverse_cx+substitute,2,data_v3/buggy/dyn_0516_buggy.qasm,data_v3/reference/dyn_0516_reference.qasm,CX control and target swapped; single-qubit gate replaced
+dyn_0517,ghz,4,4,multi_fault,reverse_cx+substitute,2,data_v3/buggy/dyn_0517_buggy.qasm,data_v3/reference/dyn_0517_reference.qasm,CX control and target swapped; single-qubit gate replaced
+dyn_0518,ghz,5,5,multi_fault,swap_measure_bits+reverse_cx+substitute,3,data_v3/buggy/dyn_0518_buggy.qasm,data_v3/reference/dyn_0518_reference.qasm,two measurements write to each other's classical bit; CX control and target swapped; single-qubit gate replaced
+dyn_0519,ghz,4,4,multi_fault,swap_measure_bits+swap_measure_qubits,2,data_v3/buggy/dyn_0519_buggy.qasm,data_v3/reference/dyn_0519_reference.qasm,two measurements write to each other's classical bit; two measurements read each other's qubit
+dyn_0520,ghz,5,5,multi_fault,swap_measure_bits+substitute+reverse_cx,3,data_v3/buggy/dyn_0520_buggy.qasm,data_v3/reference/dyn_0520_reference.qasm,two measurements write to each other's classical bit; single-qubit gate replaced; CX control and target swapped
+dyn_0521,ghz,3,3,multi_fault,reverse_cx+swap_measure_qubits,2,data_v3/buggy/dyn_0521_buggy.qasm,data_v3/reference/dyn_0521_reference.qasm,CX control and target swapped; two measurements read each other's qubit
+dyn_0522,ghz,4,4,multi_fault,swap_measure_bits+swap_measure_qubits,2,data_v3/buggy/dyn_0522_buggy.qasm,data_v3/reference/dyn_0522_reference.qasm,two measurements write to each other's classical bit; two measurements read each other's qubit
+dyn_0523,ghz,3,3,multi_fault,swap_measure_bits+reverse_cx,2,data_v3/buggy/dyn_0523_buggy.qasm,data_v3/reference/dyn_0523_reference.qasm,two measurements write to each other's classical bit; CX control and target swapped
+dyn_0524,ghz,4,4,multi_fault,reverse_cx+substitute+swap_measure_bits,3,data_v3/buggy/dyn_0524_buggy.qasm,data_v3/reference/dyn_0524_reference.qasm,CX control and target swapped; single-qubit gate replaced; two measurements write to each other's classical bit
+dyn_0525,ghz,3,3,multi_fault,swap_measure_bits+substitute,2,data_v3/buggy/dyn_0525_buggy.qasm,data_v3/reference/dyn_0525_reference.qasm,two measurements write to each other's classical bit; single-qubit gate replaced
+dyn_0526,teleport,3,3,multi_fault,angle_shift+condition_bit,2,data_v3/buggy/dyn_0526_buggy.qasm,data_v3/reference/dyn_0526_reference.qasm,rotation angle shifted by pi/2; condition reads the wrong classical bit
+dyn_0527,teleport,3,3,multi_fault,substitute+swap_measure_qubits,2,data_v3/buggy/dyn_0527_buggy.qasm,data_v3/reference/dyn_0527_reference.qasm,single-qubit gate replaced; two measurements read each other's qubit
+dyn_0528,teleport,3,3,multi_fault,swap_measure_qubits+swap_measure_bits+body_gate,3,data_v3/buggy/dyn_0528_buggy.qasm,data_v3/reference/dyn_0528_reference.qasm,two measurements read each other's qubit; two measurements write to each other's classical bit; correction applies the wrong gate
+dyn_0529,teleport,3,3,multi_fault,swap_measure_qubits+delete_if+flip_condition,3,data_v3/buggy/dyn_0529_buggy.qasm,data_v3/reference/dyn_0529_reference.qasm,two measurements read each other's qubit; classical correction missing; classical condition inverted
+dyn_0530,teleport,3,3,multi_fault,reverse_cx+condition_bit,2,data_v3/buggy/dyn_0530_buggy.qasm,data_v3/reference/dyn_0530_reference.qasm,CX control and target swapped; condition reads the wrong classical bit
+dyn_0531,teleport,3,3,multi_fault,angle_shift+swap_measure_bits+delete_if,3,data_v3/buggy/dyn_0531_buggy.qasm,data_v3/reference/dyn_0531_reference.qasm,rotation angle shifted by pi/2; two measurements write to each other's classical bit; classical correction missing
+dyn_0532,teleport,3,3,multi_fault,body_gate+substitute+reverse_cx,3,data_v3/buggy/dyn_0532_buggy.qasm,data_v3/reference/dyn_0532_reference.qasm,correction applies the wrong gate; single-qubit gate replaced; CX control and target swapped
+dyn_0533,teleport,3,3,multi_fault,flip_condition+swap_measure_qubits,2,data_v3/buggy/dyn_0533_buggy.qasm,data_v3/reference/dyn_0533_reference.qasm,classical condition inverted; two measurements read each other's qubit
+dyn_0534,teleport,3,3,multi_fault,swap_measure_qubits+condition_bit,2,data_v3/buggy/dyn_0534_buggy.qasm,data_v3/reference/dyn_0534_reference.qasm,two measurements read each other's qubit; condition reads the wrong classical bit
+dyn_0535,teleport,3,3,multi_fault,substitute+swap_measure_qubits,2,data_v3/buggy/dyn_0535_buggy.qasm,data_v3/reference/dyn_0535_reference.qasm,single-qubit gate replaced; two measurements read each other's qubit
+dyn_0536,teleport,3,3,multi_fault,flip_condition+body_gate+swap_measure_bits,3,data_v3/buggy/dyn_0536_buggy.qasm,data_v3/reference/dyn_0536_reference.qasm,classical condition inverted; correction applies the wrong gate; two measurements write to each other's classical bit
+dyn_0537,teleport,3,3,multi_fault,swap_measure_qubits+delete_if+flip_condition,3,data_v3/buggy/dyn_0537_buggy.qasm,data_v3/reference/dyn_0537_reference.qasm,two measurements read each other's qubit; classical correction missing; classical condition inverted
+dyn_0538,teleport,3,3,multi_fault,angle_shift+flip_condition,2,data_v3/buggy/dyn_0538_buggy.qasm,data_v3/reference/dyn_0538_reference.qasm,rotation angle shifted by pi/2; classical condition inverted
+dyn_0539,teleport,3,3,multi_fault,angle_negate+body_gate,2,data_v3/buggy/dyn_0539_buggy.qasm,data_v3/reference/dyn_0539_reference.qasm,rotation angle negated; correction applies the wrong gate
+dyn_0540,teleport,3,3,multi_fault,swap_measure_qubits+swap_measure_bits,2,data_v3/buggy/dyn_0540_buggy.qasm,data_v3/reference/dyn_0540_reference.qasm,two measurements read each other's qubit; two measurements write to each other's classical bit
+dyn_0541,teleport,3,3,multi_fault,delete_if+substitute+reverse_cx,3,data_v3/buggy/dyn_0541_buggy.qasm,data_v3/reference/dyn_0541_reference.qasm,classical correction missing; single-qubit gate replaced; CX control and target swapped
+dyn_0542,teleport,3,3,multi_fault,condition_bit+angle_negate+flip_condition,3,data_v3/buggy/dyn_0542_buggy.qasm,data_v3/reference/dyn_0542_reference.qasm,condition reads the wrong classical bit; rotation angle negated; classical condition inverted
+dyn_0543,teleport,3,3,multi_fault,angle_negate+condition_bit,2,data_v3/buggy/dyn_0543_buggy.qasm,data_v3/reference/dyn_0543_reference.qasm,rotation angle negated; condition reads the wrong classical bit
+dyn_0544,teleport,3,3,multi_fault,condition_bit+angle_shift+reverse_cx,3,data_v3/buggy/dyn_0544_buggy.qasm,data_v3/reference/dyn_0544_reference.qasm,condition reads the wrong classical bit; rotation angle shifted by pi/2; CX control and target swapped
+dyn_0545,teleport,3,3,multi_fault,condition_bit+reverse_cx,2,data_v3/buggy/dyn_0545_buggy.qasm,data_v3/reference/dyn_0545_reference.qasm,condition reads the wrong classical bit; CX control and target swapped
+dyn_0546,teleport,3,3,multi_fault,flip_condition+substitute+reverse_cx,3,data_v3/buggy/dyn_0546_buggy.qasm,data_v3/reference/dyn_0546_reference.qasm,classical condition inverted; single-qubit gate replaced; CX control and target swapped
+dyn_0547,teleport,3,3,multi_fault,reverse_cx+swap_measure_qubits+body_gate,3,data_v3/buggy/dyn_0547_buggy.qasm,data_v3/reference/dyn_0547_reference.qasm,CX control and target swapped; two measurements read each other's qubit; correction applies the wrong gate
+dyn_0548,teleport,3,3,multi_fault,angle_shift+swap_measure_qubits,2,data_v3/buggy/dyn_0548_buggy.qasm,data_v3/reference/dyn_0548_reference.qasm,rotation angle shifted by pi/2; two measurements read each other's qubit
+dyn_0549,teleport,3,3,multi_fault,substitute+condition_bit,2,data_v3/buggy/dyn_0549_buggy.qasm,data_v3/reference/dyn_0549_reference.qasm,single-qubit gate replaced; condition reads the wrong classical bit
+dyn_0550,teleport,3,3,multi_fault,swap_measure_bits+substitute,2,data_v3/buggy/dyn_0550_buggy.qasm,data_v3/reference/dyn_0550_reference.qasm,two measurements write to each other's classical bit; single-qubit gate replaced
+dyn_0551,parity,3,4,multi_fault,reset_qubit+swap_measure_bits+reverse_cx,3,data_v3/buggy/dyn_0551_buggy.qasm,data_v3/reference/dyn_0551_reference.qasm,reset applied to the wrong qubit; two measurements write to each other's classical bit; CX control and target swapped
+dyn_0552,parity,3,4,multi_fault,swap_measure_bits+angle_negate,2,data_v3/buggy/dyn_0552_buggy.qasm,data_v3/reference/dyn_0552_reference.qasm,two measurements write to each other's classical bit; rotation angle negated
+dyn_0553,parity,3,4,multi_fault,delete_reset+angle_negate,2,data_v3/buggy/dyn_0553_buggy.qasm,data_v3/reference/dyn_0553_reference.qasm,reset missing; rotation angle negated
+dyn_0554,parity,3,4,multi_fault,swap_measure_bits+reverse_cx,2,data_v3/buggy/dyn_0554_buggy.qasm,data_v3/reference/dyn_0554_reference.qasm,two measurements write to each other's classical bit; CX control and target swapped
+dyn_0555,parity,3,4,multi_fault,reverse_cx+swap_measure_bits+swap_measure_qubits,3,data_v3/buggy/dyn_0555_buggy.qasm,data_v3/reference/dyn_0555_reference.qasm,CX control and target swapped; two measurements write to each other's classical bit; two measurements read each other's qubit
+dyn_0556,parity,3,4,multi_fault,reverse_cx+swap_measure_bits+delete_reset,3,data_v3/buggy/dyn_0556_buggy.qasm,data_v3/reference/dyn_0556_reference.qasm,CX control and target swapped; two measurements write to each other's classical bit; reset missing
+dyn_0557,parity,3,4,multi_fault,angle_negate+swap_measure_qubits+swap_measure_bits,3,data_v3/buggy/dyn_0557_buggy.qasm,data_v3/reference/dyn_0557_reference.qasm,rotation angle negated; two measurements read each other's qubit; two measurements write to each other's classical bit
+dyn_0558,parity,3,4,multi_fault,reset_qubit+angle_negate,2,data_v3/buggy/dyn_0558_buggy.qasm,data_v3/reference/dyn_0558_reference.qasm,reset applied to the wrong qubit; rotation angle negated
+dyn_0559,parity,3,4,multi_fault,delete_reset+swap_measure_bits,2,data_v3/buggy/dyn_0559_buggy.qasm,data_v3/reference/dyn_0559_reference.qasm,reset missing; two measurements write to each other's classical bit
+dyn_0560,parity,3,4,multi_fault,swap_measure_bits+angle_negate+delete_reset,3,data_v3/buggy/dyn_0560_buggy.qasm,data_v3/reference/dyn_0560_reference.qasm,two measurements write to each other's classical bit; rotation angle negated; reset missing
+dyn_0561,parity,3,4,multi_fault,angle_negate+reverse_cx+delete_reset,3,data_v3/buggy/dyn_0561_buggy.qasm,data_v3/reference/dyn_0561_reference.qasm,rotation angle negated; CX control and target swapped; reset missing
+dyn_0562,parity,3,4,multi_fault,delete_reset+reverse_cx+swap_measure_bits,3,data_v3/buggy/dyn_0562_buggy.qasm,data_v3/reference/dyn_0562_reference.qasm,reset missing; CX control and target swapped; two measurements write to each other's classical bit
+dyn_0563,parity,3,4,multi_fault,reset_qubit+swap_measure_bits,2,data_v3/buggy/dyn_0563_buggy.qasm,data_v3/reference/dyn_0563_reference.qasm,reset applied to the wrong qubit; two measurements write to each other's classical bit
+dyn_0564,parity,3,4,multi_fault,swap_measure_qubits+reset_qubit+angle_negate,3,data_v3/buggy/dyn_0564_buggy.qasm,data_v3/reference/dyn_0564_reference.qasm,two measurements read each other's qubit; reset applied to the wrong qubit; rotation angle negated
+dyn_0565,parity,3,4,multi_fault,angle_negate+reverse_cx,2,data_v3/buggy/dyn_0565_buggy.qasm,data_v3/reference/dyn_0565_reference.qasm,rotation angle negated; CX control and target swapped
+dyn_0566,parity,3,4,multi_fault,reset_qubit+swap_measure_bits,2,data_v3/buggy/dyn_0566_buggy.qasm,data_v3/reference/dyn_0566_reference.qasm,reset applied to the wrong qubit; two measurements write to each other's classical bit
+dyn_0567,parity,3,4,multi_fault,angle_negate+swap_measure_bits,2,data_v3/buggy/dyn_0567_buggy.qasm,data_v3/reference/dyn_0567_reference.qasm,rotation angle negated; two measurements write to each other's classical bit
+dyn_0568,parity,3,4,multi_fault,angle_negate+reverse_cx+swap_measure_qubits,3,data_v3/buggy/dyn_0568_buggy.qasm,data_v3/reference/dyn_0568_reference.qasm,rotation angle negated; CX control and target swapped; two measurements read each other's qubit
+dyn_0569,parity,3,4,multi_fault,swap_measure_bits+delete_reset+angle_shift,3,data_v3/buggy/dyn_0569_buggy.qasm,data_v3/reference/dyn_0569_reference.qasm,two measurements write to each other's classical bit; reset missing; rotation angle shifted by pi/2
+dyn_0570,parity,3,4,multi_fault,delete_reset+reverse_cx+swap_measure_qubits,3,data_v3/buggy/dyn_0570_buggy.qasm,data_v3/reference/dyn_0570_reference.qasm,reset missing; CX control and target swapped; two measurements read each other's qubit
+dyn_0571,parity,3,4,multi_fault,reset_qubit+reverse_cx+delete_reset,3,data_v3/buggy/dyn_0571_buggy.qasm,data_v3/reference/dyn_0571_reference.qasm,reset applied to the wrong qubit; CX control and target swapped; reset missing
+dyn_0572,parity,3,4,multi_fault,swap_measure_bits+delete_reset+reverse_cx,3,data_v3/buggy/dyn_0572_buggy.qasm,data_v3/reference/dyn_0572_reference.qasm,two measurements write to each other's classical bit; reset missing; CX control and target swapped
+dyn_0573,parity,3,4,multi_fault,reverse_cx+swap_measure_qubits,2,data_v3/buggy/dyn_0573_buggy.qasm,data_v3/reference/dyn_0573_reference.qasm,CX control and target swapped; two measurements read each other's qubit
+dyn_0574,parity,3,4,multi_fault,swap_measure_bits+reset_qubit,2,data_v3/buggy/dyn_0574_buggy.qasm,data_v3/reference/dyn_0574_reference.qasm,two measurements write to each other's classical bit; reset applied to the wrong qubit
+dyn_0575,parity,3,4,multi_fault,swap_measure_bits+reset_qubit,2,data_v3/buggy/dyn_0575_buggy.qasm,data_v3/reference/dyn_0575_reference.qasm,two measurements write to each other's classical bit; reset applied to the wrong qubit
+dyn_0576,loop,3,3,multi_fault,loop_count+angle_shift,2,data_v3/buggy/dyn_0576_buggy.qasm,data_v3/reference/dyn_0576_reference.qasm,loop runs -1 iteration; rotation angle shifted by pi/2
+dyn_0577,loop,3,3,multi_fault,swap_measure_qubits+substitute+reverse_cx,3,data_v3/buggy/dyn_0577_buggy.qasm,data_v3/reference/dyn_0577_reference.qasm,two measurements read each other's qubit; single-qubit gate replaced; CX control and target swapped
+dyn_0578,loop,3,3,multi_fault,angle_shift+swap_measure_qubits+swap_measure_bits,3,data_v3/buggy/dyn_0578_buggy.qasm,data_v3/reference/dyn_0578_reference.qasm,rotation angle shifted by pi/2; two measurements read each other's qubit; two measurements write to each other's classical bit
+dyn_0579,loop,3,3,multi_fault,loop_count+angle_negate+reverse_cx,3,data_v3/buggy/dyn_0579_buggy.qasm,data_v3/reference/dyn_0579_reference.qasm,loop runs +1 iteration; rotation angle negated; CX control and target swapped
+dyn_0580,loop,3,3,multi_fault,substitute+swap_measure_qubits+loop_count,3,data_v3/buggy/dyn_0580_buggy.qasm,data_v3/reference/dyn_0580_reference.qasm,single-qubit gate replaced; two measurements read each other's qubit; loop runs -1 iteration
+dyn_0581,loop,3,3,multi_fault,angle_shift+swap_measure_bits,2,data_v3/buggy/dyn_0581_buggy.qasm,data_v3/reference/dyn_0581_reference.qasm,rotation angle shifted by pi/2; two measurements write to each other's classical bit
+dyn_0582,loop,3,3,multi_fault,substitute+swap_measure_qubits,2,data_v3/buggy/dyn_0582_buggy.qasm,data_v3/reference/dyn_0582_reference.qasm,single-qubit gate replaced; two measurements read each other's qubit
+dyn_0583,loop,3,3,multi_fault,swap_measure_qubits+substitute+angle_shift,3,data_v3/buggy/dyn_0583_buggy.qasm,data_v3/reference/dyn_0583_reference.qasm,two measurements read each other's qubit; single-qubit gate replaced; rotation angle shifted by pi/2
+dyn_0584,loop,3,3,multi_fault,angle_negate+substitute,2,data_v3/buggy/dyn_0584_buggy.qasm,data_v3/reference/dyn_0584_reference.qasm,rotation angle negated; single-qubit gate replaced
+dyn_0585,loop,3,3,multi_fault,loop_count+reverse_cx,2,data_v3/buggy/dyn_0585_buggy.qasm,data_v3/reference/dyn_0585_reference.qasm,loop runs +1 iteration; CX control and target swapped
+dyn_0586,loop,3,3,multi_fault,angle_negate+substitute+swap_measure_bits,3,data_v3/buggy/dyn_0586_buggy.qasm,data_v3/reference/dyn_0586_reference.qasm,rotation angle negated; single-qubit gate replaced; two measurements write to each other's classical bit
+dyn_0587,loop,3,3,multi_fault,loop_count+swap_measure_bits,2,data_v3/buggy/dyn_0587_buggy.qasm,data_v3/reference/dyn_0587_reference.qasm,loop runs +1 iteration; two measurements write to each other's classical bit
+dyn_0588,loop,3,3,multi_fault,swap_measure_qubits+angle_negate+substitute,3,data_v3/buggy/dyn_0588_buggy.qasm,data_v3/reference/dyn_0588_reference.qasm,two measurements read each other's qubit; rotation angle negated; single-qubit gate replaced
+dyn_0589,loop,3,3,multi_fault,loop_count+angle_shift+swap_measure_qubits,3,data_v3/buggy/dyn_0589_buggy.qasm,data_v3/reference/dyn_0589_reference.qasm,loop runs +1 iteration; rotation angle shifted by pi/2; two measurements read each other's qubit
+dyn_0590,loop,3,3,multi_fault,angle_negate+reverse_cx+swap_measure_qubits,3,data_v3/buggy/dyn_0590_buggy.qasm,data_v3/reference/dyn_0590_reference.qasm,rotation angle negated; CX control and target swapped; two measurements read each other's qubit
+dyn_0591,loop,3,3,multi_fault,swap_measure_qubits+swap_measure_bits+angle_negate,3,data_v3/buggy/dyn_0591_buggy.qasm,data_v3/reference/dyn_0591_reference.qasm,two measurements read each other's qubit; two measurements write to each other's classical bit; rotation angle negated
+dyn_0592,loop,3,3,multi_fault,swap_measure_qubits+angle_shift+reverse_cx,3,data_v3/buggy/dyn_0592_buggy.qasm,data_v3/reference/dyn_0592_reference.qasm,two measurements read each other's qubit; rotation angle shifted by pi/2; CX control and target swapped
+dyn_0593,loop,3,3,multi_fault,swap_measure_qubits+loop_count,2,data_v3/buggy/dyn_0593_buggy.qasm,data_v3/reference/dyn_0593_reference.qasm,two measurements read each other's qubit; loop runs +1 iteration
+dyn_0594,loop,3,3,multi_fault,swap_measure_bits+reverse_cx+substitute,3,data_v3/buggy/dyn_0594_buggy.qasm,data_v3/reference/dyn_0594_reference.qasm,two measurements write to each other's classical bit; CX control and target swapped; single-qubit gate replaced
+dyn_0595,loop,3,3,multi_fault,loop_count+swap_measure_bits,2,data_v3/buggy/dyn_0595_buggy.qasm,data_v3/reference/dyn_0595_reference.qasm,loop runs +1 iteration; two measurements write to each other's classical bit
+dyn_0596,loop,3,3,multi_fault,swap_measure_bits+loop_count,2,data_v3/buggy/dyn_0596_buggy.qasm,data_v3/reference/dyn_0596_reference.qasm,two measurements write to each other's classical bit; loop runs +1 iteration
+dyn_0597,loop,3,3,multi_fault,substitute+angle_shift+swap_measure_qubits,3,data_v3/buggy/dyn_0597_buggy.qasm,data_v3/reference/dyn_0597_reference.qasm,single-qubit gate replaced; rotation angle shifted by pi/2; two measurements read each other's qubit
+dyn_0598,loop,3,3,multi_fault,loop_count+swap_measure_qubits+substitute,3,data_v3/buggy/dyn_0598_buggy.qasm,data_v3/reference/dyn_0598_reference.qasm,loop runs -1 iteration; two measurements read each other's qubit; single-qubit gate replaced
+dyn_0599,loop,3,3,multi_fault,substitute+swap_measure_qubits+loop_count,3,data_v3/buggy/dyn_0599_buggy.qasm,data_v3/reference/dyn_0599_reference.qasm,single-qubit gate replaced; two measurements read each other's qubit; loop runs +1 iteration
+dyn_0600,loop,3,3,multi_fault,reverse_cx+swap_measure_qubits,2,data_v3/buggy/dyn_0600_buggy.qasm,data_v3/reference/dyn_0600_reference.qasm,CX control and target swapped; two measurements read each other's qubit

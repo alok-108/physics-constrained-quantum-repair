@@ -1,0 +1,7 @@
+bug_class,unitary_blind
+control_flow,100.0
+gate_fault,0.0
+loop_fault,0.0
+multi_fault,16.0
+reset_fault,100.0
+wiring,100.0

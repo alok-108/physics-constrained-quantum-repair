@@ -1,0 +1,5 @@
+family,dyn_full,dyn_noop,dyn_random,dyn_reject_only
+ghz,96.3,0.0,70.6,96.3
+loop,89.7,0.0,42.9,89.7
+parity,92.4,0.0,27.8,92.4
+teleport,92.4,0.0,60.1,91.8

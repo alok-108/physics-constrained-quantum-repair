@@ -1,0 +1,5 @@
+system,n,Pass@1 (%),Pass@3 (%),Pass@3 95% CI,mean oracle queries
+guided + feedback,600,92.2,92.3,"[89.9, 94.2]",256.6
+"guided, bare rejection",600,92.2,92.2,"[89.7, 94.1]",238.9
+random search,600,48.5,48.5,"[44.5, 52.5]",194.9
+unchanged program,600,0.0,0.0,"[0.0, 0.6]",0.0

@@ -1,0 +1,7 @@
+bug_class,dyn_full,dyn_noop,dyn_random,dyn_reject_only
+control_flow,100.0,0.0,70.0,100.0
+gate_fault,96.0,0.0,51.0,96.0
+loop_fault,91.0,0.0,47.0,91.0
+multi_fault,67.0,0.0,29.0,66.0
+reset_fault,100.0,0.0,19.0,100.0
+wiring,100.0,0.0,75.0,100.0

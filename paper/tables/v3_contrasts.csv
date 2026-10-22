@@ -1,0 +1,4 @@
+contrast,b10,b01,risk_difference,ci_lo,ci_hi,p_exact,p_holm
+guidance,268,5,0.438,0.396,0.478,1.6352863212177633e-72,3.2705726424355266e-72
+counterexample feedback,1,0,0.002,-0.004,0.008,1.0,1.0
+any repair at all,554,0,0.923,0.898,0.942,3.391660689521908e-167,1.0174982068565723e-166
