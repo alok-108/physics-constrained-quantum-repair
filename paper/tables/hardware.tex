@@ -1,0 +1,17 @@
+\begin{table*}[t]
+\centering
+\caption{Calibration-based estimate on 200 reference circuits (medians): estimated success probability (ESP), native two-qubit gates and duration/min(T1,T2), for the identity layout assumed by the benchmark and a compiler-chosen layout (FakeSherbrooke snapshot).}
+\label{tab:hardware}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrrrr}
+\toprule
+family & ESP id. & ESP auto & 2q id. & 2q auto & T ratio id. & T ratio auto \\
+\midrule
+ghz & 0.895 & 0.956 & 3.5 & 3 & 0.025 & 0.046 \\
+qaoa\_maxcut & 0.223 & 0.794 & 36 & 26 & 0.515 & 0.524 \\
+qft & 0.342 & 0.76 & 110 & 31 & 0.465 & 0.169 \\
+vqe\_h2 & 0.88 & 0.938 & 6 & 6 & 0.033 & 0.068 \\
+\bottomrule
+\end{tabular}
+\end{table*}

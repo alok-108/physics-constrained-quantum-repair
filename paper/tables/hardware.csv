@@ -1,0 +1,5 @@
+circuit_type,esp_identity,esp_auto,cx_identity,cx_auto,ratio_identity,ratio_auto
+ghz,0.895,0.956,3.5,3.0,0.025,0.046
+qaoa_maxcut,0.223,0.794,36.0,26.0,0.515,0.524
+qft,0.342,0.76,110.0,31.0,0.465,0.169
+vqe_h2,0.88,0.938,6.0,6.0,0.033,0.068
