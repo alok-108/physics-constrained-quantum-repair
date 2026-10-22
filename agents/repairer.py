@@ -91,20 +91,25 @@ class RepairerAgent:
     def __init__(self, model_name: str = "gpt-4o", temperature: float = 0.0,
                  use_physics_context: bool = True, accept_at: float = 0.999,
                  max_steps: int = 4, build_per_step: int = 4,
-                 router: str = "swapback", extended_edits: bool = False):
+                 router: str = "swapback", extended_edits: bool = False,
+                 llm_model: Optional[str] = None, llm_only: bool = False):
         self.model_name = model_name
         self.temperature = temperature
         self.use_physics_context = use_physics_context
         self.accept_at = accept_at
         self.max_steps = max_steps
         self.build_per_step = build_per_step
+        self.llm_only = llm_only          # LLM arm: no heuristic or oracle fallback, a failed LLM call = unchanged circuit
         self.extended_edits = extended_edits   # + 2-qubit substitution and analytic rotation insertion
         self.router = router            # "swapback" (own construction) or "qiskit" (SABRE + layout undo)
         self.physics = get_default_physics_model()
         self.api_key = os.getenv("OPENAI_API_KEY")
         self.llm = None
         self.last_strategy = "none"
-        if self.api_key and ChatOpenAI is not None and not self.api_key.startswith("your-"):
+        if llm_model:
+            from agents.llm import OllamaChat
+            self.llm = OllamaChat(llm_model)
+        elif self.api_key and ChatOpenAI is not None and not self.api_key.startswith("your-"):
             try:
                 self.llm = ChatOpenAI(model=self.model_name, temperature=self.temperature,
                                       api_key=self.api_key)
@@ -126,6 +131,9 @@ class RepairerAgent:
             if cand is not None and self._key_of(cand) not in tabu:
                 self.last_strategy = "llm"
                 return cand
+            if self.llm_only:
+                self.last_strategy = "llm_failed"
+                return buggy_qasm
 
         return self._heuristic_repair(buggy_qasm, bug_report, spec, oracle, tabu)
 

@@ -23,7 +23,7 @@ import json
 import math
 import re
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 import qiskit.qasm3
@@ -35,6 +35,7 @@ from agents.orchestrator import Orchestrator
 from agents.repairer import ANGLE_GATES, RepairerAgent
 from agents.validator import ValidatorAgent
 from src.physics_model import get_default_physics_model
+from src import dynamic as dyn
 from src.routing import cancel_inverses, circuit_key
 
 
@@ -96,8 +97,47 @@ def syntax_hint(qasm: str) -> Optional[Tuple[int, str]]:
     return None
 
 
+def lint_dynamic(qasm: str) -> List[Finding]:
+    """Static checks for programs with measurement, reset, conditionals or loops."""
+    try:
+        prog = dyn.parse(qasm)
+    except Exception as e:
+        hint = syntax_hint(qasm)
+        text = ((str(e).splitlines() or [""])[0]).strip()
+        return [Finding("E001", "error", "OpenQASM 3 parse error or unsupported construct: "
+                        + (text or "not valid") + (f"; probably line {hint[0]}: {hint[1]}" if hint else ""),
+                        line=hint[0] if hint else None)]
+    physics = get_default_physics_model()
+    out: List[Finding] = []
+    written: Set[int] = set()
+    measured: Set[int] = set()
+    n_meas = 0
+    for s, depth in dyn.walk(prog.stmts):
+        if isinstance(s, dyn.Gate) and len(s.qubits) == 2 and not physics.is_connected(*s.qubits):
+            out.append(Finding("W101", "warning", f"two-qubit gate on non-adjacent device qubits {list(s.qubits)}: "
+                               f"{s.name} (also checked inside blocks)"))
+        if isinstance(s, dyn.Gate) and any(q in measured for q in s.qubits):
+            out.append(Finding("I303", "info", f"gate {s.name} acts on a qubit that was measured earlier and not reset"))
+        if isinstance(s, dyn.Measure):
+            written.add(s.c)
+            measured.add(s.q)
+            n_meas += 1
+        if isinstance(s, dyn.Reset):
+            measured.discard(s.q)
+        if isinstance(s, dyn.If) and s.c not in written:
+            out.append(Finding("W401", "warning", f"condition reads c[{s.c}] before any measurement wrote it"))
+    unused = [c for c in range(prog.n_clbits) if c not in written]
+    if unused:
+        out.append(Finding("I304", "info", f"classical bit(s) never written by a measurement: {unused}"))
+    out.append(Finding("I302", "info", f"dynamic program: {n_meas} measurement(s), {prog.n_qubits} qubits, "
+                       f"{prog.n_clbits} classical bits (semantic checks use exact output distributions)"))
+    return out
+
+
 def lint(qasm: str, max_depth: int = 250) -> List[Finding]:
     """Static checks that need no specification."""
+    if dyn.has_dynamic(qasm):
+        return lint_dynamic(qasm)
     try:
         qc = qiskit.qasm3.loads(qasm)
     except Exception as e:
@@ -246,12 +286,19 @@ class Report:
 
 CERT_REFERENCE = ("exact unitary equivalence to the reference (process fidelity >= 0.99), device "
                   "admissibility, irreducibility and noisy-output agreement below the 4096-shot noise floor")
+CERT_DYNAMIC = ("exact equality (TVD <= 1e-6) of the classical output distribution to the reference on 16 "
+                "held-out inputs, matching register sizes and device adjacency (also inside blocks)")
 CERT_TESTS = ("agreement >= 0.999 with every supplied test plus device admissibility and irreducibility; "
               "NOT an equivalence certificate")
 
 
 def verify(qasm: str, reference: Optional[str] = None, tests=None,
            validator: Optional[ValidatorAgent] = None) -> Dict[str, Any]:
+    if dyn.has_dynamic(qasm) or (reference is not None and dyn.has_dynamic(reference)):
+        if reference is None:
+            raise ValueError("programs with measurement, reset, conditionals or loops need a reference circuit "
+                             "(test files cover unitary circuits only)")
+        return dyn.validate(qasm, dyn.parse(reference))
     validator = validator or ValidatorAgent()
     if reference is not None:
         return validator.validate(qasm, reference, gt_key="cli")
@@ -272,6 +319,21 @@ def repair(qasm: str, reference: Optional[str] = None, tests=None, max_attempts:
     """Repair a faulty circuit against a reference circuit or a test file."""
     if (reference is None) == (tests is None):
         raise ValueError("give exactly one of reference / tests")
+    if dyn.has_dynamic(qasm) or (reference is not None and dyn.has_dynamic(reference)):
+        if reference is None:
+            raise ValueError("programs with measurement, reset, conditionals or loops need a reference circuit "
+                             "(test files cover unitary circuits only)")
+        res = dyn.repair(qasm, reference, max_attempts, min(oracle_budget, 3000))
+        trace = [{"attempt": h["attempt"], "strategy": "dynamic search", "status": h["status"],
+                  "failed_stage": h["failed_stage"]} for h in res["history"]]
+        ok = res["success"]
+        unchanged = ok and len(res["history"]) == 1 and dyn.to_qasm(dyn.parse(qasm)) == res["qasm"]
+        return Report("ALREADY_CORRECT" if unchanged else ("PASS" if ok else "UNRESOLVED"), CERT_DYNAMIC,
+                      len(res["history"]), res["qasm"] if ok else None,
+                      unified_diff(dyn.to_qasm(dyn.parse(qasm)), res["qasm"]) if ok else "",
+                      None, None, res["queries"], trace,
+                      ["dynamic programs: no noise stage and no minimality check; acceptance compares exact "
+                       "output distributions on 16 held-out inputs"])
     validator = ValidatorAgent()
     before = _gates(qasm)
     warnings: List[str] = []

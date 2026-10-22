@@ -64,12 +64,15 @@ ARM_CONFIG: Dict[str, Dict[str, Any]] = {
     # extended edit neighbourhood: 2-qubit substitution and analytic rotation insertion
     "ours_full_ext":             dict(use_physics_context=True,  verbose_feedback=True,  use_oracle=True,
                                       extended_edits=True),
+    # local LLM as the only repair engine (no oracle, no search); model set by the QREPAIR_OLLAMA_MODEL env var
+    "llm_ollama":                dict(use_physics_context=True,  verbose_feedback=True,  use_oracle=False,
+                                      llm_only=True),
     "ours_full_qiskit_router":   dict(use_physics_context=True,  verbose_feedback=True,  use_oracle=True,
                                       router="qiskit"),
 }
 CORE_SYSTEMS = ["ours_full", "ours_reject_only", "unconstrained_diag", "unconstrained_reject_only",
                 "static_no_oracle", "pyzx_zx_calculus"]
-EXTRA_SYSTEMS = ["ours_full_ext", "ours_full_qiskit_router", "qiskit_transpile", "qiskit_transpile_l0",
+EXTRA_SYSTEMS = ["llm_ollama", "ours_full_ext", "ours_full_qiskit_router", "qiskit_transpile", "qiskit_transpile_l0",
                  "qiskit_transpile_l2", "qiskit_transpile_l3"]
 SYSTEMS = CORE_SYSTEMS + EXTRA_SYSTEMS
 
@@ -205,6 +208,7 @@ def row_from_run(meta: Dict[str, Any], system: str, res: Dict[str, Any], buggy: 
         "gates_before": before["gates"], "gates_after": after["gates"], "ref_gates": ref_gates,
         "depth_before": before["depth"], "depth_after": after["depth"],
         "overhead_vs_ref_pct": (None if after["gates"] is None else 100.0 * (after["gates"] - ref_gates) / ref_gates),
+        "llm_tokens": res.get("llm_tokens", 0), "llm_calls": res.get("llm_calls", 0),
         "duration_s": round(duration, 3),
     }
 
@@ -227,6 +231,7 @@ def _init_worker(systems: List[str], budget: int, oracle_budget: int, suite_size
     _STATE["systems"] = systems
     _STATE["orch"] = {
         name: Orchestrator(max_iterations=budget, validator=validator, variant=name,
+                           llm_model=(os.environ.get("QREPAIR_OLLAMA_MODEL") if ARM_CONFIG[name].get("llm_only") else None),
                            oracle_budget=oracle_budget, oracle_suite_size=suite_size, **ARM_CONFIG[name])
         for name in systems if name in ARM_CONFIG
     }

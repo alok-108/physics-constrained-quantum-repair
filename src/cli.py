@@ -3,6 +3,7 @@
     python -m src.cli lint      circuit.qasm
     python -m src.cli verify    circuit.qasm (--reference ref.qasm | --tests tests.json)
     python -m src.cli localize  circuit.qasm (--reference ref.qasm | --tests tests.json) [--top 5]
+    python -m src.cli hardware  circuit.qasm [--layout identity|auto|both]
     python -m src.cli repair    circuit.qasm (--reference ref.qasm | --tests tests.json) [--out fixed.qasm]
 
 Add ``--json`` for machine-readable output. Exit status: 0 success (clean lint / PASS /
@@ -53,6 +54,11 @@ def main(argv=None) -> int:
     p.add_argument("circuit")
     p.add_argument("--json", action="store_true")
 
+    p = sub.add_parser("hardware", help="calibration-based estimate on the FakeSherbrooke model (ESP, duration, T1/T2)")
+    p.add_argument("circuit")
+    p.add_argument("--layout", choices=["identity", "auto", "both"], default="both")
+    p.add_argument("--json", action="store_true")
+
     p = sub.add_parser("verify", help="run the acceptance predicate")
     p.add_argument("circuit")
     add_spec(p)
@@ -90,6 +96,20 @@ def main(argv=None) -> int:
                     print(f"{f.severity.upper():7s} {f.code}{loc}: {f.message}")
             return 1 if any(f.severity in ("error", "warning") for f in findings) else 0
 
+        if args.cmd == "hardware":
+            from src import hardware
+            layouts = ["identity", "auto"] if args.layout == "both" else [args.layout]
+            ests = [hardware.estimate_qasm(qasm, lay) for lay in layouts]
+            if args.json:
+                print(json.dumps([e.to_dict() for e in ests], indent=2))
+            else:
+                for e in ests:
+                    print(f"layout {e.layout:8s} ESP {e.esp:.3f}   native 2q gates {e.native_two_qubit_gates:3d}   "
+                          f"depth {e.native_depth:4d}   duration {e.estimated_duration_us:7.2f} us   "
+                          f"duration/min(T1,T2) {e.coherence_ratio:.3f}")
+                print("note: one calibration snapshot of a simulated backend; not a measurement on hardware")
+            return 0
+
         ref, tests = _spec(args)
         if args.cmd == "verify":
             v = product.verify(qasm, ref, tests)
@@ -101,6 +121,10 @@ def main(argv=None) -> int:
             return 0 if v["status"] == "PASS" else 1
 
         if args.cmd == "localize":
+            if product.dyn.has_dynamic(qasm):
+                print("error: localize does not support programs with measurement, reset, conditionals or loops yet",
+                      file=sys.stderr)
+                return 2
             oracle = product.tests_oracle(tests, args.budget) if tests else product.reference_oracle(ref, args.budget)
             rows = product.localize(qasm, oracle, args.top)
             if args.json:
