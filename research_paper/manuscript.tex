@@ -53,9 +53,10 @@ to $97.0\%$ ($+8.9$ points, $p<10^{-24}$) when the initial test suite is a singl
 state. On 600 programs with measurement, reset, classical control and loops, guided repair
 fixes $92.3\%$ against $48.5\%$ for random search, and a calibration-based estimate shows that
 the benchmark's identity layout is much looser than a compiler layout (median success
-estimate $0.66$ against $0.89$). A small local language model (1.5 billion parameters, 60
-circuits) repairs $16.7\%$; this is a floor, not a verdict on language models. No circuit was
-run on real hardware.
+estimate $0.66$ against $0.89$). As the only repair engine on 60 circuits, a 1.5-billion-parameter local model
+repairs $16.7\%$ and two small Gemini models $43.3\%$ and $51.7\%$, against $98.3\%$ for guided search;
+these are floors, not verdicts on larger models. On five real Bugs4Q bugs guided search repairs three.
+No circuit was run on real hardware.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -115,7 +116,7 @@ circuits whose inverse lies inside the agent's edit neighbourhood, so a high rat
 on single-edit faults is expected and is not evidence of general repair ability;
 the informative cells are the fault modes outside the neighbourhood and the
 weak-oracle and low-budget regimes. Hardware is a device model, connectivity is
-checked under the identity layout, and the only language model we ran is a small local one.
+checked under the identity layout, and the language models we ran are small ones (a local 1.5-billion-parameter model and two small Gemini models).
 
 \section{Related Work and Scope}
 
@@ -127,7 +128,8 @@ release; we therefore report no arm named after an external system. Published
 quantum repair methods with their own protocols include HornBro~\cite{tan2025hornbro}
 and the unitary-operation approach of Li \emph{et al.}~\cite{li2024unitar}; they
 differ from ours in task, language and oracle, so we do not claim a head-to-head
-comparison with them.
+comparison with them. HornBro's code is public, and a comparison on our benchmark
+needs its authors' pipeline run under our predicate (Section~\ref{sec:threats}).
 
 \textbf{Benchmarks.} Bugs4Q~\cite{zhao2023bugs4q} remains the main collection of
 real, executable quantum bugs with reproducing tests, but it is small and tied to
@@ -692,37 +694,60 @@ computer.
 
 \input{../paper/tables/hardware.tex}
 
-\subsection{A small local language model}
+\subsection{Language models as the only repair engine}
 
 The repository carried a language-model path that none of the numbers above used. We ran it
-with a local model (\texttt{qwen2.5-coder:1.5b} served by Ollama on a laptop CPU; temperature
-$0$, fixed seed, replies capped at 500 tokens) as the \emph{only} repair engine: no oracle
-queries, no search and no heuristic fallback, so a reply that does not parse leaves the circuit
-unchanged. It gets the same three attempts, the same stage-named feedback and the same
-acceptance predicate. Because a run takes about an hour, we used a stratified subset of 60
-circuits (three per fault class and circuit family) and compare on exactly those circuits
-(Table~\ref{tab:llm}).
+with three models as the \emph{only} repair engine: no oracle queries, no search and no
+heuristic fallback, so a reply that does not parse leaves the circuit unchanged. The models are
+\texttt{qwen2.5-coder:1.5b} (served by Ollama on a laptop CPU) and two models from the free tier
+of the Gemini API (\texttt{gemini-3.1-flash-lite}, \texttt{gemini-3.5-flash-lite}); temperature
+is $0$. All get the same three attempts, the same stage-named feedback and the same acceptance
+predicate. A run with an API error is not recorded, so service outages do not count as model
+failures. We used a stratified subset of 60 circuits (three per fault class and circuit family)
+and compare on exactly those circuits (Table~\ref{tab:llm}). Runs that stopped early because
+of the free-tier daily quota or server errors cover only the lowest circuit identifiers, which
+are the easiest classes, and are excluded from every table.
 
 \input{../paper/tables/llm_rates.tex}
 
-The model repairs $16.7\%$ of the circuits within three attempts ($[9.3,28.0]$; $11.7\%$ at the
-first). Guided search repairs $98.3\%$ of the same circuits, a paired difference of $+0.817$
-($[0.686,0.891]$; 49 circuits repaired by guided search only, none by the model only). Static
-repairs without any oracle reach $60.0\%$, and the model never succeeded where they failed
-(26 against 0 discordant circuits). By class, the model repaired $4$ of $12$ syntax and $6$ of
-$12$ hardware-fault circuits and none of the gate-redundancy, semantic and structural circuits;
-it often returned the faulty circuit unchanged, and $26.7\%$ of the circuits never received a
-parsable reply. The 50 unrepaired circuits ended at the semantic stage (26), the minimality
-stage (10), the syntax stage (8) or the connectivity stage (6). A run cost on average $2.7$ calls
-and $2{,}261$ tokens per circuit and $61$ seconds of wall-clock time ($1.0$ hour in total).
+The local model repairs $16.7\%$ of the circuits within three attempts ($[9.3,28.0]$), the two
+Gemini models $43.3\%$ ($[31.6,55.9]$) and $51.7\%$ ($[39.3,63.8]$). Guided search repairs
+$98.3\%$ of the same circuits; the paired difference is $+0.467$ ($[0.334,0.589]$) against the
+better Gemini model, with 28 circuits repaired by guided search only and none by the model only
+(Holm $p\approx5\times10^{-8}$), and $+0.817$ against the local model. Static repairs without any
+oracle reach $60.0\%$; their advantage over the two Gemini models ($+0.167$ and $+0.083$) is not
+significant after correction, so cheap deterministic repairs are not clearly worse than these
+models, except on hardware faults. The two Gemini models do not differ significantly
+($+0.083$, $[-0.040,0.202]$). By class, the Gemini models repair $67$--$92\%$ of syntax and
+$75$--$83\%$ of gate-redundancy circuits but only $8$--$17\%$ of semantic-deviation circuits
+(guided search: $100\%$) and $17$--$33\%$ of hardware faults; their failures end at the semantic
+stage ($16$ and $17$ circuits) or the connectivity stage ($16$ and $11$). The Gemini models always
+returned a parsable circuit, whereas $26.7\%$ of the local model's circuits never received one. A
+circuit cost $2.0$--$2.7$ calls and $1{,}650$--$2{,}261$ tokens.
 
-This result is a floor, not a verdict on language models. A $1.5$-billion-parameter model on a CPU
-is far from the frontier models used in other work, whose authors report much higher rates with
-a single retry~\cite{pham2026qbuglm} on a different benchmark and protocol; with 60 circuits and a
-single run our interval is wide; and we did not tune prompts beyond the physical-constraint
-text already in the repository. What the run does show is that the harness can host a language
-model under the same predicate and budgets, records its token and time cost, and that
-a model of this size does not substitute for the oracle-guided search here.
+These results are floors, not verdicts on language models. All three models are small; the
+frontier models used in other work report much higher rates with a single
+retry~\cite{pham2026qbuglm} on a different benchmark and protocol; we could not run larger
+Gemini models to completion on the free tier; with 60 circuits and a single run our intervals
+are wide; and we did not tune prompts beyond the physical-constraint text already in the
+repository. What the runs show is that the harness hosts language models under the same
+predicate and budgets and records their token and time cost, and that none of the three
+substitutes for the oracle-guided search here.
+
+\subsection{A pilot on real bugs}
+
+Bugs4Q collects real bugs of Qiskit programs. We ran the Python scripts of its entries in a
+sandbox with a compatibility shim and kept the entries whose buggy and fixed scripts build
+circuits that differ in logic on the same qubits. Reading the differences by hand, five of the
+entries could be turned into (faulty, reference) pairs; most entries are library, API or version
+bugs without a circuit-level fix. Three pairs use the full acceptance predicate, two (whose own
+reference contains non-adjacent two-qubit gates) use logic-only acceptance. Guided repair fixes
+three of the five (random search with the same grammar and budget: two); the two it misses are a
+QFT whose qubit-order swap is missing and four missing Hadamard gates. The language models fix
+none of the five from the faulty circuit alone and one (an H gate where an X was intended) when
+they are also told the program's output on the all-zero input. The arms do not receive the same
+information, and five pairs support no rate and no ranking; the pilot shows only that the pipeline
+runs on bugs that people wrote, and where it fails.
 
 
 \section{Threats to Validity and Limitations}
@@ -773,10 +798,12 @@ structure-aware verification such as automata-based~\cite{chen2023automata} or
 ZX-based~\cite{peham2022zx} equivalence checking would be the principled
 replacement. All reported results use the exact check ($\le 8$ qubits).
 
-\textbf{Missing baselines.} The language-model evidence is one small local model (1.5 billion
-parameters) on 60 circuits; no frontier model was run, so nothing here characterises language-model
-repair in general. We report no externally executed QBugLM, HornBro or UnitAR run: a search on 2026-10-22
-found no public code repository for any of them. No circuit was executed on real quantum hardware.
+\textbf{Missing baselines.} The language-model evidence is three small models on 60 circuits; no
+frontier model was run to completion, so nothing here characterises language-model repair in
+general. HornBro~(FSE 2025) has public code; it needs Linux and its own Python 3.10 environment, and an
+adapter and a Colab notebook that apply our predicate to its output exist, but no HornBro result is
+reported yet. We report no QBugLM or UnitAR run: a search on 2026-10-22 found no public code repository
+for either. No circuit was executed on real quantum hardware.
 
 \textbf{Statistics.} The 1000 circuits are not independent draws of real
 faults; they are a generated population, so intervals describe sampling over

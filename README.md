@@ -71,8 +71,8 @@ What the numbers do and do not say:
   edit neighbourhood, so ~97 % is **not** evidence of general repair ability.
   Per-fault-mode results (e.g. 63 % on CX→CZ replacement, 0 % when a rotation
   was removed) show where it fails; see `paper/tables/mode_breakdown.csv`.
-* **No language model was executed.** The LLM path exists but needs an API key;
-  every number comes from the deterministic path.
+* **The 1000-circuit table above uses no language model**; every number in it comes from the
+  deterministic path. Language models were run separately, on a 60-circuit subset (below).
 
 Full tables: `paper/tables/`. Figures: `paper/figures/`. Paper source:
 `research_paper/manuscript.tex`.
@@ -145,12 +145,26 @@ To compile the paper: `cd research_paper && pdflatex manuscript && bibtex manusc
   references the benchmark's identity layout has median ESP 0.66 against 0.89 with a compiler
   layout (QFT 0.34 vs 0.76): "physically valid" in the predicate is looser than "runs well".
   This is a model, not a hardware run.
-* **Local LLM arm.** `agents/llm.py` talks to a local Ollama server; the `llm_ollama` arm uses the
-  model as the only repair engine (no oracle, no search). A 1.5B model (`qwen2.5-coder:1.5b`, CPU) repairs
-  **16.7 %** Pass@3 [9.3, 28.0] on 60 circuits where guided search repairs 98.3 %; this is a floor, not a
-  verdict on frontier models. See [docs/BENCHMARK_V3.md](docs/BENCHMARK_V3.md).
-* **Not possible here:** running QBugLM, HornBro or UnitAR (no public code was found), and running on
-  a real quantum computer (needs an IBM Quantum account).
+* **LLM arms.** `agents/llm.py` talks to a local Ollama server or the Gemini API; an LLM arm uses the
+  model as the only repair engine (no oracle, no search), with the same three attempts and stage-named
+  feedback. On the same 60 circuits, Pass@3: `qwen2.5-coder:1.5b` **16.7 %** [9.3, 28.0],
+  `gemini-3.1-flash-lite` **43.3 %** [31.6, 55.9], `gemini-3.5-flash-lite` **51.7 %** [39.3, 63.8], against
+  98.3 % for guided search and 60.0 % for static repairs. Both Gemini models are "lite" models, so
+  this is not the ceiling of language models. They repair semantic-deviation circuits only 8-17 % of the time
+  (search: 100 %). Larger models are in progress (free-tier daily quota; partial runs are excluded from every
+  table). See [docs/BENCHMARK_V3.md](docs/BENCHMARK_V3.md).
+* **Real bugs (pilot, 5 pairs).** `data_real/` holds five circuit-logic bugs taken from Bugs4Q. Guided
+  repair fixes 3 of 5 (random search 2 of 5); the two it misses are a QFT with a missing swap and four
+  missing Hadamards. Language models fix 0 of 5 from the faulty circuit alone and 1 of 5 (`real_02`, an
+  H-for-X swap) when also told the program's output on the all-zero input. Five pairs support no rate.
+  Most Bugs4Q entries are library bugs, not circuit bugs ([data_real/README.md](data_real/README.md)).
+* **Rival tools.** HornBro's code is public (<https://github.com/JanusQ/HornBro>, MIT). It needs Linux and
+  Python 3.10, so the comparison runs in Colab: `notebooks/colab_hornbro.ipynb`, with an adapter
+  (`src/hornbro_adapter.py`) and a scorer that applies this repository's predicate (`src/score_hornbro.py`).
+  The adapter is written against HornBro's source but has not been run yet; no HornBro result is reported.
+  QBugLM and UnitAR: no public code was found.
+* **Not possible here:** running on a real quantum computer (needs an IBM Quantum account;
+  `src/run_hardware.py` is ready and was exercised only on the noisy simulator).
 
 Details, limits and commands: [docs/BENCHMARK_V3.md](docs/BENCHMARK_V3.md).
 

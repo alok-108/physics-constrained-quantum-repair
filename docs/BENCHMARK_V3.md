@@ -91,51 +91,105 @@ The compiler layout gave the higher ESP on all 200 circuits. Consequences to kee
   quantum computer: that needs an IBM Quantum account, calibration snapshots and queue time, none
   of which exist in this repository.
 
-## 3. A local LLM arm
+## 3. LLM arms (local Ollama and the Gemini API)
 
-The LLM path is now runnable without a paid API: `agents/llm.py` talks to a local Ollama server.
-The `llm_ollama` arm uses the model as the **only** repair engine (no oracle queries, no search, no
-heuristic fallback; a failed or unparsable reply leaves the circuit unchanged) with the same three
-attempts and the same stage-named feedback. Tokens and calls are recorded per circuit.
-`QREPAIR_OLLAMA_MODEL=qwen2.5-coder:1.5b python src/run_experiments.py --systems llm_ollama --limit 20`.
+`agents/llm.py` provides two clients with the same interface: `OllamaChat` (a local Ollama server) and
+`GeminiChat` (Gemini REST API; the key is read from `GEMINI_API_KEY`, sent in a header and scrubbed from errors;
+free-tier rate limits are handled by spacing and retries, and an exhausted daily quota stops the run instead of
+being recorded as wrong answers). An LLM arm uses the model as the **only** repair engine (no oracle queries, no
+search, no heuristic fallback; a failed or unparsable reply leaves the circuit unchanged) with the same three
+attempts and the same stage-named feedback. Tokens, calls and API errors are recorded per circuit; a circuit
+with an API error is not recorded and is redone on `--resume`, so outages never count as model failures.
 
-A 1.5-billion-parameter model on a laptop CPU is a floor, not a frontier model; see section 5 for
-the measured outcome and what it does and does not show. In this arm the model is not forced to
-diversify: resubmitting the same circuit is its own choice and is simply rejected again.
+    QREPAIR_OLLAMA_MODEL=qwen2.5-coder:1.5b python src/run_experiments.py --systems llm_ollama --limit 60
+    GEMINI_API_KEY=... QREPAIR_GEMINI_MODEL=<model id> python src/run_experiments.py --systems llm_gemini --limit 60         --out experiments/llm_runs/<model id>.csv --resume
+
+In this arm the model is not forced to diversify: resubmitting the same circuit is its own choice and is
+simply rejected again. `notebooks/colab_llm_runs.ipynb` runs open models on a free Colab GPU.
 
 ## 4. Rival tools
 
-QBugLM, HornBro and UnitAR could **not** be run. A search on 2026-10-22 found no public code
-repository for any of them (QBugLM's paper, arXiv 2606.07314, links none; HornBro and UnitAR are
-journal papers without a repository link in the sources found). Re-implementing them from their
-papers would not be a head-to-head with the tools, so none is reported. If their artifacts become
-available the runner can host them as additional arms under the same predicate and budgets.
+* **HornBro** (FSE 2025) has a public repository (<https://github.com/JanusQ/HornBro>, MIT) and a Zenodo
+  artifact. It needs Linux and Python 3.10, and its dependencies conflict with this repository's Qiskit, so the
+  comparison is done in two steps that exchange OpenQASM files: `src/hornbro_adapter.py` runs HornBro's own
+  repair loop (given the reference circuit, as it is designed) on the same 60 circuits, and `src/score_hornbro.py`
+  judges what it returns with this repository's predicate. The notebook is `notebooks/colab_hornbro.ipynb`.
+  **No HornBro result is reported yet**: the adapter has not been run (the Windows development machine cannot
+  host it). HornBro repairs gate parameters and patches of unitary circuits, so faults that leave the program
+  unparsable count as failures with the reason recorded.
+* **QBugLM, UnitAR:** no public code repository was found (search 2026-10-22). A Bugs4Q-based mutation study
+  (arXiv 2601.12273) also links none.
 
-## 5. LLM result (60 circuits, `qwen2.5-coder:1.5b`, three attempts)
+Re-implementing a tool from its paper would not be a head-to-head, so none is reported.
+
+## 5. LLM results (same 60 circuits, three attempts)
 
 Stratified subset: three circuits per fault class and circuit family, compared on exactly the same
-circuits (`python src/analyze_llm.py`; run takes about one hour on a laptop CPU).
+circuits (`python src/analyze_llm.py`). A run that stopped early (daily quota, server errors) covers only the
+lowest circuit ids, which are the easiest classes, so partial runs are excluded from every table.
 
 | System | Pass@1 | Pass@3 | 95 % CI (Pass@3) |
 |---|---|---|---|
-| local LLM only (1.5B) | 11.7 % | 16.7 % | [9.3, 28.0] |
+| `qwen2.5-coder:1.5b` (local CPU) | 11.7 % | 16.7 % | [9.3, 28.0] |
+| `gemini-3.1-flash-lite` | 40.0 % | 43.3 % | [31.6, 55.9] |
+| `gemini-3.5-flash-lite` | 51.7 % | 51.7 % | [39.3, 63.8] |
 | static repairs, no oracle | 60.0 % | 60.0 % | [47.4, 71.4] |
 | Qiskit compiler (O1) | 30.0 % | 30.0 % | [19.9, 42.5] |
 | PyZX | 5.0 % | 5.0 % | [1.7, 13.7] |
 | no hardware knowledge | 78.3 % | 78.3 % | [66.4, 86.9] |
 | guided search + oracle | 98.3 % | 98.3 % | [91.1, 99.7] |
 
-* Guided search vs the LLM: +0.817 [0.686, 0.891], 49 circuits repaired by guided search only and
-  none by the LLM only (Holm p ~ 7e-15). Static repairs vs the LLM: +0.433 [0.298, 0.544], 26 vs 0.
-* By class the LLM repaired 4 of 12 syntax and 6 of 12 hardware-fault circuits and none of the
-  gate-redundancy, semantic and structural circuits. 26.7 % of the circuits never got a parsable reply.
-  The 50 unrepaired circuits ended at the semantic (26), minimality (10), syntax (8) or connectivity (6) stage.
-* Cost per circuit: 2.7 calls, 2,261 tokens, 61 s; 1.0 hour in total.
+Pass@3 by fault class (%), 12 circuits per class:
 
-**What this does and does not show.** It shows that the harness can host a language model under the same
-predicate, attempts and feedback, and that a model of this size does not substitute for oracle-guided
-search on this benchmark. It does **not** characterise language models in general: 1.5 billion
-parameters on a CPU is far below the frontier models used in other work (whose authors report much higher
-rates with one retry, on a different benchmark and protocol); n = 60 gives a wide interval; and prompts were
-not tuned beyond the physical-constraint text already in the repository. A first LLM run with a tabu check
-that rejected a repeated reply was discarded as unfair to the model and rerun without it.
+| class | qwen 1.5B | gemini 3.1 lite | gemini 3.5 lite | static | guided |
+|---|---|---|---|---|---|
+| syntax | 33.3 | 66.7 | 91.7 | 100 | 100 |
+| gate redundancy | 0.0 | 75.0 | 83.3 | 100 | 100 |
+| hardware (physics) | 50.0 | 16.7 | 33.3 | 100 | 100 |
+| structural | 0.0 | 41.7 | 41.7 | 0 | 91.7 |
+| semantic deviation | 0.0 | 16.7 | 8.3 | 0 | 100 |
+
+* Guided search vs `gemini-3.5-flash-lite`: +0.467 [0.334, 0.589], 28 circuits repaired by guided search only and
+  none by the model only (Holm p ~ 5e-8); vs `gemini-3.1-flash-lite`: +0.550 [0.413, 0.667], 33 vs 0. Against
+  `qwen2.5-coder:1.5b`: +0.817 [0.686, 0.891], 49 vs 0.
+* Static repairs vs the Gemini models: +0.083 [-0.048, 0.210] (11 vs 6) for 3.5-lite and +0.167 [0.011, 0.310]
+  (17 vs 7) for 3.1-lite; neither survives the Holm correction (p = 0.60, 0.19). Cheap deterministic repairs are
+  not clearly worse than these models, and clearly better only on hardware faults.
+* `gemini-3.5-flash-lite` vs `gemini-3.1-flash-lite`: +0.083 [-0.040, 0.202], not significant. Both Gemini models
+  vs qwen: +0.267 and +0.350 (Holm p = 0.021, 1e-4).
+* The Gemini models never failed to produce a parsable circuit (qwen: 26.7 % of circuits). Their failures end at
+  the semantic stage (16 and 17 circuits) and the connectivity stage (16 and 11): they rarely fix angle errors and
+  often miss the hardware adjacency rule.
+* Cost per circuit: qwen 2.7 calls, 2,261 tokens, 61 s (CPU); gemini 3.1 lite 2.2 calls, 2,207 tokens, 78 s;
+  gemini 3.5 lite 2.0 calls, 1,650 tokens, 12 s.
+* In progress: `gemini-3.8-flash` (18/60 done) and `gemini-3.5-flash` (14/60) stopped at the free-tier daily
+  quota; `gemma-4-31b-it` and `gemma-4-26b-a4b-it` hit repeated HTTP 500 errors from the service. None of these
+  is reported. Open models on a Colab GPU and one 1000-circuit run are planned.
+
+## 6. Real bugs (pilot, 5 pairs)
+
+`data_real/` holds five circuit-logic bugs from Bugs4Q (see `data_real/README.md` for how they were selected and
+why most Bugs4Q entries could not be used). Accepted within three attempts:
+
+| arm | real_01 | real_02 | real_03 | real_04 | real_05 | total |
+|---|---|---|---|---|---|---|
+| guided search (oracle on the reference) | yes | yes | yes | no | no | 3 / 5 |
+| random search, same grammar and budget | yes | yes | no | no | no | 2 / 5 |
+| LLM, faulty circuit only (qwen, gemini 3.1 lite, gemini 3.5 lite) | no | no | no | no | no | 0 / 5 each |
+| LLM, plus the expected output on the all-zero input (gemini, both) | no | yes | no | no | no | 1 / 5 each |
+| LLM, same, qwen 1.5B | no | no | no | no | no | 0 / 5 |
+
+The arms do not receive the same information: guided search queries the reference's behaviour, the LLMs see at
+most one output distribution. Five pairs support no rate and no ranking; they show that the pipeline runs on
+bugs that people actually wrote and that it fails on two of them (a QFT with a missing swap and reordered
+gates; four missing Hadamards).
+
+**What this does and does not show.** The harness hosts language models under the same predicate, attempts and
+feedback, and none of the three models substitutes for oracle-guided search on this benchmark. A larger model
+did better (qwen 1.5B 16.7 %, two Gemini "lite" models 43-52 %), but the gap to guided search stays large
+(+0.47 to +0.55) and the Gemini models solve few semantic-deviation circuits. It does **not** characterise
+language models in general: no frontier-size model has been run (the free API tier stopped the larger Gemini
+runs), n = 60 gives wide intervals (the two Gemini models do not differ significantly), the circuits are
+generated faults, and prompts were not tuned beyond the physical-constraint text already in the repository. A
+first LLM run with a tabu check that rejected a repeated reply was discarded as unfair to the model and rerun
+without it.

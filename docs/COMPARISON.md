@@ -61,8 +61,10 @@ probabilities because population-only checks miss phase faults.
 
 * No interactive stepping or assertions inside a running program (MQT Debugger).
 * No execution on real hardware (Proq).
-* Unitary subset of OpenQASM 3 only: control flow, timing, measurement and reset are not
-  checked semantically.
+* Control flow, measurement and reset are checked exactly only for programs with a reference (dynamic
+  programs, benchmark v3); timing, `while` loops and multi-bit conditions are not supported.
 * Faults are small edits; real faults often involve APIs, transpilation and measurement
   wiring, which this tool does not model.
-* No comparison with HornBro, UnitAR, QBugLM or LLM agents under a matched protocol.
+* No HornBro result yet: its code is public and an adapter plus Colab notebook exist, but it has not been run.
+  No comparison with UnitAR or QBugLM (no public code found). LLM-only arms (qwen 1.5B, two Gemini "lite"
+  models) are run under the shared predicate on 60 circuits; no LLM agent with tools is evaluated.

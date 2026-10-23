@@ -1,7 +1,11 @@
 circuit_id,bugs4q_entry,arm,buggy_fails_at,accepted,oracle_queries,duration_s,description
-real_01,StackExchange/9,dyn_full,semantic,1,55,0.08,measurement results written to the classical bits in the wrong order (bit order bug)
-real_01,StackExchange/9,dyn_random,semantic,1,11,0.05,measurement results written to the classical bits in the wrong order (bit order bug)
-real_02,stackoverflow-6-10/bug_2,dyn_full,semantic,1,39,0.07,H gate used where an X gate was intended (wrong gate)
-real_02,stackoverflow-6-10/bug_2,dyn_random,semantic,1,29,0.06,H gate used where an X gate was intended (wrong gate)
-real_03,StackExchange/10,dyn_full,connectivity,1,107,0.28,teleportation-style fix-up written as non-adjacent CX/CZ gates after measurement instead of a Z correction
-real_03,StackExchange/10,dyn_random,connectivity,0,162,0.47,teleportation-style fix-up written as non-adjacent CX/CZ gates after measurement instead of a Z correction
+real_01,StackExchange/9,dyn_full,semantic,1,55,0.09,measurement results written to the classical bits in the wrong order (bit order bug)
+real_01,StackExchange/9,dyn_random,semantic,1,11,0.08,measurement results written to the classical bits in the wrong order (bit order bug)
+real_02,stackoverflow-6-10/bug_2,dyn_full,semantic,1,39,0.1,H gate used where an X gate was intended (wrong gate)
+real_02,stackoverflow-6-10/bug_2,dyn_random,semantic,1,29,0.07,H gate used where an X gate was intended (wrong gate)
+real_03,StackExchange/10,dyn_full,connectivity,1,107,0.34,teleportation-style fix-up written as non-adjacent CX/CZ gates after measurement instead of a Z correction
+real_03,StackExchange/10,dyn_random,connectivity,0,162,0.31,teleportation-style fix-up written as non-adjacent CX/CZ gates after measurement instead of a Z correction
+real_04,Bugs4Q-Framework/qiskit/29,dyn_full,semantic,0,3000,12.09,QFT-based phase estimation: the swap that restores qubit order is missing and the gates are in the wrong order (4 qubits)
+real_04,Bugs4Q-Framework/qiskit/29,dyn_random,semantic,0,589,2.13,QFT-based phase estimation: the swap that restores qubit order is missing and the gates are in the wrong order (4 qubits)
+real_05,Bugs4Q-Framework/qiskit/39,dyn_full,semantic,0,895,2.85,the four initial Hadamard gates that prepare the superposition are missing (4 qubits)
+real_05,Bugs4Q-Framework/qiskit/39,dyn_random,semantic,0,386,1.11,the four initial Hadamard gates that prepare the superposition are missing (4 qubits)

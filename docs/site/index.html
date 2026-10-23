@@ -106,9 +106,6 @@ footer{padding-block:40px 60px;border-top:1px solid var(--line);color:var(--mute
 @media (max-width:820px){.hero{grid-template-columns:1fr}.two{grid-template-columns:1fr}.stage{max-height:340px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
 </style>
-</head>
-<body>
-
 
 <header class="top"><div class="wrap">
   <span class="brand">Quantum Circuit Repair</span>
@@ -127,7 +124,7 @@ footer{padding-block:40px 60px;border-top:1px solid var(--line);color:var(--mute
     <div class="kicker">A research project, explained simply</div>
     <h1>Find the bug in a quantum circuit. <em>Fix it.</em> Prove it.</h1>
     <p class="lede">A quantum program is a short list of steps called gates. One wrong gate and the answer is wrong. This project builds a tool that finds the wrong step, repairs it with the smallest change, and then checks the fix very carefully.</p>
-    <div class="pills"><span class="pill">1000 test circuits</span><span class="pill">98.8% repaired</span><span class="pill">600 dynamic programs</span><span class="pill">82 tests pass</span><span class="pill">tiny local LLM: 16.7%</span></div>
+    <div class="pills"><span class="pill">1000 test circuits</span><span class="pill">98.8% repaired</span><span class="pill">600 dynamic programs</span><span class="pill">100+ tests pass</span><span class="pill">LLMs: 17-52%</span></div>
     <p class="small muted">Drag the 3D circuit on the right. Scroll down to play with every idea on this page.</p>
   </div>
   <div class="stage" id="heroStage" aria-label="3D picture of a three-qubit circuit. Drag to rotate."><div class="hint">drag to rotate</div></div>
@@ -335,7 +332,7 @@ footer{padding-block:40px 60px;border-top:1px solid var(--line);color:var(--mute
   <div class="grid g2">
     <div class="card"><div class="tag">Bugs are small</div><h3>Wider now, still injected</h3><p>The second test set adds wrong measurement wiring, wrong if-conditions, missing resets, loop errors and programs with two or three bugs at once. But every bug is still put in by a script, and the fix lies in the tool's search space. 92% there, 98.8% on the first set: neither shows general repair skill. Several bugs at once (67%) is where it breaks.</p></div>
     <div class="card"><div class="tag">Only part of the language</div><h3>More covered, not all</h3><p>The judge now also handles measurement, reset, one-bit if-statements and fixed loops exactly. Still missing: while loops, conditions on several bits, timing, and a noise check for such programs.</p></div>
-    <div class="card"><div class="tag">No LLM, no rivals</div><h3>A small local model, no rivals</h3><p>A small local model (1.5 billion parameters, on a laptop CPU) was tried as the only repair engine. On 60 circuits it fixed 16.7%, while the guided search fixed 98.3% of the same circuits. That is a floor, not a verdict on large language models. HornBro, UnitAR and QBugLM could not be run: no public code was found for any of them. We make no claim to beat them.</p></div>
+    <div class="card"><div class="tag">Small models, few real bugs</div><h3>Tried, still thin</h3><p>As the only repair engine on the same 60 test circuits, a 1.5-billion-parameter local model fixed 16.7%, and two small Gemini models fixed 43.3% and 51.7%, against 98.3% for the tool's guided search. They did worst on wrong-angle bugs (8-17%). These are small models on a free plan, not a ruling on larger ones. On five real bugs from the Bugs4Q collection the tool fixed three; the two it missed are a QFT with a missing swap and four missing H gates. HornBro has public code and a ready Colab setup, but it has not been run yet, so there is no comparison. UnitAR and QBugLM have no public code. We make no claim to beat any of them.</p></div>
     <div class="card"><div class="tag">A model of a chip</div><h3>Better estimate, still no chip</h3><p>A saved calibration snapshot now gives a success estimate. It shows the simple qubit layout is much worse than a good one (QFT: 0.34 against 0.76), so "valid on the chip" in the judge is looser than "runs well". No circuit was run on a real quantum computer.</p></div>
   </div>
 </section>
@@ -354,7 +351,7 @@ footer{padding-block:40px 60px;border-top:1px solid var(--line);color:var(--mute
   <details><summary>What is a program with measurements and if-statements?</summary><p>Some quantum programs measure a qubit in the middle, then act on the result, for example "if the bit is 1, flip another qubit". Teleportation works this way. Such programs cannot be compared as plain matrices, so the second test set compares what they print, exactly.</p></details>
   <details><summary>What does the chip estimate (ESP) mean?</summary><p>ESP is the estimated chance that every gate and every readout in the compiled circuit works, from the chip's published error rates. It is a quick estimate from one saved snapshot of a simulated device, not a test on real hardware.</p></details>
   <details><summary>Why was no real quantum computer used?</summary><p>That needs an IBM Quantum account, a saved set of calibration data, and waiting time in a queue. None of those are in this repository, so the chip results are estimates.</p></details>
-  <details><summary>Why are HornBro, UnitAR and QBugLM missing?</summary><p>We searched and found no public code for them, so running them was not possible. Rebuilding them from the papers would not be a fair test of the real tools, so we do not report that.</p></details>
+  <details><summary>Why is there no comparison with HornBro, UnitAR and QBugLM?</summary><p>HornBro's code is public, but it needs Linux and its own Python setup, so it is run in a separate Colab notebook; that run has not happened yet, so no number is shown. UnitAR and QBugLM have no public code that we could find. Rebuilding them from the papers would not be a fair test of the real tools.</p></details>
 </section>
 
 </main>

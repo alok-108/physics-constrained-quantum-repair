@@ -34,11 +34,12 @@ def evaluate(root: str = PROJECT_ROOT, budget: int = 3000) -> pd.DataFrame:
     for m in meta.to_dict("records"):
         read = lambda kind: open(os.path.join(root, "data_real", "pairs", f"{m['circuit_id']}_{kind}.qasm"), encoding="utf-8").read()
         bug, ref = read("buggy"), read("reference")
-        verdict = D.validate(bug, D.parse(ref))
+        verdict = D.validate(bug, D.parse(ref), device=bool(m.get("device_check", 1)))
         for arm in ("dyn_full", "dyn_random"):
             t = time.time()
-            res = (D.repair(bug, ref, 3, budget, seed_key=m["circuit_id"]) if arm == "dyn_full"
-                   else D.random_repair(bug, ref, 3, budget, seed=1))
+            dev = bool(m.get("device_check", 1))
+            res = (D.repair(bug, ref, 3, budget, seed_key=m["circuit_id"], device=dev) if arm == "dyn_full"
+                   else D.random_repair(bug, ref, 3, budget, seed=1, device=dev))
             rows.append({"circuit_id": m["circuit_id"], "bugs4q_entry": m["bugs4q_entry"], "arm": arm,
                          "buggy_fails_at": verdict["failed_stage"], "accepted": int(res["success"]),
                          "oracle_queries": res.get("queries", 0), "duration_s": round(time.time() - t, 2),
@@ -54,7 +55,7 @@ HW = "{'device': 'IBM FakeSherbrooke (127 qubits)', 'max_depth': 250, 'T1_typica
 FENCE = re.compile(r"```(?:qasm)?\n(.*?)```", re.DOTALL)
 
 
-def llm_repair(llm, bug: str, reference, attempts: int = 3, with_example: bool = False) -> dict:
+def llm_repair(llm, bug: str, reference, attempts: int = 3, with_example: bool = False, device: bool = True) -> dict:
     """LLM as the only repair engine: same K and stage-named feedback as the other LLM arms, no oracle, no search."""
     current, feedback, history, errors = bug, None, [], []
     for k in range(1, attempts + 1):
@@ -80,7 +81,7 @@ def llm_repair(llm, bug: str, reference, attempts: int = 3, with_example: bool =
             if type(e).__name__ == "QuotaExhausted":
                 raise
             errors.append(type(e).__name__ + ": " + str(e)[:80])
-        verdict = D.validate(cand, reference) if cand else {"status": "FAIL", "failed_stage": "generation",
+        verdict = D.validate(cand, reference, device=device) if cand else {"status": "FAIL", "failed_stage": "generation",
                                                            "feedback": "no usable reply"}
         history.append({"attempt": k, "status": verdict["status"], "failed_stage": verdict["failed_stage"]})
         if verdict["status"] == "PASS":
@@ -99,7 +100,7 @@ def evaluate_llm(spec: str, root: str = PROJECT_ROOT, with_example: bool = False
         read = lambda kind: open(os.path.join(root, "data_real", "pairs", f"{m['circuit_id']}_{kind}.qasm"), encoding="utf-8").read()
         bug, ref = read("buggy"), D.parse(read("reference"))
         calls0 = llm.calls
-        res = llm_repair(llm, bug, ref, with_example=with_example)
+        res = llm_repair(llm, bug, ref, with_example=with_example, device=bool(m.get("device_check", 1)))
         rows.append({"circuit_id": m["circuit_id"], "bugs4q_entry": m["bugs4q_entry"], "arm": "llm:" + spec + (" +example" if with_example else ""),
                      "accepted": int(res["success"]), "attempts": len(res["history"]),
                      "first_attempt_accepted": int(res["history"][0]["status"] == "PASS"),

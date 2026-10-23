@@ -1,4 +1,6 @@
-circuit_id,bugs4q_entry,buggy_script,fixed_script,num_qubits,description
-real_01,StackExchange/9,StackExchange/9/buggy.py,StackExchange/9/fix.py,3,measurement results written to the classical bits in the wrong order (bit order bug)
-real_02,stackoverflow-6-10/bug_2,stackoverflow-6-10/bug_2/buggy.py,stackoverflow-6-10/bug_2/fixed.py,2,H gate used where an X gate was intended (wrong gate)
-real_03,StackExchange/10,StackExchange/10/buggy.py,StackExchange/10/fix.py,3,teleportation-style fix-up written as non-adjacent CX/CZ gates after measurement instead of a Z correction
+circuit_id,bugs4q_entry,buggy_script,fixed_script,num_qubits,description,source,device_check
+real_01,StackExchange/9,StackExchange/9/buggy.py,StackExchange/9/fix.py,3,measurement results written to the classical bits in the wrong order (bit order bug),Bugs4Q,1
+real_02,stackoverflow-6-10/bug_2,stackoverflow-6-10/bug_2/buggy.py,stackoverflow-6-10/bug_2/fixed.py,2,H gate used where an X gate was intended (wrong gate),Bugs4Q,1
+real_03,StackExchange/10,StackExchange/10/buggy.py,StackExchange/10/fix.py,3,teleportation-style fix-up written as non-adjacent CX/CZ gates after measurement instead of a Z correction,Bugs4Q,1
+real_04,Bugs4Q-Framework/qiskit/29,qiskit/29/buggy_29.py,qiskit/29/fixed_29.py,4,QFT-based phase estimation: the swap that restores qubit order is missing and the gates are in the wrong order (4 qubits),Bugs4Q-Framework,0
+real_05,Bugs4Q-Framework/qiskit/39,qiskit/39/buggy_39.py,qiskit/39/fixed_39.py,4,the four initial Hadamard gates that prepare the superposition are missing (4 qubits),Bugs4Q-Framework,0
