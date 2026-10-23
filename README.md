@@ -52,6 +52,7 @@ against 97.0 % for the base agent, and the localiser ranks the faulty instructio
 | PyZX (ZX-calculus simplification) | 5.0 % [3.8, 6.5] | 15.1 % | 0 |
 | Qiskit transpiler only (SABRE + exact layout undo) | 29.7 % [26.9, 32.6] | 69.7 % | 0 |
 | P+D with extended edit neighbourhood (two-qubit substitution, rotation insertion; added after E1) | 98.8 % [97.9, 99.3] | 100 % | 547 |
+| P+D extended + oracle-guarded inverse cancellation (**post-hoc**: designed after reading the 12 failures of the row above on this same benchmark, so a development-set number) | 99.7 % [99.1, 99.9] | 100 % | 489 |
 | Qiskit transpiler O0 / O2 / O3 | 9.7 % / 29.7 % / 29.7 % | 69.7 % | 0 |
 | P+D with Qiskit's router instead of the agent's own | 97.0 % [95.7, 97.9] | 100 % | 553 |
 
@@ -151,8 +152,16 @@ To compile the paper: `cd research_paper && pdflatex manuscript && bibtex manusc
   `gemini-3.1-flash-lite` **43.3 %** [31.6, 55.9], `gemini-3.5-flash-lite` **51.7 %** [39.3, 63.8], against
   98.3 % for guided search and 60.0 % for static repairs. Both Gemini models are "lite" models, so
   this is not the ceiling of language models. They repair semantic-deviation circuits only 8-17 % of the time
-  (search: 100 %). Larger models are in progress (free-tier daily quota; partial runs are excluded from every
-  table). See [docs/BENCHMARK_V3.md](docs/BENCHMARK_V3.md).
+  (search: 100 %). Larger models stopped at the free-tier daily quota; partial runs are excluded from every
+  table. See [docs/BENCHMARK_V3.md](docs/BENCHMARK_V3.md).
+* **A model as the controller of verified tools** (`agents/llm_tools.py`). The model calls tools (localize,
+  suggest oracle-scored edits, apply, submit) instead of writing the circuit. Same 60 circuits: the same tools with
+  **no model** reach **98.3 %**; driven by `gemini-3.1-flash-lite` 95.0 % (writing the circuit: 43.3 %), by
+  `gemini-3.5-flash-lite` 90.0 % (51.7 %). The model lifts itself a lot but never beats the no-model baseline, so
+  correctness here comes from the tools and the verifier, not from the model's knowledge.
+* **Training set.** `python src/generate_train.py` writes 3000 fresh-seed circuits, keeps 1900 after dropping
+  every pair that also occurs in the benchmark (pair-level overlap 0, enforced); 21 % of its reference circuits
+  coincide with benchmark references because the families are deterministic. For future fine-tuning only.
 * **Real bugs (pilot, 5 pairs).** `data_real/` holds five circuit-logic bugs taken from Bugs4Q. Guided
   repair fixes 3 of 5 (random search 2 of 5); the two it misses are a QFT with a missing swap and four
   missing Hadamards. Language models fix 0 of 5 from the faulty circuit alone and 1 of 5 (`real_02`, an

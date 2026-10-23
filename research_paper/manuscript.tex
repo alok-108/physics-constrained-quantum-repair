@@ -55,7 +55,10 @@ fixes $92.3\%$ against $48.5\%$ for random search, and a calibration-based estim
 the benchmark's identity layout is much looser than a compiler layout (median success
 estimate $0.66$ against $0.89$). As the only repair engine on 60 circuits, a 1.5-billion-parameter local model
 repairs $16.7\%$ and two small Gemini models $43.3\%$ and $51.7\%$, against $98.3\%$ for guided search;
-these are floors, not verdicts on larger models. On five real Bugs4Q bugs guided search repairs three.
+these are floors, not verdicts on larger models. When the same models drive oracle-scored repair tools
+instead of writing the circuit they reach $90$--$95\%$, but the tools alone, with no model, reach $98.3\%$: the correctness comes from the
+tools. A guard added after reading the benchmark's failures lifts the extended agent from $98.8\%$ to $99.7\%$, a development-set
+number. On five real Bugs4Q bugs guided search repairs three.
 No circuit was run on real hardware.
 \end{abstract}
 
@@ -734,6 +737,41 @@ repository. What the runs show is that the harness hosts language models under t
 predicate and budgets and records their token and time cost, and that none of the three
 substitutes for the oracle-guided search here.
 
+\subsection{A language model as the controller of verified tools}
+
+A second way to use a language model is to let it call tools instead of writing the circuit. In the
+\texttt{llm\_tools} arm the model emits one JSON tool call per turn: diagnose, lint, localise, list the best
+oracle-scored single-instruction edits, apply one, run the static repairs, replace the circuit, or submit it to the acceptance
+predicate (at most three submissions and 14 calls). Information and budgets are those of the deterministic agent: no
+reference, counted oracle queries, stage-named feedback. The ablation is the same tool set driven by a fixed greedy policy
+with no model at all (\texttt{tools\_greedy}). Table~\ref{tab:tools} gives the result on the same 60 circuits.
+
+\input{../paper/tables/tools_rates.tex}
+
+With the tools, the two Gemini models repair $95.0\%$ ($[86.3,98.3]$) and $90.0\%$ ($[79.9,95.3]$) of the circuits, against
+$43.3\%$ and $51.7\%$ when they write the circuit (paired differences $+0.517$ and $+0.383$; $31$ and $26$ circuits only with
+tools, $0$ and $3$ only without; Holm $p<10^{-4}$). But the same tools with no model repair $98.3\%$. The model-driven arms are
+not significantly worse ($-0.033$, $[-0.122,0.047]$ and $-0.083$, $[-0.180,-0.012]$; Holm $p=0.63$ and $0.13$): one circuit was
+repaired only by the model-driven arm and three only by the baseline for the first model, none and five for the second. They cost $5.7$--$7.0$ calls and
+$9.9$--$15.2$ thousand tokens per circuit against about two calls and $2$ thousand tokens for the plain arm, and miss hardware
+faults ($83\%$). The reading is that correctness comes from the oracle-scored edit suggestions and the verifier, not from the
+model's knowledge of circuits: a model can drive the tools, which lifts it far, but it adds nothing on top of them. This does not
+show that language models repair circuits; a stronger result would be a model that uses the tools and beats the greedy
+baseline, and none of the three models we tried (the two above and a local 1.5-billion-parameter model that did not finish)
+does. A first run of this arm was discarded because the greedy policy kept state between circuits and scored $61.7\%$; the
+state is now reset per run and covered by a test.
+
+\subsection{A post-hoc change to the agent}
+
+Twelve circuits of the benchmark remained unrepaired by the extended agent, seven of them QAOA circuits with a misplaced
+rotation. In such a circuit the two CX gates around the rotation have nothing between them on their wires, so they cancel
+exactly; the static diagnosis calls the circuit redundant and the cancellation step removes them, after which three edits
+instead of one are needed. Applying the cancellation only to circuits that the oracle already scores as functionally correct
+(the \texttt{guard} arm) repairs nine more circuits (the seven misplaced rotations and two QFT circuits with a removed gate) and none fewer ($98.8\%\rightarrow99.7\%$, $[99.1,99.9]$; exact McNemar
+$p=0.004$ unadjusted; mean oracle queries $547\rightarrow489$). \textbf{This change was designed after reading these failures on
+the benchmark, so $99.7\%$ is a development-set number, not an independent test}, and the main tables are unchanged. Three
+circuits still fail: one 8-qubit QAOA circuit with a removed rotation and two QFT circuits with two simultaneous angle errors.
+
 \subsection{A pilot on real bugs}
 
 Bugs4Q collects real bugs of Qiskit programs. We ran the Python scripts of its entries in a
@@ -804,6 +842,12 @@ general. HornBro~(FSE 2025) has public code; it needs Linux and its own Python 3
 adapter and a Colab notebook that apply our predicate to its output exist, but no HornBro result is
 reported yet. We report no QBugLM or UnitAR run: a search on 2026-10-22 found no public code repository
 for either. No circuit was executed on real quantum hardware.
+
+\textbf{Post-hoc changes and training data.} Two arms were designed after reading failures on the benchmark: the
+extended edit neighbourhood and the guarded cancellation. Their numbers describe a development set; only the arms fixed
+before the first run (the main table) are untouched by this. A fresh-seed training set (1900 pairs, none shared with the
+benchmark) is provided for future fine-tuning, but 21\% of its reference circuits coincide with benchmark references because
+the circuit families are deterministic, so results of a model trained on it must say so.
 
 \textbf{Statistics.} The 1000 circuits are not independent draws of real
 faults; they are a generated population, so intervals describe sampling over

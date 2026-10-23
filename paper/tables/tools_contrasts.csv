@@ -1,0 +1,5 @@
+contrast,n,b10,b01,risk_difference,ci_lo,ci_hi,p_exact,p_holm
+gemini-3.1-flash-lite: tools vs writing the circuit,60,31,0,0.517,0.379,0.632,9.313225746154785e-10,3.725290298461914e-09
+gemini-3.1-flash-lite: tools vs no model,60,1,3,-0.033,-0.122,0.047,0.625,0.625
+gemini-3.5-flash-lite: tools vs writing the circuit,60,26,3,0.383,0.226,0.517,1.5236437320709229e-05,4.5709311962127686e-05
+gemini-3.5-flash-lite: tools vs no model,60,0,5,-0.083,-0.18,-0.012,0.0625,0.125

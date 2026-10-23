@@ -162,9 +162,11 @@ Pass@3 by fault class (%), 12 circuits per class:
   often miss the hardware adjacency rule.
 * Cost per circuit: qwen 2.7 calls, 2,261 tokens, 61 s (CPU); gemini 3.1 lite 2.2 calls, 2,207 tokens, 78 s;
   gemini 3.5 lite 2.0 calls, 1,650 tokens, 12 s.
-* In progress: `gemini-3.8-flash` (18/60 done) and `gemini-3.5-flash` (14/60) stopped at the free-tier daily
-  quota; `gemma-4-31b-it` and `gemma-4-26b-a4b-it` hit repeated HTTP 500 errors from the service. None of these
-  is reported. Open models on a Colab GPU and one 1000-circuit run are planned.
+* Not reported, partial: `gemini-3.8-flash` (18/60 circuits) and `gemini-3.5-flash` (26/60) stopped at the free-tier
+  daily quota; `gemma-4-31b-it` and `gemma-4-26b-a4b-it` hit repeated HTTP 500 errors from the service; a local
+  `qwen2.5-coder:3b` run (16/60) was stopped because two CPU models on one laptop made no progress. Their partial
+  files are in `experiments/llm_runs/` and resume with `--resume`. Open models on a Colab GPU and one 1000-circuit
+  run are planned.
 
 ## 6. Real bugs (pilot, 5 pairs)
 
@@ -193,3 +195,90 @@ runs), n = 60 gives wide intervals (the two Gemini models do not differ signific
 generated faults, and prompts were not tuned beyond the physical-constraint text already in the repository. A
 first LLM run with a tabu check that rejected a repeated reply was discarded as unfair to the model and rerun
 without it.
+
+## 7. Post-hoc: oracle-guarded inverse cancellation (`ours_full_ext_guard`)
+
+**This change was designed after reading the 12 failures of `ours_full_ext` on the benchmark, so its number is a
+development-set result, not an independent test.** Both arms ran on the same 1000 circuits (`python src/analyze_guard.py`).
+
+*Cause of the failures.* In QAOA-type circuits a fault that moves the rotation between two CX gates to another wire
+leaves two CX gates on the same pair with nothing between them on their wires. They cancel exactly, so the static
+diagnosis calls the circuit "gate redundancy" and the cancellation step removes them. The repair then needs three edits
+(re-insert two CX and move the rotation) instead of one, and the greedy search cannot get there. With the guard the
+cancellation is applied only when the oracle already scores the circuit as functionally correct (a circuit that is only
+redundant is), otherwise the search runs on the unmodified circuit. A first version of the guard, "do not cancel if the
+oracle score drops", did nothing: removing a cancelling pair does not change the unitary, so the score does not drop.
+
+| arm | Pass@3 | 95 % CI | mean oracle queries |
+|---|---|---|---|
+| `ours_full_ext` | 98.8 % | [97.9, 99.3] | 547 |
+| `ours_full_ext_guard` | **99.7 %** | [99.1, 99.9] | 489 |
+
+* 9 circuits repaired only by the guarded arm, none only by the unguarded arm (exact McNemar p = 0.004, unadjusted;
+  paired risk difference +0.009 [0.0035, 0.0171]); no circuit regressed.
+* By mode: `wrong_qubit` 87.3 % -> 100 %, `remove_gate` 95.9 % -> 98.6 %, `compound` unchanged (93.9 %). Three circuits
+  still fail: one 8-qubit QAOA `remove_gate` and two QFT `compound` faults (two simultaneous angle errors).
+* Regression tests: `tests/test_guard.py` (a misplaced rotation is repaired only with the guard; genuine redundancy is
+  still cancelled). The original arms and every number in the main tables are unchanged.
+
+## 8. A fresh-seed training set with a pair-level held-out guarantee
+
+Fine-tuning a model on repair traces needs circuits that were never evaluated. `src/generate_train.py` runs the same
+generator with a different seed (default 7000001; seed 42 is refused because it regenerates the benchmark), and drops every
+(faulty, reference) pair whose normalised text equals a pair in benchmark v2 or v3.
+
+    python src/generate_train.py --total 3000 --seed 7000001 --out train_set
+
+Audit of the run in this repository: 3000 generated, **1900 kept** after removing benchmark pairs and duplicates
+(train 1695, validation 205; all copies of one faulty circuit stay in one split).
+
+* Pair-level overlap with the benchmark: **0** (enforced in code and tested).
+* Faulty-circuit text also in the benchmark: 0 %.
+* **Reference-circuit text also in the benchmark: 21.1 %.** The families are deterministic (a 4-qubit GHZ circuit is the
+  same circuit in every set), so a model trained on this set has seen the correct circuit of some benchmark items. Only the
+  faulty variants and the pairs are new. Report this whenever you report a model trained on it.
+* By class: gate redundancy 511, semantic deviation 379, structural 375, syntax 324, physics violation 311. By family:
+  QAOA 750, VQE 750, QFT 267, GHZ 133 (GHZ and QFT are small families, so many of their draws were duplicates).
+* The generated files live in `train_set/` (git-ignored); the seed reproduces them.
+
+## 9. A language model as the controller of verified tools (`agents/llm_tools.py`)
+
+The arms above ask the model to *write* the repaired circuit. Here the model instead calls tools, one JSON object per
+turn: `diagnose`, `lint`, `localize`, `suggest_edits` (the best single-instruction edits with oracle scores),
+`apply_edit`, `fix_syntax`, `cancel_redundancy`, `route_to_device`, `replace_circuit` (write the whole circuit, the old
+behaviour) and `submit` (run the acceptance predicate; at most three submissions, at most 14 tool calls). The information
+boundary and budgets are those of the deterministic agent: no reference, counted oracle queries, stage-named feedback.
+
+The ablation is `tools_greedy`: the same tools, no model (cancel, route, apply the best suggested edit, submit).
+
+    QREPAIR_GEMINI_MODEL=<id> python src/run_experiments.py --systems llm_tools_gemini --limit 60 --out experiments/tools/<name>.csv
+    python src/run_experiments.py --systems tools_greedy --limit 60 --out experiments/tools/tools_greedy.csv
+    python src/analyze_tools.py
+
+Same 60 circuits, three attempts (`paper/tables/tools_rates.csv`, `tools_contrasts.csv`, `tools_usage.csv`):
+
+| arm | Pass@1 | Pass@3 | 95 % CI |
+|---|---|---|---|
+| tools, no model (`tools_greedy`) | 98.3 % | 98.3 % | [91.1, 99.7] |
+| tools driven by `gemini-3.1-flash-lite` | 71.7 % | **95.0 %** | [86.3, 98.3] |
+| same model writing the circuit | 40.0 % | 43.3 % | [31.6, 55.9] |
+| tools driven by `gemini-3.5-flash-lite` | 81.7 % | **90.0 %** | [79.9, 95.3] |
+| same model writing the circuit | 51.7 % | 51.7 % | [39.3, 63.8] |
+
+* **Tools versus writing the circuit** (same model): +0.517 [0.379, 0.632] for 3.1-lite (31 circuits only with tools, none
+  only without; Holm p ~ 4e-9) and +0.383 [0.226, 0.517] for 3.5-lite (26 vs 3; Holm p ~ 5e-5).
+* **Tools driven by the model versus the same tools with no model:** -0.033 [-0.122, 0.047] (1 vs 3 circuits, p = 0.63)
+  and -0.083 [-0.180, -0.012] (0 vs 5, Holm p = 0.13). The model never beat the no-model baseline and was not significantly
+  worse; most of the difference is first-attempt errors (Pass@1 72-82 % against 98 %).
+* **Reading.** Correctness comes from the oracle-scored edit suggestions and the verifier, not from the model's knowledge of
+  quantum circuits: the same tools solve 98.3 % with no model at all. A model can *drive* the tools, which lifts it from 43-52 %
+  to 90-95 %, but it adds nothing on top of them. This is not evidence that language models repair circuits. A stronger result
+  would be a model that uses the tools and beats `tools_greedy`; none of the three tried does.
+* Cost per circuit: 5.7 calls and 9.9k tokens (3.1-lite), 7.0 calls and 15.2k tokens (3.5-lite) against about 2 calls and
+  1.7-2.2k tokens for the plain arm; 1.1 invalid (non-JSON or unknown-tool) replies per circuit for 3.5-lite, none for 3.1-lite;
+  1,400-2,800 oracle queries. By class the model-driven arms miss hardware faults (83 %) and, for 3.5-lite, some syntax and
+  redundancy circuits.
+* A first run of this arm was discarded: the policy object kept state between circuits (the greedy policy skipped its
+  cancel/route steps after the first circuit and scored 61.7 %). The policy state is now reset per run and tested.
+* Not reported: a local `qwen2.5-coder:1.5b` tool run stopped at 26/60 (CPU-bound, partial files in `experiments/tools/`).
+

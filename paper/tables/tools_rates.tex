@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\caption{Language model as controller of verified tools, on the same 60 circuits. ``no model'' applies the same tools greedily; ``plain LLM'' writes the whole circuit. CI: Wilson 95\%.}
+\label{tab:tools}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrr}
+\toprule
+arm & n & P@1 (\%) & P@3 (\%) & P@3 95\% CI \\
+\midrule
+tools: gemini-3.1-flash-lite & 60 & 71.7 & 95.0 & [86.3, 98.3] \\
+plain LLM: gemini-3.1-flash-lite & 60 & 40.0 & 43.3 & [31.6, 55.9] \\
+tools: gemini-3.5-flash-lite & 60 & 81.7 & 90.0 & [79.9, 95.3] \\
+plain LLM: gemini-3.5-flash-lite & 60 & 51.7 & 51.7 & [39.3, 63.8] \\
+tools: no model (greedy) & 60 & 98.3 & 98.3 & [91.1, 99.7] \\
+\bottomrule
+\end{tabular}
+\end{table}
