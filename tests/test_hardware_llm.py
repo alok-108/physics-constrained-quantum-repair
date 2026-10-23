@@ -177,8 +177,8 @@ def gemini_stub(monkeypatch):
 
 
 def _msgs(system="be exact", user="fix it"):
-    from langchain_core.messages import HumanMessage, SystemMessage
-    return [SystemMessage(content=system), HumanMessage(content=user)]
+    from types import SimpleNamespace      # the clients only need .type and .content; langchain is not a requirement
+    return [SimpleNamespace(type="system", content=system), SimpleNamespace(type="human", content=user)]
 
 
 def test_gemini_request_shape_key_in_header_and_token_accounting(gemini_stub):
