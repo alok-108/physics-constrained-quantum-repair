@@ -37,7 +37,11 @@ statement below as "reported by the literature search, not re-derived".
 | `qrepair` CLI (lint, localize, verify, repair), test-file specifications, localisation benchmark | `src/product.py`, `src/cli.py`, `src/eval_localization.py` |
 | Dynamic programs (measure, reset, if, for), benchmark v3 with wiring / control-flow / reset / loop / multi-fault classes | `src/dynamic.py`, `src/generate_v3.py`, `src/run_v3.py` |
 | Calibration-based chip estimate (ESP, duration, T1/T2; identity vs compiler layout) | `src/hardware.py`, `hardware` CLI command |
-| Local-LLM arm (Ollama), per-circuit token accounting | `agents/llm.py`, `llm_ollama` arm |
+| LLM arms (local Ollama and Gemini API), per-circuit token accounting, quota fail-fast | `agents/llm.py`, `llm_ollama` / `llm_gemini` arms |
+| LLM as controller of verified tools, with a no-model ablation | `agents/llm_tools.py`, `llm_tools_*` and `tools_greedy` arms |
+| Oracle-guarded inverse cancellation (post-hoc, development-set number) | `ours_full_ext_guard` arm |
+| Real-bug pilot from Bugs4Q (5 pairs), hardware-run script (simulator mode only), HornBro adapter and Colab notebooks (not yet run) | `data_real/`, `src/eval_real.py`, `src/run_hardware.py`, `src/hornbro_adapter.py`, `notebooks/` |
+| Fresh-seed training set with pair-level held-out guarantee | `src/generate_train.py` |
 | Extended edit neighbourhood (two-qubit substitution, analytic rotation insertion) | `extended_edits` flag, `ours_full_ext` arm |
 | Router-robustness check (own router vs Qiskit's) | `ours_full_qiskit_router` arm |
 | Positioning against Bugs4Q, HornBro, UnitAR, AutoQ, QCEC-ZX, noise-adaptive mapping | `research_paper/manuscript.tex` |

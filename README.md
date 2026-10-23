@@ -88,6 +88,8 @@ agents/
   oracle.py          query-counted behavioural oracle: suite, counterexample pool, held-out states
   validator.py       acceptance predicate (the only reader of the reference source)
   orchestrator.py    bounded loop, counterexample-guided feedback, tabu bookkeeping
+  llm.py             Ollama and Gemini clients (token accounting, rate-limit/quota handling)
+  llm_tools.py       a model as the controller of verified repair tools, and the no-model greedy ablation
 src/
   generate_dataset.py  benchmark v2 generator (admissible references, observable faults)
   audit.py             admissibility / observability audit for any dataset
@@ -98,6 +100,10 @@ src/
   product.py, cli.py   the qrepair tool: lint, localize, verify, repair, hardware
   dynamic.py           measurement / reset / if / for programs: exact semantics, oracle, repair
   generate_v3.py, run_v3.py, analyze_v3.py   benchmark v3 (600 dynamic programs)
+  analyze_llm.py, analyze_tools.py, analyze_guard.py   LLM-only arms, tool-controller arm, guarded cancellation
+  eval_real.py, run_hardware.py   real-bug pilot (data_real/), hardware run (simulator mode tested)
+  hornbro_adapter.py, score_hornbro.py   HornBro comparison (two environments; not yet run)
+  generate_train.py    fresh-seed training set (train_set/, git-ignored)
   hardware.py, eval_hardware.py   calibration-based chip estimate
   eval_localization.py fault-localisation accuracy on the benchmark
   analyze_results.py   exact McNemar, Newcombe intervals, Holm; tables and figures
@@ -105,7 +111,9 @@ data/                 1000 circuits: buggy/, ground_truth/, metadata.csv
 experiments/          results_main.csv, results_weak_oracle.csv, results_budget_*.csv
 paper/                generated tables and figures
 research_paper/       manuscript.tex, references.bib
-docs/                 PROTOCOL.md, BENCHMARK_V2.md
+docs/                 PROTOCOL.md, BENCHMARK_V2.md, BENCHMARK_V3.md, COMPARISON.md, ROADMAP.md, site/ (interactive guide)
+data_v3/, data_real/  600 dynamic programs; 5 real Bugs4Q pairs
+notebooks/            Colab notebooks: open-model LLM runs, HornBro comparison
 legacy_v1/            the invalid first release (data, results, paper), for audit
 tests/                pytest suite (information boundary, validator stages, search, statistics)
 ```

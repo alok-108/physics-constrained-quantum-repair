@@ -71,8 +71,7 @@ Measured on the v1 data with the validator's own checks:
   capability contrast.
 * Connectivity is checked under the identity layout; no live-device or
   calibration-drift evidence.
-* No LLM configuration has been executed (no API key was available); the
-  repository contains the LLM path but every reported number is from the
-  deterministic path.
+* No LLM configuration had been executed when this document was written; every number here is from the
+  deterministic path. LLM arms were added later and are reported in docs/BENCHMARK_V3.md (sections 3, 5, 9).
 * An externally executed QBugLM run is still missing. (A compiler-only baseline,
   `qiskit_transpile`, is included: 29.7 % Pass@3.)
