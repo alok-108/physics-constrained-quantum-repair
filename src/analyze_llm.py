@@ -97,6 +97,11 @@ def main():
     common = set(runs["qwen2.5-coder:1.5b"].circuit_id) if "qwen2.5-coder:1.5b" in runs else set.intersection(
         *[set(d.circuit_id) for d in runs.values()])
 
+    # A run that stopped early (daily quota, crash) covers the lowest circuit ids, i.e. the easiest fault classes
+    # first, so it is reported as partial and kept out of every table and contrast.
+    partial = {m: d for m, d in runs.items() if not common <= set(d.circuit_id)}
+    runs = {m: d for m, d in runs.items() if m not in partial}
+
     # ---- common table: every model on the shared subset (a larger run is restricted to it)
     sub = {m: d[d.circuit_id.isin(common)] for m, d in runs.items()}
     sub = {m: d for m, d in sub.items() if len(d) == len(common)}
@@ -156,6 +161,8 @@ def main():
     print("\nPaired contrasts"); print(con.to_string(index=False))
     for m, d in runs.items():
         print(f"\ncost [{m}]:", cost_of(d))
+    for m, d in partial.items():
+        print(f"\nPARTIAL (excluded from all tables): {m} covers {len(d)} of {len(common)} circuits")
 
 
 if __name__ == "__main__":

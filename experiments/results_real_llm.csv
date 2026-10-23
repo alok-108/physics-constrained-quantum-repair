@@ -1,0 +1,19 @@
+circuit_id,bugs4q_entry,arm,accepted,attempts,first_attempt_accepted,last_failed_stage,llm_calls,api_errors,first_error,description
+real_01,StackExchange/9,llm:ollama:qwen2.5-coder:1.5b,0,3,0,semantic,3,0,,measurement results written to the classical bits in the wrong order (bit order bug)
+real_02,stackoverflow-6-10/bug_2,llm:ollama:qwen2.5-coder:1.5b,0,3,0,semantic,3,0,,H gate used where an X gate was intended (wrong gate)
+real_03,StackExchange/10,llm:ollama:qwen2.5-coder:1.5b,0,3,0,connectivity,3,0,,teleportation-style fix-up written as non-adjacent CX/CZ gates after measurement instead of a Z correction
+real_01,StackExchange/9,llm:gemini:gemini-3.5-flash-lite,0,3,0,semantic,3,0,,measurement results written to the classical bits in the wrong order (bit order bug)
+real_02,stackoverflow-6-10/bug_2,llm:gemini:gemini-3.5-flash-lite,0,3,0,semantic,3,0,,H gate used where an X gate was intended (wrong gate)
+real_03,StackExchange/10,llm:gemini:gemini-3.5-flash-lite,0,3,0,semantic,3,0,,teleportation-style fix-up written as non-adjacent CX/CZ gates after measurement instead of a Z correction
+real_01,StackExchange/9,llm:gemini:gemini-3.1-flash-lite,0,3,0,semantic,3,0,,measurement results written to the classical bits in the wrong order (bit order bug)
+real_02,stackoverflow-6-10/bug_2,llm:gemini:gemini-3.1-flash-lite,0,3,0,semantic,3,0,,H gate used where an X gate was intended (wrong gate)
+real_03,StackExchange/10,llm:gemini:gemini-3.1-flash-lite,0,3,0,semantic,3,0,,teleportation-style fix-up written as non-adjacent CX/CZ gates after measurement instead of a Z correction
+real_01,StackExchange/9,llm:ollama:qwen2.5-coder:1.5b +example,0,3,0,semantic,3,0,,measurement results written to the classical bits in the wrong order (bit order bug)
+real_02,stackoverflow-6-10/bug_2,llm:ollama:qwen2.5-coder:1.5b +example,0,3,0,semantic,3,0,,H gate used where an X gate was intended (wrong gate)
+real_03,StackExchange/10,llm:ollama:qwen2.5-coder:1.5b +example,0,3,0,connectivity,3,0,,teleportation-style fix-up written as non-adjacent CX/CZ gates after measurement instead of a Z correction
+real_01,StackExchange/9,llm:gemini:gemini-3.5-flash-lite +example,0,3,0,semantic,3,0,,measurement results written to the classical bits in the wrong order (bit order bug)
+real_02,stackoverflow-6-10/bug_2,llm:gemini:gemini-3.5-flash-lite +example,1,1,1,,1,0,,H gate used where an X gate was intended (wrong gate)
+real_03,StackExchange/10,llm:gemini:gemini-3.5-flash-lite +example,0,3,0,semantic,3,0,,teleportation-style fix-up written as non-adjacent CX/CZ gates after measurement instead of a Z correction
+real_01,StackExchange/9,llm:gemini:gemini-3.1-flash-lite +example,0,3,0,semantic,3,0,,measurement results written to the classical bits in the wrong order (bit order bug)
+real_02,stackoverflow-6-10/bug_2,llm:gemini:gemini-3.1-flash-lite +example,1,2,0,,2,0,,H gate used where an X gate was intended (wrong gate)
+real_03,StackExchange/10,llm:gemini:gemini-3.1-flash-lite +example,0,3,0,semantic,3,0,,teleportation-style fix-up written as non-adjacent CX/CZ gates after measurement instead of a Z correction

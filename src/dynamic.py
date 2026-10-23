@@ -356,8 +356,10 @@ class DynamicOracle:
         return {"suite": suite, "holdout": hold, "gap": suite - hold}
 
 
-def validate(qasm: str, reference: Program, tol: float = 1e-6, n_inputs: int = 16, seed: int = 7) -> Dict:
-    """Acceptance for dynamic programs: parse, register sizes, adjacency, exact distributions."""
+def validate(qasm: str, reference: Program, tol: float = 1e-6, n_inputs: int = 16, seed: int = 7,
+             device: bool = True) -> Dict:
+    """Acceptance for dynamic programs: parse, register sizes, adjacency, exact distributions.
+    ``device=False`` drops the adjacency stage (logic-only acceptance, for programs whose own reference is not device-ready)."""
     metrics: Dict = {}
 
     def fail(stage, why):
@@ -371,7 +373,7 @@ def validate(qasm: str, reference: Program, tol: float = 1e-6, n_inputs: int = 1
         return fail("structural", f"expected {reference.n_qubits} qubits and {reference.n_clbits} classical bits, "
                                   f"got {prog.n_qubits} and {prog.n_clbits}")
     physics = get_default_physics_model()
-    for a, b in two_qubit_pairs(prog):
+    for a, b in (two_qubit_pairs(prog) if device else []):
         if not physics.is_connected(a, b):
             return fail("connectivity", f"two-qubit gate on non-adjacent qubits ({a}, {b}), also checked inside blocks")
     inputs = input_states(prog.n_qubits, n_inputs, seed)
@@ -587,7 +589,7 @@ class DynamicRepairer:
 
 
 def repair(qasm: str, reference_qasm: str, attempts: int = 3, budget: int = 3000,
-           feedback: bool = True, seed_key: str = "dyn") -> Dict:
+           feedback: bool = True, seed_key: str = "dyn", device: bool = True) -> Dict:
     """Bounded repair loop for dynamic programs (same protocol as the unitary pipeline)."""
     ref = parse(reference_qasm)
     oracle = DynamicOracle(ref, query_budget=budget, seed_key=seed_key)
@@ -605,7 +607,7 @@ def repair(qasm: str, reference_qasm: str, attempts: int = 3, budget: int = 3000
         cand = rep.search(prog, oracle, tabu)
         tabu.add(key(cand))
         final = to_qasm(cand)
-        v = validate(final, ref)
+        v = validate(final, ref, device=device)
         history.append({"attempt": it, "status": v["status"], "failed_stage": v["failed_stage"],
                         "queries": oracle.queries_used})
         if v["status"] == "PASS":
@@ -618,7 +620,7 @@ def repair(qasm: str, reference_qasm: str, attempts: int = 3, budget: int = 3000
 
 
 def random_repair(qasm: str, reference_qasm: str, attempts: int = 3, budget: int = 3000,
-                  seed: int = 0) -> Dict:
+                  seed: int = 0, device: bool = True) -> Dict:
     """Baseline without guidance: random-mutation hill climbing over the same edit grammar and
     the same oracle budget (an edit is kept only if it raises the suite score)."""
     import random as _random
@@ -647,7 +649,7 @@ def random_repair(qasm: str, reference_qasm: str, attempts: int = 3, budget: int
                 if cur_score >= 0.999999:
                     break
         final = to_qasm(cur)
-        v = validate(final, ref)
+        v = validate(final, ref, device=device)
         history.append({"attempt": it, "status": v["status"], "failed_stage": v["failed_stage"],
                         "queries": oracle.queries_used})
         if v["status"] == "PASS":
