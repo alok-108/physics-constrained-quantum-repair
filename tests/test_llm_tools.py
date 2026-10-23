@@ -119,3 +119,11 @@ def test_llm_counters_are_per_run(scripted, validator):
     scripted.replies = ['{"tool": "submit"}'] * 3
     second = agent.run("c2", buggy(), ghz(), {"num_qubits": 3})
     assert first["invalid_replies"] == 2 and second["invalid_replies"] == 0
+
+
+def test_malformed_arguments_become_tool_errors_not_crashes(validator):
+    s = ToolSession(buggy(), ghz(), "bad", {"num_qubits": 3}, validator=validator)
+    assert "error" in s.call({"tool": "suggest_edits", "args": {"top": "abc"}})
+    assert "error" in s.call({"tool": "apply_edit", "args": {"id": {"x": 1}}})
+    assert "error" in s.call({"tool": "replace_circuit", "args": {"qasm": 5}})
+    assert s.call({"tool": "submit"})["status"] == "FAIL"        # the session is still usable afterwards

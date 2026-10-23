@@ -242,8 +242,8 @@ class ToolSession:
         self.tool_counts[name] = self.tool_counts.get(name, 0) + 1
         try:
             return getattr(self, name)(**action.get("args", {}))
-        except TypeError as e:
-            return {"error": f"bad arguments: {str(e)[:100]}"}
+        except Exception as e:                      # a malformed call from the model is a tool error, not a crash
+            return {"error": f"bad arguments or tool failure: {type(e).__name__}: {str(e)[:100]}"}
 
 
 # --------------------------------------------------------------------------- #

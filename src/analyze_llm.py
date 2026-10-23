@@ -37,7 +37,7 @@ LEGACY_MODEL = {"results_llm.csv": "qwen2.5-coder:1.5b"}
 
 
 def load_runs(exp):
-    """{model: DataFrame}; one entry per model, later files replacing nothing (duplicates are an error)."""
+    """{model: DataFrame}; one entry per model. A model found in several files is merged on circuit_id (first file wins)."""
     files = [os.path.join(exp, f) for f in LEGACY_MODEL] + sorted(glob.glob(os.path.join(exp, "llm_runs", "*.csv")))
     runs = {}
     for p in files:
@@ -48,9 +48,13 @@ def load_runs(exp):
             d["llm_model"] = LEGACY_MODEL.get(os.path.basename(p), os.path.splitext(os.path.basename(p))[0])
         d["llm_model"] = d.llm_model.fillna(LEGACY_MODEL.get(os.path.basename(p), "unknown"))
         for m, g in d.groupby("llm_model"):
-            if m in runs:
-                raise SystemExit(f"model {m} appears in two result files")
-            runs[m] = g.reset_index(drop=True)
+            g = g.reset_index(drop=True)
+            if m in runs:           # e.g. a 60-circuit and a 1000-circuit run of one model: keep the union, first file wins
+                have = set(runs[m].circuit_id)
+                extra = g[~g.circuit_id.isin(have)]
+                print(f"note: {m} appears in two result files; merged ({len(extra)} circuits added)", file=sys.stderr)
+                g = pd.concat([runs[m], extra], ignore_index=True)
+            runs[m] = g
     return runs
 
 
