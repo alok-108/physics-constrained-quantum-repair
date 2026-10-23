@@ -1,5 +1,7 @@
 # Physics-Constrained Quantum Circuit Repair
 
+[![tests](https://github.com/alok-108/physics-constrained-quantum-repair/actions/workflows/tests.yml/badge.svg)](https://github.com/alok-108/physics-constrained-quantum-repair/actions/workflows/tests.yml)
+
 A leakage-free evaluation protocol, a corrected 1000-circuit benchmark, and a
 repair agent for faulty OpenQASM 3 circuits under superconducting-device
 constraints (IBM FakeSherbrooke model).
