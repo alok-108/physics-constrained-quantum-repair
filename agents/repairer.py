@@ -103,7 +103,8 @@ class RepairerAgent:
                  use_physics_context: bool = True, accept_at: float = 0.999,
                  max_steps: int = 4, build_per_step: int = 4,
                  router: str = "swapback", extended_edits: bool = False,
-                 llm_model: Optional[str] = None, llm_only: bool = False):
+                 llm_model: Optional[str] = None, llm_only: bool = False,
+                 guard_cancel: bool = False):
         self.model_name = model_name
         self.temperature = temperature
         self.use_physics_context = use_physics_context
@@ -112,6 +113,7 @@ class RepairerAgent:
         self.build_per_step = build_per_step
         self.llm_only = llm_only          # LLM arm: no heuristic or oracle fallback, a failed LLM call = unchanged circuit
         self.extended_edits = extended_edits   # + 2-qubit substitution and analytic rotation insertion
+        self.guard_cancel = guard_cancel   # apply inverse cancellation only to circuits the oracle already scores as functionally correct
         self.router = router            # "swapback" (own construction) or "qiskit" (SABRE + layout undo)
         self.physics = get_default_physics_model()
         self.api_key = os.getenv("OPENAI_API_KEY")
@@ -202,10 +204,16 @@ class RepairerAgent:
 
         if bug_type == "gate_redundancy":
             out = cancel_inverses(qc)
-            if circuit_key(out) not in tabu:
-                self.last_strategy = "cancel"
-                return qiskit.qasm3.dumps(out)
-            qc = out
+            # Two CX on the same pair around a rotation that sits on another wire cancel exactly, so the static
+            # diagnosis calls the circuit redundant, but the cancelled circuit is further from the repair (the
+            # real fault, a misplaced rotation, then needs three edits instead of one). A circuit that is only
+            # redundant is already functionally right; with the guard, cancel when the oracle agrees it is.
+            safe = not (self.guard_cancel and oracle is not None and oracle.score(qc) < self.accept_at)
+            if safe:
+                if circuit_key(out) not in tabu:
+                    self.last_strategy = "cancel"
+                    return qiskit.qasm3.dumps(out)
+                qc = out
 
         if bug_type == "physics_violation" and self.use_physics_context:
             out = self._repair_physics(qc)

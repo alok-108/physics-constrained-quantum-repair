@@ -1,0 +1,4 @@
+bug_type,fault_mode,n,guard,ext
+semantic_deviation,compound,33,93.9,93.9
+structural,remove_gate,74,98.6,95.9
+structural,wrong_qubit,55,100.0,87.3

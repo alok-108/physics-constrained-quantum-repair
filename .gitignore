@@ -38,3 +38,7 @@ paper/build/
 .pytest_cache/
 
 experiments/llm_runs/*.partial.jsonl
+
+experiments/tool_runs/
+experiments/tools/*.partial.jsonl
+train_set/

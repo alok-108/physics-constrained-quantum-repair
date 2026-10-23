@@ -55,7 +55,8 @@ class Orchestrator:
                  log_dir: Optional[str] = None, variant: str = "ours_full",
                  oracle_budget: int = 8000, use_oracle: bool = True,
                  oracle_suite_size: int = 4, router: str = "swapback",
-                 extended_edits: bool = False, llm_model: Optional[str] = None, llm_only: bool = False):
+                 extended_edits: bool = False, llm_model: Optional[str] = None, llm_only: bool = False,
+                 guard_cancel: bool = False):
         self.max_iterations = max_iterations
         self.use_physics_context = use_physics_context
         self.verbose_feedback = verbose_feedback
@@ -66,7 +67,7 @@ class Orchestrator:
         self.diagnostician = DiagnosticianAgent(use_physics_checks=use_physics_context)
         self.repairer = RepairerAgent(use_physics_context=use_physics_context, router=router,
                                        extended_edits=extended_edits, llm_model=llm_model,
-                                       llm_only=llm_only)
+                                       llm_only=llm_only, guard_cancel=guard_cancel)
         self.validator = validator or ValidatorAgent()
         self.log_dir = log_dir
 

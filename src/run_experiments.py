@@ -65,6 +65,9 @@ ARM_CONFIG: Dict[str, Dict[str, Any]] = {
     "ours_full_ext":             dict(use_physics_context=True,  verbose_feedback=True,  use_oracle=True,
                                       extended_edits=True),
     # local LLM as the only repair engine (no oracle, no search); model set by the QREPAIR_OLLAMA_MODEL env var
+    # + oracle-guarded inverse cancellation, added after the failure analysis of ours_full_ext (docs/BENCHMARK_V3.md)
+    "ours_full_ext_guard":       dict(use_physics_context=True,  verbose_feedback=True,  use_oracle=True,
+                                      extended_edits=True, guard_cancel=True),
     "llm_ollama":                dict(use_physics_context=True,  verbose_feedback=True,  use_oracle=False,
                                       llm_only=True),
     # same arm against the Gemini API (free tier); model from QREPAIR_GEMINI_MODEL, key from GEMINI_API_KEY
@@ -75,9 +78,11 @@ ARM_CONFIG: Dict[str, Dict[str, Any]] = {
 }
 CORE_SYSTEMS = ["ours_full", "ours_reject_only", "unconstrained_diag", "unconstrained_reject_only",
                 "static_no_oracle", "pyzx_zx_calculus"]
-EXTRA_SYSTEMS = ["llm_ollama", "llm_gemini", "ours_full_ext", "ours_full_qiskit_router", "qiskit_transpile", "qiskit_transpile_l0",
+EXTRA_SYSTEMS = ["llm_ollama", "llm_gemini", "ours_full_ext", "ours_full_ext_guard", "ours_full_qiskit_router", "qiskit_transpile", "qiskit_transpile_l0",
                  "qiskit_transpile_l2", "qiskit_transpile_l3"]
-SYSTEMS = CORE_SYSTEMS + EXTRA_SYSTEMS
+# LLM-as-controller arms (agents/llm_tools.py): the model calls verified tools instead of writing the circuit
+TOOL_ARMS = ["tools_greedy", "llm_tools_ollama", "llm_tools_gemini"]
+SYSTEMS = CORE_SYSTEMS + EXTRA_SYSTEMS + TOOL_ARMS
 
 
 # --------------------------------------------------------------------------- #
@@ -213,6 +218,7 @@ def row_from_run(meta: Dict[str, Any], system: str, res: Dict[str, Any], buggy: 
         "overhead_vs_ref_pct": (None if after["gates"] is None else 100.0 * (after["gates"] - ref_gates) / ref_gates),
         "llm_tokens": res.get("llm_tokens", 0), "llm_calls": res.get("llm_calls", 0),
         "llm_errors": res.get("llm_errors", 0), "llm_model": res.get("llm_model"),
+        "tool_steps": res.get("tool_steps"), "invalid_replies": res.get("invalid_replies"),
         "duration_s": round(duration, 3),
     }
 
@@ -221,6 +227,22 @@ def row_from_run(meta: Dict[str, Any], system: str, res: Dict[str, Any], buggy: 
 # Worker
 # --------------------------------------------------------------------------- #
 _STATE: Dict[str, Any] = {}
+
+
+def _tool_policy(name: str):
+    from agents.llm import make_llm
+    from agents.llm_tools import GreedyPolicy, LLMPolicy
+    if name == "tools_greedy":
+        return GreedyPolicy()
+    if name == "llm_tools_gemini":
+        model = os.environ.get("QREPAIR_GEMINI_MODEL")
+        if not model:
+            raise SystemExit("set QREPAIR_GEMINI_MODEL (and GEMINI_API_KEY) to run the llm_tools_gemini arm")
+        return LLMPolicy(make_llm("gemini:" + model))
+    model = os.environ.get("QREPAIR_OLLAMA_MODEL")
+    if not model:
+        raise SystemExit("set QREPAIR_OLLAMA_MODEL to run the llm_tools_ollama arm")
+    return LLMPolicy(make_llm("ollama:" + model))
 
 
 def _llm_spec(name: str) -> Optional[str]:
@@ -252,6 +274,10 @@ def _init_worker(systems: List[str], budget: int, oracle_budget: int, suite_size
                            oracle_budget=oracle_budget, oracle_suite_size=suite_size, **ARM_CONFIG[name])
         for name in systems if name in ARM_CONFIG
     }
+    from agents.llm_tools import LLMToolAgent
+    _STATE["tools"] = {name: LLMToolAgent(_tool_policy(name), validator=validator, oracle_budget=oracle_budget,
+                                          suite_size=suite_size)
+                       for name in systems if name in TOOL_ARMS}
 
 
 def _run_circuit(meta: Dict[str, Any], root: str) -> List[Dict[str, Any]]:
@@ -267,6 +293,9 @@ def _run_circuit(meta: Dict[str, Any], root: str) -> List[Dict[str, Any]]:
             level = 1 if system == "qiskit_transpile" else int(system[-1])      # ..._l0 / _l2 / _l3
             res = run_qiskit_transpile(meta["circuit_id"], buggy, gt, _STATE["validator"],
                                        _STATE["budget"], level)
+        elif system in TOOL_ARMS:
+            res = _STATE["tools"][system].run(circuit_id=meta["circuit_id"], buggy_qasm=buggy,
+                                              ground_truth_qasm=gt, circuit_spec=spec)
         else:
             res = _STATE["orch"][system].run(circuit_id=meta["circuit_id"], buggy_qasm=buggy,
                                              ground_truth_qasm=gt, circuit_spec=spec)

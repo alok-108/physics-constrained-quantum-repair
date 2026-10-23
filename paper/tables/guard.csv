@@ -1,0 +1,2 @@
+n,ext_P3,guard_P3,guard_CI_lo,guard_CI_hi,only_guard,only_ext,rd,p_exact,mean_queries_ext,mean_queries_guard
+1000,98.8,99.7,99.1,99.9,9,0,0.009,0.00390625,547,489
