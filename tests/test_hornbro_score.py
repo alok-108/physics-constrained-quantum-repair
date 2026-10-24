@@ -32,3 +32,11 @@ def test_scoring_accepts_a_correct_circuit_rejects_the_faulty_one_and_counts_fai
     assert df.loc[ok, "pass_at_3"] == 1 and df.loc[bad, "pass_at_3"] == 0
     assert df.loc["circuit_0001", "pass_at_3"] == 0 and df.loc["circuit_0001", "failed_stage"] == "input_unparsable"
     assert bug  # the faulty text exists and differs from the reference
+
+
+def test_a_missing_package_is_an_environment_error_not_a_hornbro_failure(root, tmp_path, validator):
+    for cid, err in (("circuit_0009", "ModuleNotFoundError: No module named 'qiskit_aer'"), ("circuit_0013", "ValueError: bad circuit")):
+        (tmp_path / f"{cid}.json").write_text(json.dumps({"circuit_id": cid, "outcome": "crashed", "error": err}))
+    df = score_hornbro.score(str(tmp_path), os.path.join(root, "data", "metadata.csv"), validator).set_index("circuit_id")
+    assert df.loc["circuit_0009", "outcome"] == "environment_error"
+    assert df.loc["circuit_0013", "outcome"] == "crashed"          # a real crash of HornBro on the circuit stays a failure

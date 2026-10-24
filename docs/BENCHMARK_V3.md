@@ -114,8 +114,11 @@ simply rejected again. `notebooks/colab_llm_runs.ipynb` runs open models on a fr
   comparison is done in two steps that exchange OpenQASM files: `src/hornbro_adapter.py` runs HornBro's own
   repair loop (given the reference circuit, as it is designed) on the same 60 circuits, and `src/score_hornbro.py`
   judges what it returns with this repository's predicate. The notebook is `notebooks/colab_hornbro.ipynb`.
-  **No HornBro result is reported yet**: the adapter has not been run (the Windows development machine cannot
-  host it). HornBro repairs gate parameters and patches of unitary circuits, so faults that leave the program
+  **No HornBro result is reported yet.** The adapter ran once on Colab (2026-10-24) and produced no usable result: 48 of
+  the 60 circuits stopped with `No module named 'qiskit_aer'` (an undeclared dependency of HornBro's own code, now
+  installed by the notebook and checked before the run), so the "0 of 60" in that run is an environment error, not a
+  HornBro score; the scorer labels such records `environment_error` and warns. The other 12 circuits are the syntax
+  class, which does not parse and so cannot be given to HornBro (they will count as failures with that reason). A rerun is needed. HornBro repairs gate parameters and patches of unitary circuits, so faults that leave the program
   unparsable count as failures with the reason recorded.
 * **QBugLM, UnitAR:** no public code repository was found (search 2026-10-22). A Bugs4Q-based mutation study
   (arXiv 2601.12273) also links none.

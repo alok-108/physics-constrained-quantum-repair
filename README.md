@@ -180,7 +180,8 @@ To compile the paper: `cd research_paper && pdflatex manuscript && bibtex manusc
 * **Rival tools.** HornBro's code is public (<https://github.com/JanusQ/HornBro>, MIT). It needs Linux and
   Python 3.10, so the comparison runs in Colab: `notebooks/colab_hornbro.ipynb`, with an adapter
   (`src/hornbro_adapter.py`) and a scorer that applies this repository's predicate (`src/score_hornbro.py`).
-  The adapter is written against HornBro's source but has not been run yet; no HornBro result is reported.
+  The first Colab run of the adapter hit a missing dependency of HornBro (`qiskit_aer`) on 48 of 60 circuits and gave no
+  usable result (fixed in the notebook; a rerun is needed); no HornBro result is reported.
   QBugLM and UnitAR: no public code was found.
 * **Not possible here:** running on a real quantum computer (needs an IBM Quantum account;
   `src/run_hardware.py` is ready and was exercised only on the noisy simulator).

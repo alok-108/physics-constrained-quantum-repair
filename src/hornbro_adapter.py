@@ -82,6 +82,12 @@ def main():
     import pandas as pd
     import qiskit.qasm3
 
+    try:                                  # an environment problem must stop the run, not become 60 recorded "failures"
+        import evaluation.efficiencyHornBro  # noqa: F401
+    except ImportError as e:
+        raise SystemExit(f"HornBro cannot be imported in this environment ({type(e).__name__}: {e}). Install the missing "
+                         "package into the HornBro environment (e.g. `uv pip install qiskit-aer`) and run again; nothing was written.")
+
     meta = stratified(pd.read_csv(a.metadata), a.limit)
     root = os.path.abspath(os.path.join(os.path.dirname(a.metadata), ".."))
     os.makedirs(a.out, exist_ok=True)
@@ -91,8 +97,9 @@ def main():
     for m in meta.to_dict("records"):
         cid = m["circuit_id"]
         done = os.path.join(a.out, cid + ".json")
-        if os.path.exists(done):                                   # resumable
-            continue
+        if os.path.exists(done):                                   # resumable; a record that only crashed is run again
+            if json.load(open(done)).get("outcome") in ("returned_circuit", "input_unparsable"):
+                continue
         rec = {"circuit_id": cid, "outcome": None, "hornbro_says_success": None, "seconds": None, "error": None}
         try:
             ref_t = open(os.path.join(root, m["ground_truth_file"]), encoding="utf-8").read()
@@ -107,6 +114,8 @@ def main():
             repaired, own, secs = _hornbro_repair(correct, buggy, "bench_" + cid, correct.num_qubits, work)
             open(os.path.join(a.out, cid + ".qasm"), "w", encoding="utf-8").write(qiskit.qasm3.dumps(repaired))
             rec.update(outcome="returned_circuit", hornbro_says_success=own, seconds=round(secs, 2))
+        except ImportError:
+            raise                                                  # environment problem: stop, do not record a failure
         except Exception as e:                                     # HornBro crashed or does not support the circuit
             rec["outcome"], rec["error"] = "crashed", f"{type(e).__name__}: {str(e)[:200]}"
             rec["trace"] = traceback.format_exc()[-600:]

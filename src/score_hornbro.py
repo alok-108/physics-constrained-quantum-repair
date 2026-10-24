@@ -33,6 +33,8 @@ def score(directory: str, metadata: str, validator=None) -> pd.DataFrame:
         cid = rec["circuit_id"]
         m = meta.loc[cid]
         accepted, stage = 0, rec["outcome"]
+        if rec["outcome"] == "crashed" and str(rec.get("error", "")).startswith(("ModuleNotFoundError", "ImportError")):
+            rec["outcome"] = stage = "environment_error"            # a missing package says nothing about HornBro
         qpath = os.path.join(directory, cid + ".qasm")
         if rec["outcome"] == "returned_circuit" and os.path.exists(qpath):
             ref = open(os.path.join(root, m["ground_truth_file"]), encoding="utf-8").read()
@@ -53,6 +55,10 @@ def main():
     a = ap.parse_args()
     df = score(a.dir, a.metadata)
     df.to_csv(a.out, index=False)
+    env = int((df.outcome == "environment_error").sum())
+    if env:
+        print(f"WARNING: {env} of {len(df)} circuits hit an environment error (missing package), not a HornBro failure. "
+              "Fix the environment and run the adapter again before reading any number below.")
     print(df.groupby("bug_type").pass_at_3.agg(["sum", "count"]).to_string())
     print(f"HornBro accepted {int(df.pass_at_3.sum())} of {len(df)} (shared predicate, one attempt)")
     print(df.outcome.value_counts().to_string())
