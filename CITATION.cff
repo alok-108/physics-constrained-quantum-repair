@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite it as below."
+title: "Physics-Constrained Quantum Circuit Repair: a leakage-free evaluation protocol, benchmarks and a repair agent"
+type: software
+authors:
+  - family-names: "Pandey"
+    given-names: "Alok"
+    alias: "alok-108"
+    affiliation: "Indian Institute of Technology Patna, India"
+repository-code: "https://github.com/alok-108/physics-constrained-quantum-repair"
+url: "https://alok-108.github.io/physics-constrained-quantum-repair/"
+license: MIT
+date-released: "2026-10-24"
+abstract: >-
+  A leakage-free evaluation protocol, a corrected 1000-circuit benchmark, a 600-program benchmark of dynamic
+  circuits, and an oracle-guided repair agent for faulty OpenQASM 3 circuits under superconducting-device
+  constraints. Includes LLM-only and LLM-as-tool-controller arms, a real-bug pilot from Bugs4Q, and the
+  honest limits of each result. The first release of this repository reported invalid numbers (reference
+  leakage); they are kept under legacy_v1/ for audit only.
+keywords:
+  - quantum software engineering
+  - automated program repair
+  - OpenQASM 3
+  - benchmark
+  - Qiskit

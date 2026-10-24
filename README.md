@@ -212,3 +212,10 @@ paper's threats-to-validity section.
 
 `.env.example` documents the optional `OPENAI_API_KEY` for the LLM repair path.
 No reported result uses it.
+
+## License and citation
+
+Code, data and documentation are released under the [MIT License](LICENSE). `data_real/` contains circuits built from the
+buggy and fixed scripts of [Bugs4Q](https://github.com/Z-928/Bugs4Q) (Apache-2.0); see `data_real/README.md`. If you use this
+repository, cite it with [CITATION.cff](CITATION.cff) (GitHub shows a "Cite this repository" button). The first release in
+`legacy_v1/` reports numbers that are not valid and must not be cited.
