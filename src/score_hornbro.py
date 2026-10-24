@@ -20,6 +20,17 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 import pandas as pd
+import qiskit.qasm3
+
+
+def functionally_equivalent(candidate_qasm: str, reference_qasm: str, threshold: float = 0.99) -> bool:
+    """Unitary equivalence only (process fidelity), ignoring device adjacency, depth and minimality. HornBro has no device
+    model, so the strict shared predicate alone would judge it on a criterion it was never built for; both are reported."""
+    from src.sim import process_fidelity
+    try:
+        return bool(process_fidelity(qiskit.qasm3.loads(candidate_qasm), qiskit.qasm3.loads(reference_qasm)) >= threshold)
+    except Exception:
+        return False
 
 
 def score(directory: str, metadata: str, validator=None) -> pd.DataFrame:
@@ -32,7 +43,7 @@ def score(directory: str, metadata: str, validator=None) -> pd.DataFrame:
         rec = json.load(open(path))
         cid = rec["circuit_id"]
         m = meta.loc[cid]
-        accepted, stage = 0, rec["outcome"]
+        accepted, stage, functional = 0, rec["outcome"], 0
         if rec["outcome"] == "crashed" and str(rec.get("error", "")).startswith(("ModuleNotFoundError", "ImportError")):
             rec["outcome"] = stage = "environment_error"            # a missing package says nothing about HornBro
         qpath = os.path.join(directory, cid + ".qasm")
@@ -40,10 +51,12 @@ def score(directory: str, metadata: str, validator=None) -> pd.DataFrame:
             ref = open(os.path.join(root, m["ground_truth_file"]), encoding="utf-8").read()
             v = validator.validate(open(qpath, encoding="utf-8").read(), ref, gt_key=cid)
             accepted, stage = int(v["status"] == "PASS"), (None if v["status"] == "PASS" else v["failed_stage"])
+            functional = int(functionally_equivalent(open(qpath, encoding="utf-8").read(), ref))
         rows.append({"circuit_id": cid, "circuit_type": m["circuit_type"], "num_qubits": int(m["num_qubits"]),
-                     "bug_type": m["bug_type"], "system_name": "hornbro", "pass_at_3": accepted,
+                     "bug_type": m["bug_type"], "system_name": "hornbro", "pass_at_3": accepted, "functionally_equivalent": functional,
                      "outcome": rec["outcome"], "failed_stage": stage,
-                     "hornbro_says_success": rec.get("hornbro_says_success"), "seconds": rec.get("seconds")})
+                     "hornbro_says_success": rec.get("hornbro_says_success"), "seconds": rec.get("seconds"),
+                     "solver_timeout_scale": rec.get("solver_timeout_scale", 1.0)})
     return pd.DataFrame(rows)
 
 
@@ -60,7 +73,9 @@ def main():
         print(f"WARNING: {env} of {len(df)} circuits hit an environment error (missing package), not a HornBro failure. "
               "Fix the environment and run the adapter again before reading any number below.")
     print(df.groupby("bug_type").pass_at_3.agg(["sum", "count"]).to_string())
-    print(f"HornBro accepted {int(df.pass_at_3.sum())} of {len(df)} (shared predicate, one attempt)")
+    print(f"HornBro accepted {int(df.pass_at_3.sum())} of {len(df)} (full shared predicate, one attempt)")
+    print(f"HornBro returned a functionally equivalent circuit (unitary only, no device/minimality) for "
+          f"{int(df.functionally_equivalent.sum())} of {len(df)}")
     print(df.outcome.value_counts().to_string())
     agree = df[df.hornbro_says_success.notna()]
     if len(agree):

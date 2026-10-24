@@ -41,7 +41,7 @@ def stratified(meta, limit, seed=20260915):
     return pd.concat(parts).sort_values("circuit_id").reset_index(drop=True)
 
 
-def _hornbro_repair(correct, buggy, tag, n_qubits, workdir):
+def _hornbro_repair(correct, buggy, tag, n_qubits, workdir, solver_scale=1.0):
     """Call HornBro's repair() and return (qiskit circuit, its own success flag, seconds)."""
     import evaluation.efficiencyHornBro as H                       # noqa: E402  (HornBro checkout on sys.path)
     from hornbro.circuit import Circuit
@@ -54,13 +54,26 @@ def _hornbro_repair(correct, buggy, tag, n_qubits, workdir):
         return original(self)
 
     Circuit.to_json = capture
+    # HornBro's SMT solver gets 0.01 * n^5 milliseconds (about 10 ms for 4 qubits), tuned to the authors' 8-core/32 GB machine.
+    # On slower hardware the solver times out, returns `unknown` with no model and HornBro raises. ``solver_scale`` multiplies
+    # that budget (it only ever gives HornBro MORE time) and is recorded with every result.
+    original_corrector = H.CllifordCorrecter
+
+    def scaled(*args, **kwargs):
+        kwargs["time_out_eff"] = kwargs.get("time_out_eff", 0.01) * solver_scale
+        return original_corrector(*args, **kwargs)
+
+    H.CllifordCorrecter = scaled
     cwd = os.getcwd()
+    for sub in ("constraints", "models"):                          # HornBro writes here and does not create the first one
+        os.makedirs(os.path.join(workdir, "data", sub), exist_ok=True)
     os.chdir(workdir)                                              # repair() writes results/hornbro/... relative to cwd
     t0 = time.time()
     try:
         H.repair(correct, buggy, tag, n_qubits, 1, 0)
     finally:
         Circuit.to_json = original
+        H.CllifordCorrecter = original_corrector
         os.chdir(cwd)
     seconds = time.time() - t0
     metrics_path = os.path.join(workdir, "results", "hornbro", tag, f"{n_qubits}_errors_1", "metrics0.json")
@@ -76,6 +89,8 @@ def main():
     ap.add_argument("--hornbro", default=os.environ.get("HORNBRO_DIR", "HornBro"), help="path to the HornBro checkout")
     ap.add_argument("--limit", type=int, default=60)
     ap.add_argument("--out", default="hornbro_out")
+    ap.add_argument("--solver-timeout-scale", type=float, default=1.0,
+                    help="multiply HornBro's SMT solver time budget (1 = as published); recorded in every result")
     a = ap.parse_args()
 
     sys.path.insert(0, os.path.abspath(a.hornbro))
@@ -100,7 +115,8 @@ def main():
         if os.path.exists(done):                                   # resumable; a record that only crashed is run again
             if json.load(open(done)).get("outcome") in ("returned_circuit", "input_unparsable"):
                 continue
-        rec = {"circuit_id": cid, "outcome": None, "hornbro_says_success": None, "seconds": None, "error": None}
+        rec = {"circuit_id": cid, "outcome": None, "hornbro_says_success": None, "seconds": None, "error": None,
+               "solver_timeout_scale": a.solver_timeout_scale}
         try:
             ref_t = open(os.path.join(root, m["ground_truth_file"]), encoding="utf-8").read()
             bug_t = open(os.path.join(root, m["buggy_file"]), encoding="utf-8").read()
@@ -111,7 +127,8 @@ def main():
                 rec["outcome"], rec["error"] = "input_unparsable", f"faulty program does not parse: {type(e).__name__}"
                 json.dump(rec, open(done, "w"))
                 continue
-            repaired, own, secs = _hornbro_repair(correct, buggy, "bench_" + cid, correct.num_qubits, work)
+            repaired, own, secs = _hornbro_repair(correct, buggy, "bench_" + cid, correct.num_qubits, work,
+                                                  a.solver_timeout_scale)
             open(os.path.join(a.out, cid + ".qasm"), "w", encoding="utf-8").write(qiskit.qasm3.dumps(repaired))
             rec.update(outcome="returned_circuit", hornbro_says_success=own, seconds=round(secs, 2))
         except ImportError:

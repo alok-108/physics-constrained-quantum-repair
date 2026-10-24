@@ -40,3 +40,21 @@ def test_a_missing_package_is_an_environment_error_not_a_hornbro_failure(root, t
     df = score_hornbro.score(str(tmp_path), os.path.join(root, "data", "metadata.csv"), validator).set_index("circuit_id")
     assert df.loc["circuit_0009", "outcome"] == "environment_error"
     assert df.loc["circuit_0013", "outcome"] == "crashed"          # a real crash of HornBro on the circuit stays a failure
+
+
+def test_functional_equivalence_ignores_device_adjacency_but_the_strict_predicate_does_not(tmp_path, validator):
+    """A circuit that is correct as a unitary but uses a non-adjacent CX: strict predicate fails, functional check passes."""
+    import qiskit.qasm3
+    from qiskit import QuantumCircuit
+    ref = QuantumCircuit(3)
+    ref.h(0), ref.cx(0, 1), ref.cx(1, 2)
+    far = QuantumCircuit(3)
+    far.h(0), far.cx(0, 1), far.cx(0, 2), far.cx(0, 1), far.cx(1, 2)          # = H, CX01, CX12 (extra 02 conjugation is identity)
+    far = QuantumCircuit(3)
+    far.h(0), far.cx(0, 1), far.cx(1, 2), far.cx(0, 2), far.cx(0, 2)
+    ref_t, far_t = qiskit.qasm3.dumps(ref), qiskit.qasm3.dumps(far)
+    assert score_hornbro.functionally_equivalent(far_t, ref_t)
+    wrong = QuantumCircuit(3)
+    wrong.h(0), wrong.cx(0, 1)
+    assert not score_hornbro.functionally_equivalent(qiskit.qasm3.dumps(wrong), ref_t)
+    assert not score_hornbro.functionally_equivalent("not qasm", ref_t)
