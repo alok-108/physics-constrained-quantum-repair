@@ -39,6 +39,5 @@ paper/build/
 
 experiments/llm_runs/*.partial.jsonl
 
-experiments/tool_runs/
 experiments/tools/*.partial.jsonl
 train_set/

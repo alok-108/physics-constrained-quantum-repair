@@ -281,7 +281,7 @@ def test_repairer_works_without_langchain_installed():
         assert (m.type, m.content) == ('system', 'x') and repairer.HumanMessage(content='y').type == 'human'
     """)
     root = __import__("os").path.dirname(__import__("os").path.dirname(__file__))
-    r = subprocess.run([sys.executable, "-c", code], cwd=root, capture_output=True, text=True)
+    r = subprocess.run([sys.executable, "-c", code], cwd=root, capture_output=True, text=True, timeout=600)
     assert r.returncode == 0, r.stderr
 
 

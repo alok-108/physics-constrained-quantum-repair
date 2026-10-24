@@ -168,7 +168,8 @@ Pass@3 by fault class (%), 12 circuits per class:
 * Not reported, partial: `gemini-3.8-flash` (18/60 circuits) and `gemini-3.5-flash` (26/60) stopped at the free-tier
   daily quota; `gemma-4-31b-it` and `gemma-4-26b-a4b-it` hit repeated HTTP 500 errors from the service; a local
   `qwen2.5-coder:3b` run (16/60) was stopped because two CPU models on one laptop made no progress. Their partial
-  files are in `experiments/llm_runs/` and resume with `--resume`. Open models on a Colab GPU and one 1000-circuit
+  results are committed as `experiments/llm_runs/gemini-3.5-flash.csv` (53/60) and `gemini-3.8-flash.csv` (18/60), which the
+  analysis labels PARTIAL and keeps out of every table, and resume with `--resume`. Open models on a Colab GPU and one 1000-circuit
   run are planned.
 
 ## 6. Real bugs (pilot, 5 pairs)
@@ -221,6 +222,12 @@ oracle score drops", did nothing: removing a cancelling pair does not change the
   paired risk difference +0.009 [0.0035, 0.0171]); no circuit regressed.
 * By mode: `wrong_qubit` 87.3 % -> 100 %, `remove_gate` 95.9 % -> 98.6 %, `compound` unchanged (93.9 %). Three circuits
   still fail: one 8-qubit QAOA `remove_gate` and two QFT `compound` faults (two simultaneous angle errors).
+* **Why three circuits still fail (a limit, left as it is).** In `circuit_0974` (QFT, two sign errors on controlled-phase gates)
+  the highest-scoring first edit is an analytically solved *rotation insertion* (score 0.64 from 0.33), not the correct
+  angle replacement. A free-parameter edit can fit the four test states better than the true sparse fix, so the greedy
+  search takes it and ends 8,000 queries later at about 0.75. This is overfitting to a four-state suite. A preference for
+  angle replacements over insertions, or a larger suite, would probably fix these circuits, but tuning that on the same
+  1000 circuits would be a third post-hoc change for three circuits, so it was not done.
 * Regression tests: `tests/test_guard.py` (a misplaced rotation is repaired only with the guard; genuine redundancy is
   still cancelled). The original arms and every number in the main tables are unchanged.
 
@@ -283,5 +290,5 @@ Same 60 circuits, three attempts (`paper/tables/tools_rates.csv`, `tools_contras
   redundancy circuits.
 * A first run of this arm was discarded: the policy object kept state between circuits (the greedy policy skipped its
   cancel/route steps after the first circuit and scored 61.7 %). The policy state is now reset per run and tested.
-* Not reported: a local `qwen2.5-coder:1.5b` tool run stopped at 26/60 (CPU-bound, partial files in `experiments/tools/`).
+* Not reported: a local `qwen2.5-coder:1.5b` tool run stopped at 26/60 (CPU-bound; its partial output was only kept locally and is not in the repository).
 
