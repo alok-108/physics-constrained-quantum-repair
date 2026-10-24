@@ -67,5 +67,5 @@ probabilities because population-only checks miss phase faults.
   wiring, which this tool does not model.
 * No HornBro result yet: its code is public and an adapter plus Colab notebook exist, but it has not been run.
   No comparison with UnitAR or QBugLM (no public code found). LLM-only arms (qwen 1.5B, two Gemini "lite"
-  models) are run under the shared predicate on 60 circuits; a model driving verified tools (`llm_tools`) is evaluated on the same 60 circuits and does not beat the no-model
+  models and `gemini-3.5-flash`, 86.7 %) are run under the shared predicate on 60 circuits; a model driving verified tools (`llm_tools`) is evaluated on the same 60 circuits and does not beat the no-model
   baseline (docs/BENCHMARK_V3.md section 9).

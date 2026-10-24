@@ -136,6 +136,7 @@ lowest circuit ids, which are the easiest classes, so partial runs are excluded 
 | `qwen2.5-coder:1.5b` (local CPU) | 11.7 % | 16.7 % | [9.3, 28.0] |
 | `gemini-3.1-flash-lite` | 40.0 % | 43.3 % | [31.6, 55.9] |
 | `gemini-3.5-flash-lite` | 51.7 % | 51.7 % | [39.3, 63.8] |
+| `gemini-3.5-flash` | 75.0 % | **86.7 %** | [75.8, 93.1] |
 | static repairs, no oracle | 60.0 % | 60.0 % | [47.4, 71.4] |
 | Qiskit compiler (O1) | 30.0 % | 30.0 % | [19.9, 42.5] |
 | PyZX | 5.0 % | 5.0 % | [1.7, 13.7] |
@@ -144,33 +145,42 @@ lowest circuit ids, which are the easiest classes, so partial runs are excluded 
 
 Pass@3 by fault class (%), 12 circuits per class:
 
-| class | qwen 1.5B | gemini 3.1 lite | gemini 3.5 lite | static | guided |
-|---|---|---|---|---|---|
-| syntax | 33.3 | 66.7 | 91.7 | 100 | 100 |
-| gate redundancy | 0.0 | 75.0 | 83.3 | 100 | 100 |
-| hardware (physics) | 50.0 | 16.7 | 33.3 | 100 | 100 |
-| structural | 0.0 | 41.7 | 41.7 | 0 | 91.7 |
-| semantic deviation | 0.0 | 16.7 | 8.3 | 0 | 100 |
+| class | qwen 1.5B | gemini 3.1 lite | gemini 3.5 lite | gemini 3.5 flash | static | guided |
+|---|---|---|---|---|---|---|
+| syntax | 33.3 | 66.7 | 91.7 | 100 | 100 | 100 |
+| gate redundancy | 0.0 | 75.0 | 83.3 | 100 | 100 | 100 |
+| hardware (physics) | 50.0 | 16.7 | 33.3 | 83.3 | 100 | 100 |
+| structural | 0.0 | 41.7 | 41.7 | 75.0 | 0 | 91.7 |
+| semantic deviation | 0.0 | 16.7 | 8.3 | 75.0 | 0 | 100 |
 
 * Guided search vs `gemini-3.5-flash-lite`: +0.467 [0.334, 0.589], 28 circuits repaired by guided search only and
   none by the model only (Holm p ~ 5e-8); vs `gemini-3.1-flash-lite`: +0.550 [0.413, 0.667], 33 vs 0. Against
   `qwen2.5-coder:1.5b`: +0.817 [0.686, 0.891], 49 vs 0.
+* **Guided search vs `gemini-3.5-flash`: +0.117 [0.038, 0.221], 7 circuits repaired by guided search only, none by the
+  model only (exact p = 0.016, Holm p = 0.0625).** The larger model comes within 12 points of the oracle-guided search
+  without any oracle query, and with n = 60 that gap is not significant after the Holm correction, and the intervals
+  overlap ([75.8, 93.1] against [91.1, 99.7]).
+* `gemini-3.5-flash` vs the other models: +0.350 [0.224, 0.464] against 3.5-lite (21 vs 0), +0.433 [0.298, 0.546] against
+  3.1-lite (26 vs 0), +0.700 against qwen (all Holm p < 1e-5). A bigger model of the same family is a lot better.
 * Static repairs vs the Gemini models: +0.083 [-0.048, 0.210] (11 vs 6) for 3.5-lite and +0.167 [0.011, 0.310]
-  (17 vs 7) for 3.1-lite; neither survives the Holm correction (p = 0.60, 0.19). Cheap deterministic repairs are
-  not clearly worse than these models, and clearly better only on hardware faults.
-* `gemini-3.5-flash-lite` vs `gemini-3.1-flash-lite`: +0.083 [-0.040, 0.202], not significant. Both Gemini models
+  (17 vs 7) for 3.1-lite; neither survives the Holm correction (p = 0.60, 0.19). Against `gemini-3.5-flash` static repairs
+  are clearly worse: -0.267 [-0.391, -0.133] (2 vs 18, Holm p = 0.002). So cheap deterministic repairs are not clearly worse
+  than the two lite models, but are clearly worse than the larger one.
+* `gemini-3.5-flash-lite` vs `gemini-3.1-flash-lite`: +0.083 [-0.040, 0.202], not significant. Both lite models
   vs qwen: +0.267 and +0.350 (Holm p = 0.021, 1e-4).
-* The Gemini models never failed to produce a parsable circuit (qwen: 26.7 % of circuits). Their failures end at
-  the semantic stage (16 and 17 circuits) and the connectivity stage (16 and 11): they rarely fix angle errors and
-  often miss the hardware adjacency rule.
+* The lite Gemini models never failed to produce a parsable circuit (qwen: 26.7 % of circuits; `gemini-3.5-flash`: 5.0 %,
+  3 circuits). The lite models' failures end at the semantic stage (16 and 17 circuits) and the connectivity stage
+  (16 and 11): they rarely fix angle errors and often miss the hardware adjacency rule. `gemini-3.5-flash` fails at the
+  semantic stage on 7 circuits and at the connectivity stage on 1.
 * Cost per circuit: qwen 2.7 calls, 2,261 tokens, 61 s (CPU); gemini 3.1 lite 2.2 calls, 2,207 tokens, 78 s;
-  gemini 3.5 lite 2.0 calls, 1,650 tokens, 12 s.
-* Not reported, partial: `gemini-3.8-flash` (18/60 circuits) and `gemini-3.5-flash` (26/60) stopped at the free-tier
-  daily quota; `gemma-4-31b-it` and `gemma-4-26b-a4b-it` hit repeated HTTP 500 errors from the service; a local
-  `qwen2.5-coder:3b` run (16/60) was stopped because two CPU models on one laptop made no progress. Their partial
-  results are committed as `experiments/llm_runs/gemini-3.5-flash.csv` (53/60) and `gemini-3.8-flash.csv` (18/60), which the
-  analysis labels PARTIAL and keeps out of every table, and resume with `--resume`. Open models on a Colab GPU and one 1000-circuit
-  run are planned.
+  gemini 3.5 lite 2.0 calls, 1,650 tokens, 12 s; gemini 3.5 flash 1.4 calls, 5,568 tokens, 42 s.
+* `gemini-3.5-flash` was completed over several days (the free tier allows few requests per day) with the resumable
+  runner; model and temperature (0) were the same throughout and API-error circuits were redone, not recorded.
+* Not reported, partial: `gemini-3.8-flash` (18/60 circuits) stopped at the free-tier daily quota and is very slow;
+  `gemma-4-31b-it` and `gemma-4-26b-a4b-it` hit repeated HTTP 500 errors from the service; a local
+  `qwen2.5-coder:3b` run (16/60) was stopped because two CPU models on one laptop made no progress. The Gemini
+  partial result is committed as `experiments/llm_runs/gemini-3.8-flash.csv` and labelled PARTIAL by the analysis, which
+  keeps it out of every table; it resumes with `--resume`. Open models on a Colab GPU and one 1000-circuit run are planned.
 
 ## 6. Real bugs (pilot, 5 pairs)
 
@@ -191,14 +201,14 @@ bugs that people actually wrote and that it fails on two of them (a QFT with a m
 gates; four missing Hadamards).
 
 **What this does and does not show.** The harness hosts language models under the same predicate, attempts and
-feedback, and none of the three models substitutes for oracle-guided search on this benchmark. A larger model
-did better (qwen 1.5B 16.7 %, two Gemini "lite" models 43-52 %), but the gap to guided search stays large
-(+0.47 to +0.55) and the Gemini models solve few semantic-deviation circuits. It does **not** characterise
-language models in general: no frontier-size model has been run (the free API tier stopped the larger Gemini
-runs), n = 60 gives wide intervals (the two Gemini models do not differ significantly), the circuits are
-generated faults, and prompts were not tuned beyond the physical-constraint text already in the repository. A
-first LLM run with a tabu check that rejected a repeated reply was discarded as unfair to the model and rerun
-without it.
+feedback. Model size matters a lot: qwen 1.5B 16.7 %, the two Gemini "lite" models 43-52 %, `gemini-3.5-flash` 86.7 %.
+The three small models do not substitute for oracle-guided search (gaps +0.47 to +0.82, all significant). The larger
+model comes close (+0.117, not significant after Holm correction at n = 60), so on this benchmark an LLM alone gets most
+of the way, and the oracle-guided search is needed for the last points and for a guarantee (it never submits an unverified
+circuit). It does **not** characterise language models in general: no frontier-size model has been run, `gemini-3.8-flash`
+did not finish, n = 60 gives wide intervals, the circuits are generated faults, and prompts were not tuned beyond the
+physical-constraint text already in the repository. A first LLM run with a tabu check that rejected a repeated reply was
+discarded as unfair to the model and rerun without it.
 
 ## 7. Post-hoc: oracle-guarded inverse cancellation (`ours_full_ext_guard`)
 
@@ -281,8 +291,9 @@ Same 60 circuits, three attempts (`paper/tables/tools_rates.csv`, `tools_contras
   and -0.083 [-0.180, -0.012] (0 vs 5, Holm p = 0.13). The model never beat the no-model baseline and was not significantly
   worse; most of the difference is first-attempt errors (Pass@1 72-82 % against 98 %).
 * **Reading.** Correctness comes from the oracle-scored edit suggestions and the verifier, not from the model's knowledge of
-  quantum circuits: the same tools solve 98.3 % with no model at all. A model can *drive* the tools, which lifts it from 43-52 %
-  to 90-95 %, but it adds nothing on top of them. This is not evidence that language models repair circuits. A stronger result
+  quantum circuits: the same tools solve 98.3 % with no model at all. A model can *drive* the tools, which lifts the two lite models from 43-52 %
+  to 90-95 %, but it adds nothing on top of them. The tool arm was run only with those two models; `gemini-3.5-flash`
+  (86.7 % without tools) was not run in it, so for a stronger model the comparison with `tools_greedy` is untested. This is not evidence that language models repair circuits. A stronger result
   would be a model that uses the tools and beats `tools_greedy`; none of the three tried does.
 * Cost per circuit: 5.7 calls and 9.9k tokens (3.1-lite), 7.0 calls and 15.2k tokens (3.5-lite) against about 2 calls and
   1.7-2.2k tokens for the plain arm; 1.1 invalid (non-JSON or unknown-tool) replies per circuit for 3.5-lite, none for 3.1-lite;

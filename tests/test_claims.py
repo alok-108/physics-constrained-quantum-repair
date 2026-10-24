@@ -89,8 +89,16 @@ def test_site_quotes_the_current_llm_numbers(tables, docs):
 
 def test_partial_runs_are_not_in_any_table(root):
     t = pd.read_csv(os.path.join(root, "paper", "tables", "llm_rates.csv"))
-    assert not t.system.str.contains("3.8-flash|gemini-3.5-flash$", regex=True).any()
+    assert not t.system.str.contains("3.8-flash", regex=True).any()      # gemini-3.8-flash is still partial (< 60 circuits)
     assert (t.n == 60).all()
+
+
+def test_every_llm_in_the_table_is_quoted_in_readme_docs_paper_and_site(tables, docs):
+    r = tables["llm_rates.csv"].set_index("system")
+    for name in ("qwen2.5-coder:1.5b", "gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.5-flash"):
+        for where in ("README", "V3", "paper"):
+            assert has(docs[where], r.loc[name, "P@3 (%)"]), (name, where)
+    assert "87%" in docs["site"] and "not significant" in docs["README"]
 
 
 def test_no_secrets_in_tracked_text(root):

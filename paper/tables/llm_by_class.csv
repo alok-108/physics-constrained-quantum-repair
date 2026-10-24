@@ -1,6 +1,6 @@
-bug_type,qwen2.5-coder:1.5b,gemini-3.1-flash-lite,gemini-3.5-flash-lite,guided search + oracle,"static repairs, no oracle"
-gate_redundancy,0.0,75.0,83.3,100.0,100.0
-physics_violation,50.0,16.7,33.3,100.0,100.0
-semantic_deviation,0.0,16.7,8.3,100.0,0.0
-structural,0.0,41.7,41.7,91.7,0.0
-syntax,33.3,66.7,91.7,100.0,100.0
+bug_type,qwen2.5-coder:1.5b,gemini-3.1-flash-lite,gemini-3.5-flash-lite,gemini-3.5-flash,guided search + oracle,"static repairs, no oracle"
+gate_redundancy,0.0,75.0,83.3,100.0,100.0,100.0
+physics_violation,50.0,16.7,33.3,83.3,100.0,100.0
+semantic_deviation,0.0,16.7,8.3,75.0,100.0,0.0
+structural,0.0,41.7,41.7,75.0,91.7,0.0
+syntax,33.3,66.7,91.7,100.0,100.0,100.0

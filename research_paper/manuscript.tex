@@ -54,10 +54,10 @@ state. On 600 programs with measurement, reset, classical control and loops, gui
 fixes $92.3\%$ against $48.5\%$ for random search, and a calibration-based estimate shows that
 the benchmark's identity layout is much looser than a compiler layout (median success
 estimate $0.66$ against $0.89$). As the only repair engine on 60 circuits, a 1.5-billion-parameter local model
-repairs $16.7\%$ and two small Gemini models $43.3\%$ and $51.7\%$, against $98.3\%$ for guided search;
-these are floors, not verdicts on larger models. When the same models drive oracle-scored repair tools
-instead of writing the circuit they reach $90$--$95\%$, but the tools alone, with no model, reach $98.3\%$: the correctness comes from the
-tools. A guard added after reading the benchmark's failures lifts the extended agent from $98.8\%$ to $99.7\%$, a development-set
+repairs $16.7\%$, two small Gemini models $43.3\%$ and $51.7\%$, and a larger one, \texttt{gemini-3.5-flash}, $86.7\%$,
+against $98.3\%$ for guided search; the last gap is not significant after correction ($n=60$), and these are single runs of four
+models, not verdicts on language models. When the two small models drive oracle-scored repair tools
+instead of writing the circuit they reach $90$--$95\%$, but the tools alone, with no model, reach $98.3\%$. A guard added after reading the benchmark's failures lifts the extended agent from $98.8\%$ to $99.7\%$, a development-set
 number. On five real Bugs4Q bugs guided search repairs three.
 No circuit was run on real hardware.
 \end{abstract}
@@ -700,13 +700,13 @@ computer.
 \subsection{Language models as the only repair engine}
 
 The repository carried a language-model path that none of the numbers above used. We ran it
-with three models as the \emph{only} repair engine: no oracle queries, no search and no
+with four models as the \emph{only} repair engine: no oracle queries, no search and no
 heuristic fallback, so a reply that does not parse leaves the circuit unchanged. The models are
-\texttt{qwen2.5-coder:1.5b} (served by Ollama on a laptop CPU) and two models from the free tier
-of the Gemini API (\texttt{gemini-3.1-flash-lite}, \texttt{gemini-3.5-flash-lite}); temperature
+\texttt{qwen2.5-coder:1.5b} (served by Ollama on a laptop CPU) and three models from the free tier
+of the Gemini API (\texttt{gemini-3.1-flash-lite}, \texttt{gemini-3.5-flash-lite}, \texttt{gemini-3.5-flash}); temperature
 is $0$. All get the same three attempts, the same stage-named feedback and the same acceptance
 predicate. A run with an API error is not recorded, so service outages do not count as model
-failures. We used a stratified subset of 60 circuits (three per fault class and circuit family)
+failures. Because the free tier allows few requests per day, the \texttt{gemini-3.5-flash} run was completed over several days with the resumable runner; model and temperature are the same throughout. We used a stratified subset of 60 circuits (three per fault class and circuit family)
 and compare on exactly those circuits (Table~\ref{tab:llm}). Runs that stopped early because
 of the free-tier daily quota or server errors cover only the lowest circuit identifiers, which
 are the easiest classes, and are excluded from every table.
@@ -714,28 +714,36 @@ are the easiest classes, and are excluded from every table.
 \input{../paper/tables/llm_rates.tex}
 
 The local model repairs $16.7\%$ of the circuits within three attempts ($[9.3,28.0]$), the two
-Gemini models $43.3\%$ ($[31.6,55.9]$) and $51.7\%$ ($[39.3,63.8]$). Guided search repairs
-$98.3\%$ of the same circuits; the paired difference is $+0.467$ ($[0.334,0.589]$) against the
-better Gemini model, with 28 circuits repaired by guided search only and none by the model only
-(Holm $p\approx5\times10^{-8}$), and $+0.817$ against the local model. Static repairs without any
-oracle reach $60.0\%$; their advantage over the two Gemini models ($+0.167$ and $+0.083$) is not
-significant after correction, so cheap deterministic repairs are not clearly worse than these
-models, except on hardware faults. The two Gemini models do not differ significantly
-($+0.083$, $[-0.040,0.202]$). By class, the Gemini models repair $67$--$92\%$ of syntax and
-$75$--$83\%$ of gate-redundancy circuits but only $8$--$17\%$ of semantic-deviation circuits
-(guided search: $100\%$) and $17$--$33\%$ of hardware faults; their failures end at the semantic
-stage ($16$ and $17$ circuits) or the connectivity stage ($16$ and $11$). The Gemini models always
-returned a parsable circuit, whereas $26.7\%$ of the local model's circuits never received one. A
-circuit cost $2.0$--$2.7$ calls and $1{,}650$--$2{,}261$ tokens.
+small Gemini models $43.3\%$ ($[31.6,55.9]$) and $51.7\%$ ($[39.3,63.8]$), and the larger
+\texttt{gemini-3.5-flash} $86.7\%$ ($[75.8,93.1]$; $75.0\%$ at the first attempt). Guided search repairs
+$98.3\%$ of the same circuits. The paired difference is $+0.467$ ($[0.334,0.589]$) against the
+better small model, with 28 circuits repaired by guided search only and none by the model only
+(Holm $p\approx5\times10^{-8}$), and $+0.817$ against the local model, but only $+0.117$ ($[0.038,0.221]$)
+against \texttt{gemini-3.5-flash}: 7 circuits repaired by guided search only, none by the model only, exact
+$p=0.016$, Holm $p=0.0625$. With $n=60$ that gap is not significant after correction and the two intervals
+overlap. Static repairs without any oracle reach $60.0\%$; their advantage over the two small Gemini models
+($+0.167$ and $+0.083$) is not significant after correction, but they are clearly worse than
+\texttt{gemini-3.5-flash} ($-0.267$, $[-0.391,-0.133]$; Holm $p=0.002$). The two small Gemini models do not
+differ significantly ($+0.083$, $[-0.040,0.202]$); \texttt{gemini-3.5-flash} is clearly better than both
+($+0.350$ and $+0.433$, with $21$ and $26$ circuits against none; Holm $p<10^{-5}$). By class, the small Gemini
+models repair $67$--$92\%$ of syntax and $75$--$83\%$ of gate-redundancy circuits but only $8$--$17\%$ of
+semantic-deviation circuits and $17$--$33\%$ of hardware faults, whereas \texttt{gemini-3.5-flash} repairs
+$100\%$ of the first two, $75\%$ of semantic-deviation and of structural circuits, and $83\%$ of hardware faults
+(guided search: $100\%$ in every class except structural, $92\%$). The small models' failures end at the
+semantic stage ($16$ and $17$ circuits) or the connectivity stage ($16$ and $11$); those of
+\texttt{gemini-3.5-flash} at the semantic stage ($7$) or the connectivity stage ($1$). The small Gemini models
+always returned a parsable circuit, \texttt{gemini-3.5-flash} did not for $5.0\%$ of the circuits and the local
+model for $26.7\%$. A circuit cost $1.4$--$2.7$ calls, $1{,}650$--$5{,}568$ tokens and $12$--$78$ seconds.
 
-These results are floors, not verdicts on language models. All three models are small; the
-frontier models used in other work report much higher rates with a single
-retry~\cite{pham2026qbuglm} on a different benchmark and protocol; we could not run larger
-Gemini models to completion on the free tier; with 60 circuits and a single run our intervals
-are wide; and we did not tune prompts beyond the physical-constraint text already in the
-repository. What the runs show is that the harness hosts language models under the same
-predicate and budgets and records their token and time cost, and that none of the three
-substitutes for the oracle-guided search here.
+These results are not verdicts on language models. The larger Gemini model repairs most circuits with no oracle at all,
+so on this benchmark an oracle-guided search is not needed to reach a high rate, only for the last points ($86.7\%$ against
+$98.3\%$, a difference that is not significant at $n=60$) and for the guarantee that every submitted circuit has been verified.
+None of the four models is a frontier model; the frontier models used in other work report much higher rates with a single
+retry~\cite{pham2026qbuglm} on a different benchmark and protocol; \texttt{gemini-3.8-flash} did not finish on the free
+tier; with 60 circuits and a single run our intervals are wide; the circuits are generated faults; and we did not tune prompts
+beyond the physical-constraint text already in the repository. What the runs show is that the harness hosts language models
+under the same predicate and budgets and records their token and time cost, that the three small models do not substitute
+for the oracle-guided search here, and that a larger one comes close.
 
 \subsection{A language model as the controller of verified tools}
 
@@ -759,7 +767,8 @@ model's knowledge of circuits: a model can drive the tools, which lifts it far, 
 show that language models repair circuits; a stronger result would be a model that uses the tools and beats the greedy
 baseline, and none of the three models we tried (the two above and a local 1.5-billion-parameter model that did not finish)
 does. A first run of this arm was discarded because the greedy policy kept state between circuits and scored $61.7\%$; the
-state is now reset per run and covered by a test.
+state is now reset per run and covered by a test. The tool arm was run only with the two small Gemini models; the larger
+\texttt{gemini-3.5-flash} ($86.7\%$ without tools) was not run in it, so the comparison with the no-model baseline is untested for a stronger model.
 
 \subsection{A post-hoc change to the agent}
 

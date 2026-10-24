@@ -159,11 +159,13 @@ To compile the paper: `cd research_paper && pdflatex manuscript && bibtex manusc
 * **LLM arms.** `agents/llm.py` talks to a local Ollama server or the Gemini API; an LLM arm uses the
   model as the only repair engine (no oracle, no search), with the same three attempts and stage-named
   feedback. On the same 60 circuits, Pass@3: `qwen2.5-coder:1.5b` **16.7 %** [9.3, 28.0],
-  `gemini-3.1-flash-lite` **43.3 %** [31.6, 55.9], `gemini-3.5-flash-lite` **51.7 %** [39.3, 63.8], against
-  98.3 % for guided search and 60.0 % for static repairs. Both Gemini models are "lite" models, so
-  this is not the ceiling of language models. They repair semantic-deviation circuits only 8-17 % of the time
-  (search: 100 %). Larger models stopped at the free-tier daily quota; partial runs are excluded from every
-  table. See [docs/BENCHMARK_V3.md](docs/BENCHMARK_V3.md).
+  `gemini-3.1-flash-lite` **43.3 %** [31.6, 55.9], `gemini-3.5-flash-lite` **51.7 %** [39.3, 63.8],
+  `gemini-3.5-flash` **86.7 %** [75.8, 93.1], against 98.3 % for guided search and 60.0 % for static repairs.
+  Model size matters a lot. The three small models are far below guided search; the larger one is 12 points below it,
+  a gap that is **not significant** after correction at n = 60 (7 circuits vs 0, Holm p = 0.06). So an LLM alone gets
+  most of the way here, and the oracle-guided search adds the last points and the guarantee that every answer is
+  verified. No frontier-size model was run, and `gemini-3.8-flash` stopped at the free-tier quota; partial runs are
+  excluded from every table. See [docs/BENCHMARK_V3.md](docs/BENCHMARK_V3.md).
 * **A model as the controller of verified tools** (`agents/llm_tools.py`). The model calls tools (localize,
   suggest oracle-scored edits, apply, submit) instead of writing the circuit. Same 60 circuits: the same tools with
   **no model** reach **98.3 %**; driven by `gemini-3.1-flash-lite` 95.0 % (writing the circuit: 43.3 %), by
